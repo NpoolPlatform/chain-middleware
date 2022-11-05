@@ -1,28 +1,27 @@
-module github.com/NpoolPlatform/service-template
+module github.com/NpoolPlatform/chain-middleware
 
 go 1.17
 
 require (
-	entgo.io/ent v0.11.2
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
+	github.com/NpoolPlatform/chain-manager v0.0.0-20221105091351-664437c6769b
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220927113434-7c153f087a8c
-	github.com/NpoolPlatform/libent-cruder v0.0.0-20220621110548-8f3f8049ecc5
-	github.com/NpoolPlatform/message v0.0.0-20220819134247-1dc75c85fe43
+	github.com/NpoolPlatform/message v0.0.0-20221105123411-20cd42741aff
 	github.com/go-resty/resty/v2 v2.7.0
-	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
-	github.com/shopspring/decimal v1.3.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.1
 	github.com/urfave/cli/v2 v2.4.0
 	go.opentelemetry.io/otel v1.8.0
 	go.opentelemetry.io/otel/trace v1.8.0
-	google.golang.org/grpc v1.48.0
+	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.0
 )
 
 require (
 	ariga.io/atlas v0.5.1-0.20220717122844-8593d7eb1a8e // indirect
+	entgo.io/ent v0.11.2 // indirect
+	github.com/NpoolPlatform/libent-cruder v0.0.0-20220621110548-8f3f8049ecc5 // indirect
 	github.com/Shonminh/apollo-client v0.4.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
@@ -44,6 +43,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/hashicorp/consul/api v1.12.0 // indirect
@@ -73,6 +73,7 @@ require (
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect

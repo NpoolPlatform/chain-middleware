@@ -7,9 +7,9 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/app"
 
-	"github.com/NpoolPlatform/service-template/pkg/db"
+	"github.com/NpoolPlatform/chain-manager/pkg/db"
 
-	servicename "github.com/NpoolPlatform/service-template/pkg/servicename"
+	servicename "github.com/NpoolPlatform/chain-middleware/pkg/servicename"
 
 	mysqlconst "github.com/NpoolPlatform/go-service-framework/pkg/mysql/const"
 	rabbitmqconst "github.com/NpoolPlatform/go-service-framework/pkg/rabbitmq/const"

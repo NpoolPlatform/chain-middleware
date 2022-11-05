@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chain-middleware-config
+  namespace: kube-system
+data:
+  service-conf: |
+    config:
+      hostname: "chain-middleware.npool.top"
+      http_port: 50570
+      grpc_port: 50571
+      healthz_port: 50572
+      prometheus_port: 50573
+      appid: "89089012783789789719823798127398"
+      serviceid: "bd09cb7c-5ceb-11ed-a2b0-fb139cea1292"
+      logdir: "./"
+      apolloAccessKey: "0147fb70b815403790e8634b899fac07"

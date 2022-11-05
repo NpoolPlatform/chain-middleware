@@ -3,33 +3,25 @@ package api
 import (
 	"context"
 
-	"github.com/NpoolPlatform/message/npool/servicetmpl"
+	chainmw "github.com/NpoolPlatform/message/npool/chain/mw/v1"
 
-	"github.com/NpoolPlatform/service-template/api/detail"
-	"github.com/NpoolPlatform/service-template/api/general"
+	"github.com/NpoolPlatform/chain-middleware/api/appcoin"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
-	servicetmpl.UnimplementedManagerServer
+	chainmw.UnimplementedMiddlewareServer
 }
 
 func Register(server grpc.ServiceRegistrar) {
-	servicetmpl.RegisterManagerServer(server, &Server{})
-	general.Register(server)
-	detail.Register(server)
+	chainmw.RegisterMiddlewareServer(server, &Server{})
+	appcoin.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
-	if err := servicetmpl.RegisterManagerHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
-		return err
-	}
-	if err := general.RegisterGateway(mux, endpoint, opts); err != nil {
-		return err
-	}
-	if err := detail.RegisterGateway(mux, endpoint, opts); err != nil {
+	if err := chainmw.RegisterMiddlewareHandlerFromEndpoint(context.Background(), mux, endpoint, opts); err != nil {
 		return err
 	}
 	return nil

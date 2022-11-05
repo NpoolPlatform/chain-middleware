@@ -1,3 +1,3 @@
 package servicename
 
-const ServiceName = "Service Template"
+const ServiceName = "Chain Middleware"

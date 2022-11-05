@@ -1,0 +1,5 @@
+resources:
+  - 01-chain-middleware.viper.yaml
+  - 02-chain-middleware.yaml
+  - 03-strip-prefix.yaml
+  - 04-service-monitor.yaml

@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chain-middleware
+  namespace: kube-system
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chain-middleware
+  template:
+    metadata:
+      labels:
+        app: chain-middleware
+    spec:
+      containers:
+        - name: chain-middleware
+          image: uhub.service.ucloud.cn/entropypool/chain-middleware:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: service-config
+              mountPath: /etc/ChainMiddleware
+          env:
+            - name: ENV_ENVIRONMENT_TARGET
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.target
+            - name: ENV_CONSUL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_host
+            - name: ENV_CONSUL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_port
+            - name: ENV_CLUSTER_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      volumes:
+        - name: service-config
+          configMap:
+            name: chain-middleware-config
+            items:
+              - key: service-conf
+                path: ChainMiddleware.viper.yaml
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chain-middleware
+  namespace: kube-system
+spec:
+  ports:
+    - name: http
+      port: 50570
+      targetPort: 50570
+    - name: grpc
+      port: 50571
+      targetPort: 50571
+    - name: healthz
+      port: 50572
+      targetPort: 50572
+    - name: prometheus
+      port: 50573
+      targetPort: 50573
+  selector:
+    app: chain-middleware
