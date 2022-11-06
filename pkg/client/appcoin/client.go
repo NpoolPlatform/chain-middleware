@@ -1,2 +1,1 @@
-//nolint:dupl
 package appcoin

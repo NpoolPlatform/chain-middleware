@@ -6,9 +6,9 @@ package api
 import (
 	"context"
 
+	"github.com/NpoolPlatform/chain-middleware/pkg/version"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool"
-	"github.com/NpoolPlatform/chain-middleware/pkg/version"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"

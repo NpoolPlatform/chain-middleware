@@ -13,17 +13,17 @@ func trace(span trace1.Span, in *npool.CoinReq, index int) trace1.Span {
 	span.SetAttributes(
 		attribute.String(fmt.Sprintf("ID.%v", index), in.GetID()),
 		attribute.String(fmt.Sprintf("AppID.%v", index), in.GetAppID()),
-		attribute.String(fmt.Sprintf("UserID.%v", index), in.GetUserID()),
 		attribute.String(fmt.Sprintf("CoinTypeID.%v", index), in.GetCoinTypeID()),
-		attribute.String(fmt.Sprintf("Incoming.%v", index), in.GetIncoming()),
-		attribute.String(fmt.Sprintf("Locked.%v", index), in.GetLocked()),
-		attribute.String(fmt.Sprintf("Outcoming.%v", index), in.GetOutcoming()),
-		attribute.String(fmt.Sprintf("Spendable.%v", index), in.GetSpendable()),
+		attribute.Bool(fmt.Sprintf("ForPay.%v", index), in.GetForPay()),
+		attribute.String(fmt.Sprintf("WithdrawAutoReviewAmount.%v", index), in.GetWithdrawAutoReviewAmount()),
+		attribute.String(fmt.Sprintf("MarketValue.%v", index), in.GetMarketValue()),
+		attribute.Int(fmt.Sprintf("SettlePercent.%v", index), int(in.GetSettlePercent())),
+		attribute.String(fmt.Sprintf("Setter.%v", index), in.GetSetter()),
 	)
 	return span
 }
 
-func Trace(span trace1.Span, in *npool.GeneralReq) trace1.Span {
+func Trace(span trace1.Span, in *npool.CoinReq) trace1.Span {
 	return trace(span, in, 0)
 }
 
@@ -33,23 +33,15 @@ func TraceConds(span trace1.Span, in *npool.Conds) trace1.Span {
 		attribute.String("ID.Value", in.GetID().GetValue()),
 		attribute.String("AppID.Op", in.GetAppID().GetOp()),
 		attribute.String("AppID.Value", in.GetAppID().GetValue()),
-		attribute.String("UserID.Op", in.GetUserID().GetOp()),
-		attribute.String("UserID.Value", in.GetUserID().GetValue()),
 		attribute.String("CoinTypeID.Op", in.GetCoinTypeID().GetOp()),
 		attribute.String("CoinTypeID.Value", in.GetCoinTypeID().GetValue()),
-		attribute.String("Incoming.Op", in.GetIncoming().GetOp()),
-		attribute.String("Incoming.Value", in.GetIncoming().GetValue()),
-		attribute.String("Locked.Op", in.GetLocked().GetOp()),
-		attribute.String("Locked.Value", in.GetLocked().GetValue()),
-		attribute.String("Outcoming.Op", in.GetOutcoming().GetOp()),
-		attribute.String("Outcoming.Value", in.GetOutcoming().GetValue()),
-		attribute.String("Spendable.Op", in.GetSpendable().GetOp()),
-		attribute.String("Spendable.Value", in.GetSpendable().GetValue()),
+		attribute.String("ForPay.Op", in.GetForPay().GetOp()),
+		attribute.Bool("ForPay.Value", in.GetForPay().GetValue()),
 	)
 	return span
 }
 
-func TraceMany(span trace1.Span, infos []*npool.GeneralReq) trace1.Span {
+func TraceMany(span trace1.Span, infos []*npool.CoinReq) trace1.Span {
 	for index, info := range infos {
 		span = trace(span, info, index)
 	}
