@@ -91,6 +91,12 @@ func (s *Server) GetCoins(
 			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
+	for _, id := range in.GetConds().GetIDs().GetValue() {
+		if _, err := uuid.Parse(id); err != nil {
+			logger.Sugar().Errorw("GetCoins", "IDs", in.GetConds().GetIDs().GetValue(), "error", err)
+			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
 
 	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 

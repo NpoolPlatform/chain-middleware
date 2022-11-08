@@ -1,3 +1,4 @@
+//nolint:dupl
 package coin
 
 import (
@@ -119,6 +120,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 	return infos[0], nil
 }
 
+//nolint:funlen
 func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (infos []*npool.Coin, total uint32, err error) {
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoins")
 	defer span.End()
@@ -132,6 +134,11 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 
 	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 
+	ids := []uuid.UUID{}
+	for _, id := range conds.GetIDs().GetValue() {
+		ids = append(ids, uuid.MustParse(id))
+	}
+
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm, err := basecrud.SetQueryConds(&basemgrpb.Conds{
 			ID:      conds.ID,
@@ -141,6 +148,13 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 		}, cli)
 		if err != nil {
 			return err
+		}
+
+		if len(ids) > 0 {
+			stm = stm.
+				Where(
+					entbase.IDIn(ids...),
+				)
 		}
 
 		stm.

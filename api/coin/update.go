@@ -23,6 +23,7 @@ import (
 	"github.com/google/uuid"
 )
 
+//nolint
 func (s *Server) UpdateCoin(
 	ctx context.Context,
 	in *npool.UpdateCoinRequest,
@@ -120,7 +121,9 @@ func (s *Server) UpdateCoin(
 	}
 	if in.GetInfo().PaymentAccountCollectAmount != nil {
 		if _, err := decimal.NewFromString(in.GetInfo().GetPaymentAccountCollectAmount()); err != nil {
-			logger.Sugar().Errorw("UpdateCoin", "PaymentAccountCollectAmount", in.GetInfo().GetPaymentAccountCollectAmount(), "error", "permission denied")
+			logger.Sugar().Errorw("UpdateCoin",
+				"PaymentAccountCollectAmount", in.GetInfo().GetPaymentAccountCollectAmount(),
+				"error", "permission denied")
 			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("PaymentAccountCollectAmount is invalid: %v", err))
 		}
 	}
