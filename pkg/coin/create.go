@@ -73,11 +73,14 @@ func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 		_, err = settingcrud.CreateSet(
 			tx.Setting.Create(),
 			&settingmgrpb.SettingReq{
-				FeeCoinTypeID:               in.FeeCoinTypeID,
+				CoinTypeID:                  &id,
+				FeeCoinTypeID:               &id,
 				WithdrawFeeByStableUSD:      in.WithdrawFeeByStableUSD,
 				WithdrawFeeAmount:           in.WithdrawFeeAmount,
 				CollectFeeAmount:            in.CollectFeeAmount,
 				HotWalletFeeAmount:          in.HotWalletFeeAmount,
+				LowFeeAmount:                in.LowFeeAmount,
+				HotWalletAccountAmount:      in.HotWalletAccountAmount,
 				PaymentAccountCollectAmount: in.PaymentAccountCollectAmount,
 			},
 		).Save(_ctx)
