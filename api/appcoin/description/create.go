@@ -4,11 +4,15 @@ import (
 	"context"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
+	commonpb "github.com/NpoolPlatform/message/npool"
 	descmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/appcoin/description"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin/description"
 
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+
 	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
 
+	coindescmgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/appcoin/description"
 	coinbasemgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/coin/base"
 
 	description1 "github.com/NpoolPlatform/chain-middleware/pkg/appcoin/description"
@@ -74,6 +78,28 @@ func (s *Server) CreateCoinDescription(
 	if in.GetInfo().GetMessage() == "" {
 		logger.Sugar().Errorw("CreateCoinDescription", "Message", in.GetInfo().GetMessage())
 		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "Message is invalid")
+	}
+	exist, err = coindescmgrcli.ExistCoinDescriptionConds(ctx, &descmgrpb.Conds{
+		AppID: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetInfo().GetAppID(),
+		},
+		CoinTypeID: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetInfo().GetCoinTypeID(),
+		},
+		UsedFor: &commonpb.Int32Val{
+			Op:    cruder.EQ,
+			Value: int32(in.GetInfo().GetUsedFor()),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "error", err)
+		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+	if exist {
+		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "exist", exist)
+		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "CoinDescription exist")
 	}
 
 	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "CreateCoinDescription")
