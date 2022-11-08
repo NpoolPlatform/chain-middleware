@@ -83,6 +83,14 @@ func (s *Server) GetCoins(
 		logger.Sugar().Errorw("GetCoins", "ID", in.GetConds().GetID().GetValue(), "error", err)
 		return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
+	if in.GetConds().ENV != nil {
+		switch in.GetConds().GetENV().GetValue() {
+		case "main", "test":
+		default:
+			logger.Sugar().Errorw("GetCoins", "ENV", in.GetConds().GetENV().GetValue(), "error", err)
+			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
 
 	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 

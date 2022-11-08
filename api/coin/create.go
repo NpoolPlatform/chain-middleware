@@ -1,4 +1,3 @@
-//nolint:nolintlint,dupl
 package coin
 
 import (
@@ -34,7 +33,7 @@ func (s *Server) CreateCoin(
 ) {
 	var err error
 
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateAppCoin")
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateCoin")
 	defer span.End()
 
 	defer func() {

@@ -24,7 +24,6 @@ import (
 
 func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 	var id string
-
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateCoin")
@@ -62,8 +61,9 @@ func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 		_, err = extracrud.CreateSet(
 			tx.CoinExtra.Create(),
 			&extramgrpb.CoinExtraReq{
-				HomePage: in.HomePage,
-				Specs:    in.Specs,
+				CoinTypeID: &id,
+				HomePage:   in.HomePage,
+				Specs:      in.Specs,
 			},
 		).Save(_ctx)
 		if err != nil {
