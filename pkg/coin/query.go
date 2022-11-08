@@ -1,4 +1,3 @@
-//nolint:nolintlint,dupl
 package coin
 
 import (
