@@ -75,26 +75,21 @@ func create(t *testing.T) {
 }
 
 func update(t *testing.T) {
-	/*
-		amount := "123.700000000000000000"
-		logo := uuid.NewString()
+	title := uuid.NewString()
+	message := uuid.NewString()
 
-		ret.Logo = logo
-		ret.WithdrawAutoReviewAmount = amount
-		ret.MarketValue = amount
-		ret.SettleValue = "111.330000000000000000"
+	ret.Title = title
+	ret.Message = message
 
-		req.ID = &ret.ID
-		req.Logo = &logo
-		req.WithdrawAutoReviewAmount = &amount
-		req.MarketValue = &amount
+	req.ID = &ret.ID
+	req.Title = &title
+	req.Message = &message
 
-		info, err := UpdateCoin(context.Background(), req)
-		if assert.Nil(t, err) {
-			ret.UpdatedAt = info.UpdatedAt
-			assert.Equal(t, info, ret)
-		}
-	*/
+	info, err := UpdateCoinDescription(context.Background(), req)
+	if assert.Nil(t, err) {
+		ret.UpdatedAt = info.UpdatedAt
+		assert.Equal(t, info, ret)
+	}
 }
 
 func TestTx(t *testing.T) {
