@@ -5,10 +5,10 @@ go 1.17
 require (
 	entgo.io/ent v0.11.2
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
-	github.com/NpoolPlatform/chain-manager v0.0.0-20221108143630-546cf842f6fe
+	github.com/NpoolPlatform/chain-manager v0.0.0-20221108152213-fd098148d909
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220927113434-7c153f087a8c
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20220621110548-8f3f8049ecc5
-	github.com/NpoolPlatform/message v0.0.0-20221108142401-1d644b6b2cf8
+	github.com/NpoolPlatform/message v0.0.0-20221108151553-cf1b9b197975
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
