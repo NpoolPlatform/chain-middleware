@@ -7,6 +7,8 @@ import (
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
+	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
+
 	basemgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/coin/base"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
@@ -127,6 +129,8 @@ func (s *Server) UpdateCoin(
 			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("PaymentAccountCollectAmount is invalid: %v", err))
 		}
 	}
+
+	span = commontracer.TraceInvoker(span, "coin", "coin", "UpdateCoin")
 
 	info, err := coin1.UpdateCoin(ctx, in.GetInfo())
 	if err != nil {

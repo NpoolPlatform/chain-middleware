@@ -8,6 +8,8 @@ import (
 
 	commonpb "github.com/NpoolPlatform/message/npool"
 
+	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
+
 	coinmgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/coin/base"
 	coinmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/base"
 
@@ -89,6 +91,8 @@ func (s *Server) CreateCoin(
 			Info: info1,
 		}, nil
 	}
+
+	span = commontracer.TraceInvoker(span, "coin", "coin", "CreateCoin")
 
 	info2, err := coin1.CreateCoin(ctx, in.GetInfo())
 	if err != nil {
