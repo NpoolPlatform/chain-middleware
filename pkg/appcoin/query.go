@@ -101,6 +101,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 						sql.As(t3.C(entcoinbase.FieldName), "fee_coin_name"),
 						sql.As(t3.C(entcoinbase.FieldLogo), "fee_coin_logo"),
 						sql.As(t3.C(entcoinbase.FieldUnit), "fee_coin_unit"),
+						sql.As(t3.C(entcoinbase.FieldEnv), "fee_coin_env"),
 					)
 
 				t4 := sql.Table(entcoinbase.Table)
@@ -112,6 +113,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 					).
 					AppendSelect(
 						sql.As(t4.C(entcoinbase.FieldUnit), "unit"),
+						sql.As(t4.C(entcoinbase.FieldEnv), "env"),
 						sql.As(t4.C(entcoinbase.FieldPresale), "presale"),
 						sql.As(t4.C(entcoinbase.FieldReservedAmount), "reserved_amount"),
 					)
