@@ -104,7 +104,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 						sql.As(t3.C(entbase.FieldName), "fee_coin_name"),
 						sql.As(t3.C(entbase.FieldLogo), "fee_coin_logo"),
 						sql.As(t3.C(entbase.FieldUnit), "fee_coin_unit"),
-						sql.As(t3.C(entbase.FieldEnv), "fee_coin_ent"),
+						sql.As(t3.C(entbase.FieldEnv), "fee_coin_env"),
 					)
 			}).
 			Scan(_ctx, &infos)
@@ -209,7 +209,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 						sql.As(t3.C(entbase.FieldName), "fee_coin_name"),
 						sql.As(t3.C(entbase.FieldLogo), "fee_coin_logo"),
 						sql.As(t3.C(entbase.FieldUnit), "fee_coin_unit"),
-						sql.As(t3.C(entbase.FieldEnv), "fee_coin_ent"),
+						sql.As(t3.C(entbase.FieldEnv), "fee_coin_env"),
 					)
 			}).
 			Scan(_ctx, &infos)
