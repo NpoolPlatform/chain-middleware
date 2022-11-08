@@ -25,7 +25,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*npool.CreateCoinResponse, error) {
+func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*npool.CreateCoinResponse, error) { //nolint
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateCoin")
@@ -86,9 +86,23 @@ func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*
 		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	input := in.GetInfo()
+
+	if input.Name == nil {
+		input.Name = &info.Name
+	}
+	if input.GetName() == "" {
+		logger.Sugar().Errorw("CreateCoin", "Name", in.GetInfo().GetName(), "error", "Name is invalid")
+		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, "Name is invalid")
+	}
+
+	if input.Logo == nil {
+		input.Logo = &info.Logo
+	}
+
 	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "CreateCoin")
 
-	info1, err := appcoin1.CreateCoin(ctx, in.GetInfo())
+	info1, err := appcoin1.CreateCoin(ctx, input)
 	if err != nil {
 		logger.Sugar().Errorw("CreateCoin", "error", err)
 		return &npool.CreateCoinResponse{}, status.Error(codes.Internal, err.Error())
