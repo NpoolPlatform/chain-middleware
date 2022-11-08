@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	descmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/appcoin/description"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin/description"
 
 	"entgo.io/ent/dialect/sql"
@@ -61,5 +62,14 @@ func GetCoinDescription(ctx context.Context, id string) (*npool.CoinDescription,
 		return nil, fmt.Errorf("no record")
 	}
 
+	infos = expand(infos)
+
 	return infos[0], nil
+}
+
+func expand(infos []*npool.CoinDescription) []*npool.CoinDescription {
+	for _, info := range infos {
+		info.UsedFor = descmgrpb.UsedFor(descmgrpb.UsedFor_value[info.UsedForStr])
+	}
+	return infos
 }
