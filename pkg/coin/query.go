@@ -92,6 +92,20 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 						sql.As(t2.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
 						sql.As(t2.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
 					)
+
+				t3 := sql.Table(entbase.Table)
+				s.
+					LeftJoin(t3).
+					On(
+						t3.C(entbase.FieldID),
+						t2.C(entsetting.FieldFeeCoinTypeID),
+					).
+					AppendSelect(
+						sql.As(t3.C(entbase.FieldName), "fee_coin_name"),
+						sql.As(t3.C(entbase.FieldLogo), "fee_coin_logo"),
+						sql.As(t3.C(entbase.FieldUnit), "fee_coin_unit"),
+						sql.As(t3.C(entbase.FieldEnv), "fee_coin_ent"),
+					)
 			}).
 			Scan(_ctx, &infos)
 	})
@@ -172,9 +186,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 					On(
 						s.C(entbase.FieldID),
 						t2.C(entsetting.FieldCoinTypeID),
-					)
-
-				s.
+					).
 					AppendSelect(
 						sql.As(t2.C(entsetting.FieldFeeCoinTypeID), "fee_coin_type_id"),
 						sql.As(t2.C(entsetting.FieldWithdrawFeeByStableUsd), "withdraw_fee_by_stable_usd"),
@@ -184,6 +196,20 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 						sql.As(t2.C(entsetting.FieldLowFeeAmount), "low_fee_amount"),
 						sql.As(t2.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
 						sql.As(t2.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
+					)
+
+				t3 := sql.Table(entbase.Table)
+				s.
+					LeftJoin(t3).
+					On(
+						t3.C(entbase.FieldID),
+						t2.C(entsetting.FieldFeeCoinTypeID),
+					).
+					AppendSelect(
+						sql.As(t3.C(entbase.FieldName), "fee_coin_name"),
+						sql.As(t3.C(entbase.FieldLogo), "fee_coin_logo"),
+						sql.As(t3.C(entbase.FieldUnit), "fee_coin_unit"),
+						sql.As(t3.C(entbase.FieldEnv), "fee_coin_ent"),
 					)
 			}).
 			Scan(_ctx, &infos)
