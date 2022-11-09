@@ -114,7 +114,7 @@ func (s *Server) GetCoins(
 
 	infos, total, err := coin1.GetCoins(ctx, conds, in.GetOffset(), limit)
 	if err != nil {
-		logger.Sugar().Errorw("GetCoins", "ID", conds, "error", err)
+		logger.Sugar().Errorw("GetCoins", "Conds", conds, "error", err)
 		return &npool.GetCoinsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 

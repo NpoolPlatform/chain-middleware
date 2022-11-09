@@ -164,7 +164,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 
 		total = uint32(_total)
 
-		stm.
+		return stm.
 			Select(
 				entbase.FieldID,
 				entbase.FieldName,
@@ -176,9 +176,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 				entbase.FieldReservedAmount,
 				entbase.FieldCreatedAt,
 				entbase.FieldUpdatedAt,
-			)
-
-		return stm.
+			).
 			Offset(int(offset)).
 			Limit(int(limit)).
 			Modify(func(s *sql.Selector) {

@@ -115,6 +115,8 @@ func GetCoinDescriptions(ctx context.Context, conds *descmgrpb.Conds, offset, li
 				entcoindesc.FieldCreatedAt,
 				entcoindesc.FieldUpdatedAt,
 			).
+			Offset(int(offset)).
+			Limit(int(limit)).
 			Modify(func(s *sql.Selector) {
 				t1 := sql.Table(entcoinbase.Table)
 				s.
