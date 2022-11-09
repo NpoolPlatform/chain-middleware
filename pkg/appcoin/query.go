@@ -1,3 +1,4 @@
+//nolint:dupl
 package appcoin
 
 import (
@@ -293,9 +294,6 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 	})
 	if err != nil {
 		return nil, 0, err
-	}
-	if len(infos) == 0 {
-		return nil, 0, nil
 	}
 
 	return infos, total, nil

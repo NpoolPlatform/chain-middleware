@@ -82,23 +82,27 @@ func create(t *testing.T) {
 }
 
 func update(t *testing.T) {
-	/*
-		title := uuid.NewString()
-		message := uuid.NewString()
+	state := txmgrpb.TxState_StateTransferring
 
-		ret.Title = title
-		ret.Message = message
+	ret.State = state
 
-		req.ID = &ret.ID
-		req.Title = &title
-		req.Message = &message
+	req.ID = &ret.ID
+	req.State = &state
 
-		info, err := UpdateTx(context.Background(), req)
-		if assert.Nil(t, err) {
-			ret.UpdatedAt = info.UpdatedAt
-			assert.Equal(t, info, ret)
-		}
-	*/
+	_, err := UpdateTx(context.Background(), req)
+	assert.NotNil(t, err)
+
+	state = txmgrpb.TxState_StateWait
+
+	ret.State = state
+	ret.StateStr = state.String()
+	req.State = &state
+
+	info, err := UpdateTx(context.Background(), req)
+	if assert.Nil(t, err) {
+		ret.UpdatedAt = info.UpdatedAt
+		assert.Equal(t, info, ret)
+	}
 }
 
 func TestTx(t *testing.T) {
