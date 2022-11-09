@@ -157,6 +157,13 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 				)
 		}
 
+		_total, err := stm.Count(_ctx)
+		if err != nil {
+			return err
+		}
+
+		total = uint32(_total)
+
 		stm.
 			Select(
 				entbase.FieldID,
@@ -170,13 +177,6 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 				entbase.FieldCreatedAt,
 				entbase.FieldUpdatedAt,
 			)
-
-		_total, err := stm.Count(_ctx)
-		if err != nil {
-			return err
-		}
-
-		total = uint32(_total)
 
 		return stm.
 			Offset(int(offset)).

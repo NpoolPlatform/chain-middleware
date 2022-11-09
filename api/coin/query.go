@@ -79,21 +79,28 @@ func (s *Server) GetCoins(
 		}
 	}()
 
-	if _, err := uuid.Parse(in.GetConds().GetID().GetValue()); err != nil {
-		logger.Sugar().Errorw("GetCoins", "ID", in.GetConds().GetID().GetValue(), "error", err)
-		return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	conds := in.GetConds()
+	if conds == nil {
+		conds = &npool.Conds{}
 	}
-	if in.GetConds().ENV != nil {
-		switch in.GetConds().GetENV().GetValue() {
-		case "main", "test":
-		default:
-			logger.Sugar().Errorw("GetCoins", "ENV", in.GetConds().GetENV().GetValue(), "error", err)
+
+	if conds.ID != nil {
+		if _, err := uuid.Parse(conds.GetID().GetValue()); err != nil {
+			logger.Sugar().Errorw("GetCoins", "ID", conds.GetID().GetValue(), "error", err)
 			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
-	for _, id := range in.GetConds().GetIDs().GetValue() {
+	if conds.ENV != nil {
+		switch conds.GetENV().GetValue() {
+		case "main", "test":
+		default:
+			logger.Sugar().Errorw("GetCoins", "ENV", conds.GetENV().GetValue(), "error", err)
+			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	for _, id := range conds.GetIDs().GetValue() {
 		if _, err := uuid.Parse(id); err != nil {
-			logger.Sugar().Errorw("GetCoins", "IDs", in.GetConds().GetIDs().GetValue(), "error", err)
+			logger.Sugar().Errorw("GetCoins", "IDs", conds.GetIDs().GetValue(), "error", err)
 			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
@@ -105,9 +112,9 @@ func (s *Server) GetCoins(
 		limit = constant1.DefaultRowLimit
 	}
 
-	infos, total, err := coin1.GetCoins(ctx, in.GetConds(), in.GetOffset(), limit)
+	infos, total, err := coin1.GetCoins(ctx, conds, in.GetOffset(), limit)
 	if err != nil {
-		logger.Sugar().Errorw("GetCoins", "ID", in.GetConds(), "error", err)
+		logger.Sugar().Errorw("GetCoins", "ID", conds, "error", err)
 		return &npool.GetCoinsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
