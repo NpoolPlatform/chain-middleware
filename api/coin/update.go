@@ -25,7 +25,95 @@ import (
 	"github.com/google/uuid"
 )
 
-//nolint
+func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error { //nolint
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorw("UpdateCoin", "ID", in.GetID(), "error", err)
+		return err
+	}
+	if in.Name != nil {
+		logger.Sugar().Errorw("UpdateCoin", "Name", in.GetName(), "error", "permission denied")
+		return fmt.Errorf("permission denied")
+	}
+	if in.Unit != nil {
+		logger.Sugar().Errorw("UpdateCoin", "Unit", in.GetUnit(), "error", "permission denied")
+		return fmt.Errorf("permission denied")
+	}
+	if in.ENV != nil {
+		logger.Sugar().Errorw("UpdateCoin", "ENV", in.GetENV(), "error", "permission denied")
+		return fmt.Errorf("permission denied")
+	}
+	if in.Logo != nil && in.GetLogo() == "" {
+		logger.Sugar().Errorw("UpdateCoin", "Logo", in.GetLogo(), "error", "permission denied")
+		return fmt.Errorf("permission denied")
+	}
+	if in.ReservedAmount != nil {
+		if _, err := decimal.NewFromString(in.GetReservedAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin", "ReservedAmount", in.GetReservedAmount(), "error", err)
+			return err
+		}
+	}
+	if in.HomePage != nil && in.GetHomePage() == "" {
+		logger.Sugar().Errorw("UpdateCoin", "HomePage", in.GetHomePage(), "error", "permission denied")
+		return fmt.Errorf("permission denied")
+	}
+	if in.Specs != nil && in.GetSpecs() == "" {
+		logger.Sugar().Errorw("UpdateCoin", "Specs", in.GetSpecs(), "error", "permission denied")
+		return fmt.Errorf("permission denied")
+	}
+	if in.FeeCoinTypeID != nil {
+		exist, err := basemgrcli.ExistCoinBase(ctx, in.GetFeeCoinTypeID())
+		if err != nil {
+			logger.Sugar().Errorw("UpdateCoin", "FeeCoinTypeID", in.GetFeeCoinTypeID(), "error", err)
+			return err
+		}
+		if !exist {
+			logger.Sugar().Errorw("UpdateCoin", "FeeCoinTypeID", in.GetFeeCoinTypeID(), "error", "not exist")
+			return fmt.Errorf("FeeCoinTypeID not exist")
+		}
+	}
+	if in.WithdrawFeeAmount != nil {
+		withdrawFeeAmount, err := decimal.NewFromString(in.GetWithdrawFeeAmount())
+		if err != nil || withdrawFeeAmount.Cmp(decimal.NewFromInt(0)) <= 0 {
+			logger.Sugar().Errorw("UpdateCoin", "WithdrawFeeAmount", in.GetWithdrawFeeAmount(), "error", err)
+			return fmt.Errorf("WithdrawFeeAmount is invalid: %v", err)
+		}
+	}
+	if in.CollectFeeAmount != nil {
+		if _, err := decimal.NewFromString(in.GetCollectFeeAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin", "CollectFeeAmount", in.GetCollectFeeAmount(), "error", "permission denied")
+			return fmt.Errorf("CollectFeeAmount is invalid: %v", err)
+		}
+	}
+	if in.HotWalletFeeAmount != nil {
+		if _, err := decimal.NewFromString(in.GetHotWalletFeeAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin", "HotWalletFeeAmount", in.GetHotWalletFeeAmount(), "error", "permission denied")
+			return fmt.Errorf("HotWalletFeeAmount is invalid: %v", err)
+		}
+	}
+	if in.LowFeeAmount != nil {
+		if _, err := decimal.NewFromString(in.GetLowFeeAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin", "LowFeeAmount", in.GetLowFeeAmount(), "error", "permission denied")
+			return fmt.Errorf("LowFeeAmount is invalid: %v", err)
+		}
+	}
+	if in.HotWalletAccountAmount != nil {
+		if _, err := decimal.NewFromString(in.GetHotWalletAccountAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin", "HotWalletAccountAmount", in.GetHotWalletAccountAmount(), "error", "permission denied")
+			return err
+		}
+	}
+	if in.PaymentAccountCollectAmount != nil {
+		if _, err := decimal.NewFromString(in.GetPaymentAccountCollectAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin",
+				"PaymentAccountCollectAmount", in.GetPaymentAccountCollectAmount(),
+				"error", "permission denied")
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (s *Server) UpdateCoin(
 	ctx context.Context,
 	in *npool.UpdateCoinRequest,
@@ -45,89 +133,8 @@ func (s *Server) UpdateCoin(
 		}
 	}()
 
-	if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-		logger.Sugar().Errorw("UpdateCoin", "ID", in.GetInfo().GetID(), "error", err)
+	if err := ValidateUpdate(ctx, in.GetInfo()); err != nil {
 		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().Name != nil {
-		logger.Sugar().Errorw("UpdateCoin", "Name", in.GetInfo().GetName(), "error", "permission denied")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().Unit != nil {
-		logger.Sugar().Errorw("UpdateCoin", "Unit", in.GetInfo().GetUnit(), "error", "permission denied")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().ENV != nil {
-		logger.Sugar().Errorw("UpdateCoin", "ENV", in.GetInfo().GetENV(), "error", "permission denied")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().Logo != nil && in.GetInfo().GetLogo() == "" {
-		logger.Sugar().Errorw("UpdateCoin", "Logo", in.GetInfo().GetLogo(), "error", "permission denied")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().ReservedAmount != nil {
-		if _, err := decimal.NewFromString(in.GetInfo().GetReservedAmount()); err != nil {
-			logger.Sugar().Errorw("UpdateCoin", "ReservedAmount", in.GetInfo().GetReservedAmount(), "error", "permission denied")
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if in.GetInfo().HomePage != nil && in.GetInfo().GetHomePage() == "" {
-		logger.Sugar().Errorw("UpdateCoin", "HomePage", in.GetInfo().GetHomePage(), "error", "permission denied")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().Specs != nil && in.GetInfo().GetSpecs() == "" {
-		logger.Sugar().Errorw("UpdateCoin", "Specs", in.GetInfo().GetSpecs(), "error", "permission denied")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().FeeCoinTypeID != nil {
-		exist, err := basemgrcli.ExistCoinBase(ctx, in.GetInfo().GetFeeCoinTypeID())
-		if err != nil {
-			logger.Sugar().Errorw("UpdateCoin", "FeeCoinTypeID", in.GetInfo().GetFeeCoinTypeID(), "error", err)
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-		if !exist {
-			logger.Sugar().Errorw("UpdateCoin", "FeeCoinTypeID", in.GetInfo().GetFeeCoinTypeID(), "error", "not exist")
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, "FeeCoinTypeID not exist")
-		}
-	}
-	if in.GetInfo().WithdrawFeeAmount != nil {
-		withdrawFeeAmount, err := decimal.NewFromString(in.GetInfo().GetWithdrawFeeAmount())
-		if err != nil || withdrawFeeAmount.Cmp(decimal.NewFromInt(0)) <= 0 {
-			logger.Sugar().Errorw("UpdateCoin", "WithdrawFeeAmount", in.GetInfo().GetWithdrawFeeAmount(), "error", err)
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("WithdrawFeeAmount is invalid: %v", err))
-		}
-	}
-	if in.GetInfo().CollectFeeAmount != nil {
-		if _, err := decimal.NewFromString(in.GetInfo().GetCollectFeeAmount()); err != nil {
-			logger.Sugar().Errorw("UpdateCoin", "CollectFeeAmount", in.GetInfo().GetCollectFeeAmount(), "error", "permission denied")
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("CollectFeeAmount is invalid: %v", err))
-		}
-	}
-	if in.GetInfo().HotWalletFeeAmount != nil {
-		if _, err := decimal.NewFromString(in.GetInfo().GetHotWalletFeeAmount()); err != nil {
-			logger.Sugar().Errorw("UpdateCoin", "HotWalletFeeAmount", in.GetInfo().GetHotWalletFeeAmount(), "error", "permission denied")
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("HotWalletFeeAmount is invalid: %v", err))
-		}
-	}
-	if in.GetInfo().LowFeeAmount != nil {
-		if _, err := decimal.NewFromString(in.GetInfo().GetLowFeeAmount()); err != nil {
-			logger.Sugar().Errorw("UpdateCoin", "LowFeeAmount", in.GetInfo().GetLowFeeAmount(), "error", "permission denied")
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("LowFeeAmount is invalid: %v", err))
-		}
-	}
-	if in.GetInfo().HotWalletAccountAmount != nil {
-		if _, err := decimal.NewFromString(in.GetInfo().GetHotWalletAccountAmount()); err != nil {
-			logger.Sugar().Errorw("UpdateCoin", "HotWalletAccountAmount", in.GetInfo().GetHotWalletAccountAmount(), "error", "permission denied")
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("HotWalletAccountAmount is invalid: %v", err))
-		}
-	}
-	if in.GetInfo().PaymentAccountCollectAmount != nil {
-		if _, err := decimal.NewFromString(in.GetInfo().GetPaymentAccountCollectAmount()); err != nil {
-			logger.Sugar().Errorw("UpdateCoin",
-				"PaymentAccountCollectAmount", in.GetInfo().GetPaymentAccountCollectAmount(),
-				"error", "permission denied")
-			return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, fmt.Sprintf("PaymentAccountCollectAmount is invalid: %v", err))
-		}
 	}
 
 	span = commontracer.TraceInvoker(span, "coin", "coin", "UpdateCoin")

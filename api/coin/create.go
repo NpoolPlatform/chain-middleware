@@ -2,6 +2,7 @@ package coin
 
 import (
 	"context"
+	"fmt"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
@@ -26,6 +27,32 @@ import (
 	"github.com/google/uuid"
 )
 
+func ValidateCreate(in *npool.CoinReq) error {
+	if in.ID != nil {
+		if _, err := uuid.Parse(in.GetID()); err != nil {
+			logger.Sugar().Errorw("CreateCoin", "ID", in.GetID(), "error", err)
+			return err
+		}
+	}
+	if in.GetName() == "" {
+		logger.Sugar().Errorw("CreateCoin", "Name", in.GetName())
+		return fmt.Errorf("name is invalid")
+	}
+	if in.GetUnit() == "" {
+		logger.Sugar().Errorw("CreateCoin", "Unit", in.GetUnit())
+		return fmt.Errorf("unit is invalid")
+	}
+	switch in.GetENV() {
+	case "main":
+	case "test":
+	default:
+		logger.Sugar().Errorw("CreateCoin", "ENV", in.GetENV())
+		return fmt.Errorf("env is invalid")
+	}
+
+	return nil
+}
+
 func (s *Server) CreateCoin(
 	ctx context.Context,
 	in *npool.CreateCoinRequest,
@@ -45,26 +72,8 @@ func (s *Server) CreateCoin(
 		}
 	}()
 
-	if in.GetInfo().ID != nil {
-		if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-			logger.Sugar().Errorw("CreateCoin", "ID", in.GetInfo().GetID(), "error", err)
-			return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if in.GetInfo().GetName() == "" {
-		logger.Sugar().Errorw("CreateCoin", "Name", in.GetInfo().GetName())
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, "Name is invalid")
-	}
-	if in.GetInfo().GetUnit() == "" {
-		logger.Sugar().Errorw("CreateCoin", "Unit", in.GetInfo().GetUnit())
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, "Unit is invalid")
-	}
-	switch in.GetInfo().GetENV() {
-	case "main":
-	case "test":
-	default:
-		logger.Sugar().Errorw("CreateCoin", "ENV", in.GetInfo().GetENV())
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, "ENV is invalid")
+	if err := ValidateCreate(in.GetInfo()); err != nil {
+		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	info, err := coinmgrcli.GetCoinBaseOnly(ctx, &coinmgrpb.Conds{
