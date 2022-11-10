@@ -64,7 +64,9 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 	return info.(*npool.Coin), nil
 }
 
-func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Coin, error) {
+func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Coin, uint32, error) {
+	var total uint32
+
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetCoins(ctx, &npool.GetCoinsRequest{
 			Conds:  conds,
@@ -74,12 +76,15 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 		if err != nil {
 			return nil, err
 		}
+
+		total = resp.Total
+
 		return resp.Infos, nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return infos.([]*npool.Coin), nil
+	return infos.([]*npool.Coin), total, nil
 }
 
 func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
