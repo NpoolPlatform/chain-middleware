@@ -2,8 +2,10 @@ package description
 
 import (
 	"context"
+	"fmt"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
+	descmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/appcoin/description"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin/description"
 
 	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
@@ -19,6 +21,22 @@ import (
 
 	"github.com/google/uuid"
 )
+
+func ValidateUpdate(in *descmgrpb.CoinDescriptionReq) error {
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorw("UpdateCoinDescription", "ID", in.GetID(), "error", err)
+		return err
+	}
+	if in.GetTitle() == "" {
+		logger.Sugar().Errorw("UpdateCoinDescription", "Title", in.GetTitle())
+		return fmt.Errorf("title is invalid")
+	}
+	if in.GetMessage() == "" {
+		logger.Sugar().Errorw("UpdateCoinDescription", "Message", in.GetMessage())
+		return fmt.Errorf("message is invalid")
+	}
+	return nil
+}
 
 func (s *Server) UpdateCoinDescription(
 	ctx context.Context,
@@ -39,17 +57,8 @@ func (s *Server) UpdateCoinDescription(
 		}
 	}()
 
-	if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-		logger.Sugar().Errorw("UpdateCoinDescription", "ID", in.GetInfo().GetID(), "error", err)
+	if err := ValidateUpdate(in.GetInfo()); err != nil {
 		return &npool.UpdateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().GetTitle() == "" {
-		logger.Sugar().Errorw("UpdateCoinDescription", "Title", in.GetInfo().GetTitle())
-		return &npool.UpdateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "Title is invalid")
-	}
-	if in.GetInfo().GetMessage() == "" {
-		logger.Sugar().Errorw("UpdateCoinDescription", "Message", in.GetInfo().GetMessage())
-		return &npool.UpdateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "Message is invalid")
 	}
 
 	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "UpdateCoinDescription")

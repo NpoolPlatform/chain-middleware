@@ -2,6 +2,7 @@ package description
 
 import (
 	"context"
+	"fmt"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 	commonpb "github.com/NpoolPlatform/message/npool"
@@ -27,6 +28,66 @@ import (
 	"github.com/google/uuid"
 )
 
+func ValidateCreate(ctx context.Context, in *descmgrpb.CoinDescriptionReq) error {
+	if in.ID != nil {
+		if _, err := uuid.Parse(in.GetID()); err != nil {
+			logger.Sugar().Errorw("CreateCoinDescription", "ID", in.GetID(), "error", err)
+			return err
+		}
+	}
+	if _, err := uuid.Parse(in.GetAppID()); err != nil {
+		logger.Sugar().Errorw("CreateCoinDescription", "AppID", in.GetAppID(), "error", err)
+		return err
+	}
+	exist, err := coinbasemgrcli.ExistCoinBase(ctx, in.GetCoinTypeID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetCoinTypeID(), "error", err)
+		return err
+	}
+	if !exist {
+		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetCoinTypeID(), "exist", exist)
+		return fmt.Errorf("cointypeid not exist")
+	}
+	switch in.GetUsedFor() {
+	case descmgrpb.UsedFor_ProductPage:
+	default:
+		logger.Sugar().Errorw("CreateCoinDescription", "UsedFor", in.GetUsedFor())
+		return fmt.Errorf("usedfor is invalid")
+	}
+	if in.GetTitle() == "" {
+		logger.Sugar().Errorw("CreateCoinDescription", "Title", in.GetTitle())
+		return fmt.Errorf("title is invalid")
+	}
+	if in.GetMessage() == "" {
+		logger.Sugar().Errorw("CreateCoinDescription", "Message", in.GetMessage())
+		return fmt.Errorf("message is invalid")
+	}
+	exist, err = coindescmgrcli.ExistCoinDescriptionConds(ctx, &descmgrpb.Conds{
+		AppID: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		CoinTypeID: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetCoinTypeID(),
+		},
+		UsedFor: &commonpb.Int32Val{
+			Op:    cruder.EQ,
+			Value: int32(in.GetUsedFor()),
+		},
+	})
+	if err != nil {
+		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetCoinTypeID(), "error", err)
+		return err
+	}
+	if exist {
+		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetCoinTypeID(), "exist", exist)
+		return fmt.Errorf("coindescription exist")
+	}
+
+	return nil
+}
+
 func (s *Server) CreateCoinDescription(
 	ctx context.Context,
 	in *npool.CreateCoinDescriptionRequest,
@@ -46,60 +107,8 @@ func (s *Server) CreateCoinDescription(
 		}
 	}()
 
-	if in.GetInfo().ID != nil {
-		if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-			logger.Sugar().Errorw("CreateCoinDescription", "ID", in.GetInfo().GetID(), "error", err)
-			return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if _, err := uuid.Parse(in.GetInfo().GetAppID()); err != nil {
-		logger.Sugar().Errorw("CreateCoinDescription", "AppID", in.GetInfo().GetAppID(), "error", err)
+	if err := ValidateCreate(ctx, in.GetInfo()); err != nil {
 		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	exist, err := coinbasemgrcli.ExistCoinBase(ctx, in.GetInfo().GetCoinTypeID())
-	if err != nil {
-		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "error", err)
-		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if !exist {
-		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "exist", exist)
-		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "CoinTypeID not exist")
-	}
-	switch in.GetInfo().GetUsedFor() {
-	case descmgrpb.UsedFor_ProductPage:
-	default:
-		logger.Sugar().Errorw("CreateCoinDescription", "UsedFor", in.GetInfo().GetUsedFor())
-		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "UsedFor is invalid")
-	}
-	if in.GetInfo().GetTitle() == "" {
-		logger.Sugar().Errorw("CreateCoinDescription", "Title", in.GetInfo().GetTitle())
-		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "Title is invalid")
-	}
-	if in.GetInfo().GetMessage() == "" {
-		logger.Sugar().Errorw("CreateCoinDescription", "Message", in.GetInfo().GetMessage())
-		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "Message is invalid")
-	}
-	exist, err = coindescmgrcli.ExistCoinDescriptionConds(ctx, &descmgrpb.Conds{
-		AppID: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetInfo().GetAppID(),
-		},
-		CoinTypeID: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: in.GetInfo().GetCoinTypeID(),
-		},
-		UsedFor: &commonpb.Int32Val{
-			Op:    cruder.EQ,
-			Value: int32(in.GetInfo().GetUsedFor()),
-		},
-	})
-	if err != nil {
-		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "error", err)
-		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if exist {
-		logger.Sugar().Errorw("CreateCoinDescription", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "exist", exist)
-		return &npool.CreateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, "CoinDescription exist")
 	}
 
 	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "CreateCoinDescription")
