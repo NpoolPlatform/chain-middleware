@@ -3,6 +3,7 @@ package appcoin
 
 import (
 	"context"
+	"fmt"
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 
@@ -139,7 +140,10 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 		return nil, err
 	}
 	if len(infos) == 0 {
-		return nil, nil
+		return nil, fmt.Errorf("no record")
+	}
+	if len(infos) > 1 {
+		return nil, fmt.Errorf("too many records")
 	}
 
 	return infos[0], nil

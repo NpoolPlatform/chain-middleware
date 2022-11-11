@@ -142,6 +142,16 @@ func getCoins(t *testing.T) {
 	}
 }
 
+func deleteCoin(t *testing.T) {
+	info, err := DeleteCoin(context.Background(), ret.ID)
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, ret)
+	}
+
+	_, err = GetCoin(context.Background(), ret.ID)
+	assert.NotNil(t, err)
+}
+
 func TestClient(t *testing.T) {
 	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
 		return
@@ -158,4 +168,5 @@ func TestClient(t *testing.T) {
 	t.Run("updateCoin", updateCoin)
 	t.Run("getCoin", getCoin)
 	t.Run("getCoins", getCoins)
+	t.Run("deleteCoin", deleteCoin)
 }
