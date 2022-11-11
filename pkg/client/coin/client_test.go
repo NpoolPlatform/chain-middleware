@@ -16,8 +16,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	commonpb "github.com/NpoolPlatform/message/npool"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	"github.com/stretchr/testify/assert"
+
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"
 )
@@ -110,6 +113,27 @@ func updateCoin(t *testing.T) {
 	}
 }
 
+func getCoin(t *testing.T) {
+	info, err := GetCoin(context.Background(), ret.ID)
+	if assert.Nil(t, err) {
+		assert.Equal(t, info, ret)
+	}
+}
+
+func getCoins(t *testing.T) {
+	infos, total, err := GetCoins(context.Background(), &npool.Conds{
+		ID: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: ret.ID,
+		},
+	}, 0, 1)
+	if assert.Nil(t, err) {
+		assert.Equal(t, len(infos), 1)
+		assert.Equal(t, total, uint32(1))
+		assert.Equal(t, infos[0], ret)
+	}
+}
+
 func TestClient(t *testing.T) {
 	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction { //nolint
 		return
@@ -124,8 +148,6 @@ func TestClient(t *testing.T) {
 
 	t.Run("createCoin", createCoin)
 	t.Run("updateCoin", updateCoin)
-	/*
-		t.Run("getCoin", getCoin)
-		t.Run("getCoins", getCoins)
-	*/
+	t.Run("getCoin", getCoin)
+	t.Run("getCoins", getCoins)
 }
