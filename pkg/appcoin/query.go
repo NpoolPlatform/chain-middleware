@@ -130,6 +130,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 						sql.As(t5.C(entappexrate.FieldMarketValue), "market_value"),
 						sql.As(t5.C(entappexrate.FieldSettleValue), "settle_value"),
 						sql.As(t5.C(entappexrate.FieldSettlePercent), "settle_percent"),
+						sql.As(t5.C(entappexrate.FieldSetter), "setter"),
 					)
 			}).
 			Scan(_ctx, &infos)
@@ -288,6 +289,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 						sql.As(t5.C(entappexrate.FieldMarketValue), "market_value"),
 						sql.As(t5.C(entappexrate.FieldSettleValue), "settle_value"),
 						sql.As(t5.C(entappexrate.FieldSettlePercent), "settle_percent"),
+						sql.As(t5.C(entappexrate.FieldSetter), "setter"),
 					)
 			}).
 			Scan(_ctx, &infos)

@@ -60,6 +60,7 @@ var ret = &npool.Coin{
 	MarketValue:                 "0.000000000000000000",
 	SettleValue:                 "0.000000000000000000",
 	SettlePercent:               90,
+	Setter:                      uuid.NewString(),
 }
 
 var req = &npool.CoinReq{
@@ -68,6 +69,7 @@ var req = &npool.CoinReq{
 	Logo:          &ret.Logo,
 	ForPay:        &ret.ForPay,
 	SettlePercent: &ret.SettlePercent,
+	Setter:        &ret.Setter,
 }
 
 func create(t *testing.T) {

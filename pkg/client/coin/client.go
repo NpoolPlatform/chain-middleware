@@ -2,7 +2,6 @@ package coin
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
@@ -99,7 +98,6 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 		return resp.Info, nil
 	})
 	if err != nil {
-		fmt.Printf("---- %v\n", err)
 		return nil, err
 	}
 	return info.(*npool.Coin), nil
