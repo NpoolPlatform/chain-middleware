@@ -63,9 +63,11 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 		logger.Sugar().Errorw("CreateCoin", "SettlePercent", in.GetSettlePercent(), "error", "SettlePercent is invalid")
 		return nil, fmt.Errorf("settlepercent is invalid")
 	}
-	if _, err := uuid.Parse(in.GetSetter()); err != nil {
-		logger.Sugar().Errorw("CreateCoin", "Setter", in.GetSetter(), "error", err)
-		return nil, err
+	if in.Setter != nil {
+		if _, err := uuid.Parse(in.GetSetter()); err != nil {
+			logger.Sugar().Errorw("CreateCoin", "Setter", in.GetSetter(), "error", err)
+			return nil, err
+		}
 	}
 
 	if in.Name == nil {
