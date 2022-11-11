@@ -90,6 +90,12 @@ func (s *Server) GetCoins(
 			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
+	if conds.AppID != nil {
+		if _, err := uuid.Parse(conds.GetAppID().GetValue()); err != nil {
+			logger.Sugar().Errorw("GetCoins", "AppID", conds.GetAppID().GetValue(), "error", err)
+			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
 	if conds.CoinTypeID != nil {
 		if _, err := uuid.Parse(conds.GetCoinTypeID().GetValue()); err != nil {
 			logger.Sugar().Errorw("GetCoins", "CoinTypeID", conds.GetCoinTypeID().GetValue(), "error", err)
