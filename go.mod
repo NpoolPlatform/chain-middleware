@@ -3,6 +3,7 @@ module github.com/NpoolPlatform/chain-middleware
 go 1.17
 
 require (
+	bou.ke/monkey v1.0.2
 	entgo.io/ent v0.11.2
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
 	github.com/NpoolPlatform/chain-manager v0.0.0-20221108152213-fd098148d909
