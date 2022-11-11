@@ -99,14 +99,14 @@ func updateCoin(t *testing.T) {
 	req.HotWalletAccountAmount = &amount
 	req.PaymentAccountCollectAmount = &amount
 
-	info, err := UpdateCoin(context.Background(), req)
+	_, err := UpdateCoin(context.Background(), req)
 	assert.NotNil(t, err)
 
 	req.Name = nil
 	req.Unit = nil
 	req.ENV = nil
 
-	info, err = UpdateCoin(context.Background(), req)
+	info, err := UpdateCoin(context.Background(), req)
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
 		assert.Equal(t, info, ret)
@@ -135,7 +135,7 @@ func getCoins(t *testing.T) {
 }
 
 func TestClient(t *testing.T) {
-	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction { //nolint
+	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
 		return
 	}
 	// Here won't pass test due to we always test with localhost

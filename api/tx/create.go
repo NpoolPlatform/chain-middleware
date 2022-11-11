@@ -26,7 +26,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func ValidateCreate(ctx context.Context, in *txmgrpb.TxReq) error {
+func ValidateCreate(ctx context.Context, in *txmgrpb.TxReq) error { //nolint
 	if in.ID != nil {
 		if _, err := uuid.Parse(in.GetID()); err != nil {
 			logger.Sugar().Errorw("CreateTx", "ID", in.GetID(), "error", err)
@@ -89,7 +89,7 @@ func ValidateCreate(ctx context.Context, in *txmgrpb.TxReq) error {
 	return nil
 }
 
-func (s *Server) CreateTx(ctx context.Context, in *npool.CreateTxRequest) (*npool.CreateTxResponse, error) { //nolint
+func (s *Server) CreateTx(ctx context.Context, in *npool.CreateTxRequest) (*npool.CreateTxResponse, error) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateTx")

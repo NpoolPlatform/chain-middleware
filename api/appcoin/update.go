@@ -25,7 +25,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error {
+func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error { //nolint
 	if _, err := uuid.Parse(in.GetID()); err != nil {
 		logger.Sugar().Errorw("UpdateCoin", "ID", in.GetID(), "error", err)
 		return err
@@ -73,7 +73,7 @@ func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error {
 	return nil
 }
 
-func (s *Server) UpdateCoin(ctx context.Context, in *npool.UpdateCoinRequest) (*npool.UpdateCoinResponse, error) { //nolint
+func (s *Server) UpdateCoin(ctx context.Context, in *npool.UpdateCoinRequest) (*npool.UpdateCoinResponse, error) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "UpdateCoin")

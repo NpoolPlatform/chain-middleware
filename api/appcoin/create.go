@@ -25,7 +25,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, error) {
+func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, error) { //nolint
 	if in.ID != nil {
 		if _, err := uuid.Parse(in.GetID()); err != nil {
 			logger.Sugar().Errorw("CreateCoin", "ID", in.GetID(), "error", err)
@@ -43,7 +43,7 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 	}
 	if !info.ForPay && in.GetForPay() {
 		logger.Sugar().Errorw("CreateCoin", "ForPay", in.GetForPay(), "CoinForPay", info.ForPay)
-		return nil, fmt.Errorf("Coin is not payable")
+		return nil, fmt.Errorf("cointypeid is not payable")
 	}
 	if in.WithdrawAutoReviewAmount != nil {
 		amount, err := decimal.NewFromString(in.GetWithdrawAutoReviewAmount())
@@ -85,7 +85,7 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 	return in, nil
 }
 
-func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*npool.CreateCoinResponse, error) { //nolint
+func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*npool.CreateCoinResponse, error) {
 	var err error
 
 	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateCoin")
