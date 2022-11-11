@@ -25,6 +25,64 @@ import (
 	"github.com/google/uuid"
 )
 
+func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, error) {
+	if in.ID != nil {
+		if _, err := uuid.Parse(in.GetID()); err != nil {
+			logger.Sugar().Errorw("CreateCoin", "ID", in.GetID(), "error", err)
+			return nil, err
+		}
+	}
+	if _, err := uuid.Parse(in.GetAppID()); err != nil {
+		logger.Sugar().Errorw("CreateCoin", "AppID", in.GetAppID(), "error", err)
+		return nil, err
+	}
+	info, err := coinbasemgrcli.GetCoinBase(ctx, in.GetCoinTypeID())
+	if err != nil {
+		logger.Sugar().Errorw("CreateCoin", "CoinTypeID", in.GetCoinTypeID(), "error", err)
+		return nil, err
+	}
+	if !info.ForPay && in.GetForPay() {
+		logger.Sugar().Errorw("CreateCoin", "ForPay", in.GetForPay(), "CoinForPay", info.ForPay)
+		return nil, fmt.Errorf("Coin is not payable")
+	}
+	if in.WithdrawAutoReviewAmount != nil {
+		amount, err := decimal.NewFromString(in.GetWithdrawAutoReviewAmount())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("CreateCoin", "WithdrawAutoReviewAmount", in.GetWithdrawAutoReviewAmount(), "error", err)
+			return nil, fmt.Errorf("WithdrawAutoReviewAmount is invalid: %v", err)
+		}
+	}
+	if in.MarketValue != nil {
+		amount, err := decimal.NewFromString(in.GetMarketValue())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("CreateCoin", "MarketValue", in.GetMarketValue(), "error", err)
+			return nil, fmt.Errorf("MarketValue is invalid: %v", err)
+		}
+	}
+	if in.SettlePercent != nil && (in.GetSettlePercent() > 100 || in.GetSettlePercent() <= 0) {
+		logger.Sugar().Errorw("CreateCoin", "SettlePercent", in.GetSettlePercent(), "error", "SettlePercent is invalid")
+		return nil, fmt.Errorf("settlepercent is invalid")
+	}
+	if _, err := uuid.Parse(in.GetSetter()); err != nil {
+		logger.Sugar().Errorw("CreateCoin", "Setter", in.GetSetter(), "error", err)
+		return nil, err
+	}
+
+	if in.Name == nil {
+		in.Name = &info.Name
+	}
+	if in.GetName() == "" {
+		logger.Sugar().Errorw("CreateCoin", "Name", in.GetName(), "error", "Name is invalid")
+		return nil, fmt.Errorf("name is invalid")
+	}
+
+	if in.Logo == nil {
+		in.Logo = &info.Logo
+	}
+
+	return in, nil
+}
+
 func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*npool.CreateCoinResponse, error) { //nolint
 	var err error
 
@@ -38,66 +96,9 @@ func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*
 		}
 	}()
 
-	if in.GetInfo().ID != nil {
-		if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-			logger.Sugar().Errorw("CreateCoin", "ID", in.GetInfo().GetID(), "error", err)
-			return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if _, err := uuid.Parse(in.GetInfo().GetAppID()); err != nil {
-		logger.Sugar().Errorw("CreateCoin", "AppID", in.GetInfo().GetAppID(), "error", err)
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	info, err := coinbasemgrcli.GetCoinBase(ctx, in.GetInfo().GetCoinTypeID())
+	input, err := ValidateCreate(ctx, in.GetInfo())
 	if err != nil {
-		logger.Sugar().Errorw("CreateCoin", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "error", err)
 		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if !info.ForPay && in.GetInfo().GetForPay() {
-		logger.Sugar().Errorw("CreateCoin", "ForPay", in.GetInfo().GetForPay(), "CoinForPay", info.ForPay)
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, "permission denied")
-	}
-	if in.GetInfo().WithdrawAutoReviewAmount != nil {
-		amount, err := decimal.NewFromString(in.GetInfo().GetWithdrawAutoReviewAmount())
-		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
-			logger.Sugar().Errorw("CreateCoin", "WithdrawAutoReviewAmount", in.GetInfo().GetWithdrawAutoReviewAmount(), "error", err)
-			return &npool.CreateCoinResponse{}, status.Error(
-				codes.InvalidArgument,
-				fmt.Sprintf("WithdrawAutoReviewAmount is invalid: %v", err),
-			)
-		}
-	}
-	if in.GetInfo().MarketValue != nil {
-		amount, err := decimal.NewFromString(in.GetInfo().GetMarketValue())
-		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
-			logger.Sugar().Errorw("CreateCoin", "MarketValue", in.GetInfo().GetMarketValue(), "error", err)
-			return &npool.CreateCoinResponse{}, status.Error(
-				codes.InvalidArgument,
-				fmt.Sprintf("MarketValue is invalid: %v", err),
-			)
-		}
-	}
-	if in.GetInfo().SettlePercent != nil && (in.GetInfo().GetSettlePercent() > 100 || in.GetInfo().GetSettlePercent() <= 0) {
-		logger.Sugar().Errorw("CreateCoin", "SettlePercent", in.GetInfo().GetSettlePercent(), "error", "SettlePercent is invalid")
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, "SettlePercent is invalid")
-	}
-	if _, err := uuid.Parse(in.GetInfo().GetSetter()); err != nil {
-		logger.Sugar().Errorw("CreateCoin", "Setter", in.GetInfo().GetSetter(), "error", err)
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	input := in.GetInfo()
-
-	if input.Name == nil {
-		input.Name = &info.Name
-	}
-	if input.GetName() == "" {
-		logger.Sugar().Errorw("CreateCoin", "Name", in.GetInfo().GetName(), "error", "Name is invalid")
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, "Name is invalid")
-	}
-
-	if input.Logo == nil {
-		input.Logo = &info.Logo
 	}
 
 	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "CreateCoin")

@@ -25,6 +25,54 @@ import (
 	"github.com/google/uuid"
 )
 
+func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error {
+	if _, err := uuid.Parse(in.GetID()); err != nil {
+		logger.Sugar().Errorw("UpdateCoin", "ID", in.GetID(), "error", err)
+		return err
+	}
+	info, err := coinbasemgrcli.GetCoinBase(ctx, in.GetCoinTypeID())
+	if err != nil {
+		logger.Sugar().Errorw("UpdateCoin", "CoinTypeID", in.GetCoinTypeID(), "error", err)
+		return err
+	}
+	if !info.ForPay && in.GetForPay() {
+		logger.Sugar().Errorw("UpdateCoin", "ForPay", in.GetForPay(), "CoinForPay", info.ForPay)
+		return fmt.Errorf("coin is not payable")
+	}
+	if in.WithdrawAutoReviewAmount != nil {
+		amount, err := decimal.NewFromString(in.GetWithdrawAutoReviewAmount())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("UpdateCoin", "WithdrawAutoReviewAmount", in.GetWithdrawAutoReviewAmount(), "error", err)
+			return fmt.Errorf("WithdrawAutoReviewAmount is invalid: %v", err)
+		}
+	}
+	if in.MarketValue != nil {
+		amount, err := decimal.NewFromString(in.GetMarketValue())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("UpdateCoin", "MarketValue", in.GetMarketValue(), "error", err)
+			return fmt.Errorf("MarketValue is invalid: %v", err)
+		}
+	}
+	if in.SettlePercent != nil && (in.GetSettlePercent() > 100 || in.GetSettlePercent() <= 0) {
+		logger.Sugar().Errorw("UpdateCoin", "SettlePercent", in.GetSettlePercent(), "error", "SettlePercent is invalid")
+		return fmt.Errorf("settlepercent is invalid")
+	}
+	if _, err := uuid.Parse(in.GetSetter()); err != nil {
+		logger.Sugar().Errorw("UpdateCoin", "Setter", in.GetSetter(), "error", err)
+		return err
+	}
+	if in.Name != nil && in.GetName() == "" {
+		logger.Sugar().Errorw("UpdateCoin", "Name", in.GetName(), "error", "Name is invalid")
+		return fmt.Errorf("name is invalid")
+	}
+	if in.Logo != nil && in.GetLogo() == "" {
+		logger.Sugar().Errorw("UpdateCoin", "Logo", in.GetLogo(), "error", "Logo is invalid")
+		return fmt.Errorf("logo is invalid")
+	}
+
+	return nil
+}
+
 func (s *Server) UpdateCoin(ctx context.Context, in *npool.UpdateCoinRequest) (*npool.UpdateCoinResponse, error) { //nolint
 	var err error
 
@@ -38,54 +86,8 @@ func (s *Server) UpdateCoin(ctx context.Context, in *npool.UpdateCoinRequest) (*
 		}
 	}()
 
-	if _, err := uuid.Parse(in.GetInfo().GetID()); err != nil {
-		logger.Sugar().Errorw("UpdateCoin", "ID", in.GetInfo().GetID(), "error", err)
+	if err := ValidateUpdate(ctx, in.GetInfo()); err != nil {
 		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	info, err := coinbasemgrcli.GetCoinBase(ctx, in.GetInfo().GetCoinTypeID())
-	if err != nil {
-		logger.Sugar().Errorw("UpdateCoin", "CoinTypeID", in.GetInfo().GetCoinTypeID(), "error", err)
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if !info.ForPay && in.GetInfo().GetForPay() {
-		logger.Sugar().Errorw("UpdateCoin", "ForPay", in.GetInfo().GetForPay(), "CoinForPay", info.ForPay)
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, "permission denied")
-	}
-	if in.GetInfo().WithdrawAutoReviewAmount != nil {
-		amount, err := decimal.NewFromString(in.GetInfo().GetWithdrawAutoReviewAmount())
-		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
-			logger.Sugar().Errorw("UpdateCoin", "WithdrawAutoReviewAmount", in.GetInfo().GetWithdrawAutoReviewAmount(), "error", err)
-			return &npool.UpdateCoinResponse{}, status.Error(
-				codes.InvalidArgument,
-				fmt.Sprintf("WithdrawAutoReviewAmount is invalid: %v", err),
-			)
-		}
-	}
-	if in.GetInfo().MarketValue != nil {
-		amount, err := decimal.NewFromString(in.GetInfo().GetMarketValue())
-		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
-			logger.Sugar().Errorw("UpdateCoin", "MarketValue", in.GetInfo().GetMarketValue(), "error", err)
-			return &npool.UpdateCoinResponse{}, status.Error(
-				codes.InvalidArgument,
-				fmt.Sprintf("MarketValue is invalid: %v", err),
-			)
-		}
-	}
-	if in.GetInfo().SettlePercent != nil && (in.GetInfo().GetSettlePercent() > 100 || in.GetInfo().GetSettlePercent() <= 0) {
-		logger.Sugar().Errorw("UpdateCoin", "SettlePercent", in.GetInfo().GetSettlePercent(), "error", "SettlePercent is invalid")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, "SettlePercent is invalid")
-	}
-	if _, err := uuid.Parse(in.GetInfo().GetSetter()); err != nil {
-		logger.Sugar().Errorw("UpdateCoin", "Setter", in.GetInfo().GetSetter(), "error", err)
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	if in.GetInfo().Name != nil && in.GetInfo().GetName() == "" {
-		logger.Sugar().Errorw("UpdateCoin", "Name", in.GetInfo().GetName(), "error", "Name is invalid")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, "Name is invalid")
-	}
-	if in.GetInfo().Logo != nil && in.GetInfo().GetLogo() == "" {
-		logger.Sugar().Errorw("UpdateCoin", "Logo", in.GetInfo().GetLogo(), "error", "Logo is invalid")
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, "Logo is invalid")
 	}
 
 	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "UpdateCoin")
