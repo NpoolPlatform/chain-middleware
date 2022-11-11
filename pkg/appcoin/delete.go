@@ -88,6 +88,10 @@ func DeleteCoin(ctx context.Context, id string) (*npool.Coin, error) {
 			entdescription.AppID(info.AppID),
 			entdescription.CoinTypeID(info.CoinTypeID),
 		).ForUpdate().All(_ctx)
+		if err != nil {
+			return err
+		}
+
 		for _, info2 := range infos {
 			_, err = appdescriptionmgrcrud.UpdateSet(
 				info2,
