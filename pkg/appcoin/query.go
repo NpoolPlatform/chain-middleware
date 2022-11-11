@@ -285,6 +285,10 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 						s.C(entappcoin.FieldCoinTypeID),
 						t5.C(entappexrate.FieldCoinTypeID),
 					).
+					On(
+						s.C(entappcoin.FieldAppID),
+						t5.C(entappexrate.FieldAppID),
+					).
 					AppendSelect(
 						sql.As(t5.C(entappexrate.FieldMarketValue), "market_value"),
 						sql.As(t5.C(entappexrate.FieldSettleValue), "settle_value"),
