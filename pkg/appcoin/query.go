@@ -58,6 +58,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 				entappcoin.FieldLogo,
 				entappcoin.FieldForPay,
 				entappcoin.FieldWithdrawAutoReviewAmount,
+				entappcoin.FieldProductPage,
 				entappcoin.FieldCreatedAt,
 				entappcoin.FieldUpdatedAt,
 			).
@@ -222,6 +223,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 				entappcoin.FieldLogo,
 				entappcoin.FieldForPay,
 				entappcoin.FieldWithdrawAutoReviewAmount,
+				entappcoin.FieldProductPage,
 				entappcoin.FieldCreatedAt,
 				entappcoin.FieldUpdatedAt,
 			).

@@ -46,6 +46,7 @@ func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 				Name:                     in.Name,
 				Logo:                     in.Logo,
 				ForPay:                   in.ForPay,
+				ProductPage:              in.ProductPage,
 				WithdrawAutoReviewAmount: in.WithdrawAutoReviewAmount,
 			},
 		).Save(_ctx)
