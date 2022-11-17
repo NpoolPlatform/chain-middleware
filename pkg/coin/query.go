@@ -60,6 +60,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 				entbase.FieldUnit,
 				entbase.FieldEnv,
 				entbase.FieldReservedAmount,
+				entbase.FieldDisabled,
 				entbase.FieldCreatedAt,
 				entbase.FieldUpdatedAt,
 			).
@@ -174,6 +175,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 				entbase.FieldUnit,
 				entbase.FieldEnv,
 				entbase.FieldReservedAmount,
+				entbase.FieldDisabled,
 				entbase.FieldCreatedAt,
 				entbase.FieldUpdatedAt,
 			).

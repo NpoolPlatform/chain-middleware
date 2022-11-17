@@ -59,6 +59,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 				entappcoin.FieldForPay,
 				entappcoin.FieldWithdrawAutoReviewAmount,
 				entappcoin.FieldProductPage,
+				entappcoin.FieldDisabled,
 				entappcoin.FieldCreatedAt,
 				entappcoin.FieldUpdatedAt,
 			).
@@ -119,6 +120,8 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 						sql.As(t4.C(entcoinbase.FieldEnv), "env"),
 						sql.As(t4.C(entcoinbase.FieldPresale), "presale"),
 						sql.As(t4.C(entcoinbase.FieldReservedAmount), "reserved_amount"),
+						sql.As(t4.C(entcoinbase.FieldDisabled), "coin_disabled"),
+						sql.As(t4.C(entcoinbase.FieldForPay), "coin_for_pay"),
 					)
 
 				t5 := sql.Table(entappexrate.Table)
@@ -150,6 +153,8 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) { //nolint
 	if len(infos) > 1 {
 		return nil, fmt.Errorf("too many records")
 	}
+
+	infos = expand(infos)
 
 	return infos[0], nil
 }
@@ -224,6 +229,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 				entappcoin.FieldForPay,
 				entappcoin.FieldWithdrawAutoReviewAmount,
 				entappcoin.FieldProductPage,
+				entappcoin.FieldDisabled,
 				entappcoin.FieldCreatedAt,
 				entappcoin.FieldUpdatedAt,
 			).
@@ -286,6 +292,8 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 						sql.As(t4.C(entcoinbase.FieldEnv), "env"),
 						sql.As(t4.C(entcoinbase.FieldPresale), "presale"),
 						sql.As(t4.C(entcoinbase.FieldReservedAmount), "reserved_amount"),
+						sql.As(t4.C(entcoinbase.FieldDisabled), "coin_disabled"),
+						sql.As(t4.C(entcoinbase.FieldForPay), "coin_for_pay"),
 					)
 
 				t5 := sql.Table(entappexrate.Table)
@@ -312,5 +320,19 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 		return nil, 0, err
 	}
 
+	infos = expand(infos)
+
 	return infos, total, nil
+}
+
+func expand(infos []*npool.Coin) []*npool.Coin {
+	for _, info := range infos {
+		if !info.CoinForPay {
+			info.ForPay = info.CoinForPay
+		}
+		if info.Disabled {
+			info.Disabled = info.CoinDisabled
+		}
+	}
+	return infos
 }

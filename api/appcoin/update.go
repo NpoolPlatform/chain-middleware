@@ -39,6 +39,10 @@ func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error { //nolint
 		logger.Sugar().Errorw("UpdateCoin", "ForPay", in.GetForPay(), "CoinForPay", info.ForPay)
 		return fmt.Errorf("coin is not payable")
 	}
+	if info.Disabled && !in.GetDisabled() {
+		logger.Sugar().Errorw("UpdateCoin", "Disabled", in.GetDisabled(), "CoinDisabled", info.Disabled)
+		return fmt.Errorf("coin is not payable")
+	}
 	if in.WithdrawAutoReviewAmount != nil {
 		amount, err := decimal.NewFromString(in.GetWithdrawAutoReviewAmount())
 		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {

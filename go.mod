@@ -6,10 +6,10 @@ require (
 	bou.ke/monkey v1.0.2
 	entgo.io/ent v0.11.2
 	github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0
-	github.com/NpoolPlatform/chain-manager v0.0.0-20221113104052-e5af8f49aa9d
+	github.com/NpoolPlatform/chain-manager v0.0.0-20221117100505-44bfaf971519
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20220927113434-7c153f087a8c
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20220621110548-8f3f8049ecc5
-	github.com/NpoolPlatform/message v0.0.0-20221113104316-4b807f18511d
+	github.com/NpoolPlatform/message v0.0.0-20221117102417-6e30fa85309b
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0

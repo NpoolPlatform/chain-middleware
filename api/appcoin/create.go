@@ -45,6 +45,10 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 		logger.Sugar().Errorw("CreateCoin", "ForPay", in.GetForPay(), "CoinForPay", info.ForPay)
 		return nil, fmt.Errorf("cointypeid is not payable")
 	}
+	if info.Disabled && !in.GetDisabled() {
+		logger.Sugar().Errorw("CreateCoin", "Disabled", in.GetDisabled(), "CoinDisabled", info.Disabled)
+		return nil, fmt.Errorf("cointypeid is not payable")
+	}
 	if in.WithdrawAutoReviewAmount != nil {
 		amount, err := decimal.NewFromString(in.GetWithdrawAutoReviewAmount())
 		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
