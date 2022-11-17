@@ -127,3 +127,59 @@ func (s *Server) GetCoins(
 		Total: total,
 	}, nil
 }
+
+func (s *Server) GetCoinOnly(
+	ctx context.Context,
+	in *npool.GetCoinOnlyRequest,
+) (
+	*npool.GetCoinOnlyResponse,
+	error,
+) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoinOnly")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	conds := in.GetConds()
+	if conds == nil {
+		conds = &npool.Conds{}
+	}
+
+	if conds.ID != nil {
+		if _, err := uuid.Parse(conds.GetID().GetValue()); err != nil {
+			logger.Sugar().Errorw("GetCoinOnly", "ID", conds.GetID().GetValue(), "error", err)
+			return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if conds.AppID != nil {
+		if _, err := uuid.Parse(conds.GetAppID().GetValue()); err != nil {
+			logger.Sugar().Errorw("GetCoinOnly", "AppID", conds.GetAppID().GetValue(), "error", err)
+			return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if conds.CoinTypeID != nil {
+		if _, err := uuid.Parse(conds.GetCoinTypeID().GetValue()); err != nil {
+			logger.Sugar().Errorw("GetCoinOnly", "CoinTypeID", conds.GetCoinTypeID().GetValue(), "error", err)
+			return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+
+	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
+
+	info, err := appcoin1.GetCoinOnly(ctx, conds)
+	if err != nil {
+		logger.Sugar().Errorw("GetCoinOnly", "Conds", conds, "error", err)
+		return &npool.GetCoinOnlyResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetCoinOnlyResponse{
+		Info: info,
+	}, nil
+}
