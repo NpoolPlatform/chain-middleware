@@ -43,6 +43,8 @@ func GetCurrencyFeed(ctx context.Context, id string) (*npool.CurrencyFeed, error
 		return nil, fmt.Errorf("too many record")
 	}
 
+	infos = expand(infos)
+
 	return infos[0], nil
 }
 
@@ -89,6 +91,8 @@ func GetCurrencyFeeds(ctx context.Context, conds *npool.Conds, offset, limit int
 		return nil, 0, err
 	}
 
+	infos = expand(infos)
+
 	return infos, total, nil
 }
 
@@ -116,4 +120,11 @@ func join(stm *ent.CurrencyFeedQuery) *ent.CurrencyFeedSelect {
 					sql.As(t1.C(entcoinbase.FieldEnv), "coin_env"),
 				)
 		})
+}
+
+func expand(infos []*npool.CurrencyFeed) []*npool.CurrencyFeed {
+	for _, info := range infos {
+		info.FeedType = feedmgrpb.FeedType(feedmgrpb.FeedType_value[info.FeedTypeStr])
+	}
+	return infos
 }

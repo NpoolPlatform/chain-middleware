@@ -177,7 +177,6 @@ func join(stm *ent.CurrencyValueQuery) *ent.CurrencyValueSelect {
 		Select(
 			entvalue.FieldID,
 			entvalue.FieldCoinTypeID,
-			entvalue.FieldFeedSourceID,
 			entvalue.FieldMarketValueHigh,
 			entvalue.FieldMarketValueLow,
 			entvalue.FieldCreatedAt,
