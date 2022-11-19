@@ -1,3 +1,4 @@
+//nolint:dupl
 package currencyvalue
 
 import (
@@ -82,12 +83,7 @@ func (s *Server) GetCurrencies(ctx context.Context, in *npool.GetCurrenciesReque
 		return &npool.GetCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	limit := int32(constant.DefaultRowLimit)
-	if in.GetLimit() > 0 {
-		limit = in.GetLimit()
-	}
-
-	infos, total, err := value1.GetCurrencies(ctx, in.GetConds(), in.GetOffset(), in.GetLimit())
+	infos, err := value1.GetCurrencies(ctx, in.GetConds())
 	if err != nil {
 		logger.Sugar().Errorw("GetCurrencies", "error", err)
 		return &npool.GetCurrenciesResponse{}, status.Error(codes.Internal, err.Error())
@@ -95,7 +91,6 @@ func (s *Server) GetCurrencies(ctx context.Context, in *npool.GetCurrenciesReque
 
 	return &npool.GetCurrenciesResponse{
 		Infos: infos,
-		Total: total,
 	}, nil
 }
 
@@ -113,7 +108,7 @@ func (s *Server) GetHistories(ctx context.Context, in *npool.GetHistoriesRequest
 		limit = in.GetLimit()
 	}
 
-	infos, total, err := value1.GetHistories(ctx, in.GetConds(), in.GetOffset(), in.GetLimit())
+	infos, total, err := value1.GetHistories(ctx, in.GetConds(), in.GetOffset(), limit)
 	if err != nil {
 		logger.Sugar().Errorw("GetHistories", "error", err)
 		return &npool.GetHistoriesResponse{}, status.Error(codes.Internal, err.Error())
