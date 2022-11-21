@@ -103,6 +103,7 @@ func join(stm *ent.CurrencyFeedQuery) *ent.CurrencyFeedSelect {
 			entfeed.FieldCoinTypeID,
 			entfeed.FieldFeedType,
 			entfeed.FieldFeedSource,
+			entfeed.FieldDisabled,
 			entfeed.FieldCreatedAt,
 			entfeed.FieldUpdatedAt,
 		).

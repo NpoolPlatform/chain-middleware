@@ -66,7 +66,16 @@ func create(t *testing.T) {
 }
 
 func update(t *testing.T) {
+	disabled := true
 
+	ret.Disabled = disabled
+	req.Disabled = &disabled
+
+	info, err := UpdateCurrencyFeed(context.Background(), req)
+	if assert.Nil(t, err) {
+		ret.UpdatedAt = info.UpdatedAt
+		assert.Equal(t, info, ret)
+	}
 }
 
 func TestTx(t *testing.T) {

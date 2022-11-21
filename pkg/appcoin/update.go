@@ -53,6 +53,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 				Logo:                     in.Logo,
 				ForPay:                   in.ForPay,
 				WithdrawAutoReviewAmount: in.WithdrawAutoReviewAmount,
+				Disabled:                 in.Disabled,
 			},
 		).Save(_ctx)
 		if err != nil {
