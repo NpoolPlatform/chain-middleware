@@ -1,4 +1,5 @@
-package coin
+//nolint:dupl
+package currencyvalue
 
 import (
 	"context"
@@ -7,7 +8,8 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
+	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 )
@@ -32,9 +34,9 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 	return handler(_ctx, cli)
 }
 
-func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
+func CreateCurrency(ctx context.Context, in *valuemgrpb.CurrencyReq) (*npool.Currency, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
-		resp, err := cli.CreateCoin(ctx, &npool.CreateCoinRequest{
+		resp, err := cli.CreateCurrency(ctx, &npool.CreateCurrencyRequest{
 			Info: in,
 		})
 		if err != nil {
@@ -45,12 +47,12 @@ func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 	if err != nil {
 		return nil, err
 	}
-	return info.(*npool.Coin), nil
+	return info.(*npool.Currency), nil
 }
 
-func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
+func GetCurrency(ctx context.Context, id string) (*npool.Currency, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
-		resp, err := cli.GetCoin(ctx, &npool.GetCoinRequest{
+		resp, err := cli.GetCurrency(ctx, &npool.GetCurrencyRequest{
 			ID: id,
 		})
 		if err != nil {
@@ -61,14 +63,30 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 	if err != nil {
 		return nil, err
 	}
-	return info.(*npool.Coin), nil
+	return info.(*npool.Currency), nil
 }
 
-func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Coin, uint32, error) {
+func GetCoinCurrency(ctx context.Context, coinTypeID string) (*npool.Currency, error) {
+	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.GetCoinCurrency(ctx, &npool.GetCoinCurrencyRequest{
+			CoinTypeID: coinTypeID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Info, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return info.(*npool.Currency), nil
+}
+
+func GetCurrencies(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Currency, uint32, error) {
 	var total uint32
 
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
-		resp, err := cli.GetCoins(ctx, &npool.GetCoinsRequest{
+		resp, err := cli.GetCurrencies(ctx, &npool.GetCurrenciesRequest{
 			Conds:  conds,
 			Offset: offset,
 			Limit:  limit,
@@ -84,21 +102,28 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 	if err != nil {
 		return nil, 0, err
 	}
-	return infos.([]*npool.Coin), total, nil
+	return infos.([]*npool.Currency), total, nil
 }
 
-func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
-	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
-		resp, err := cli.UpdateCoin(ctx, &npool.UpdateCoinRequest{
-			Info: in,
+func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Currency, uint32, error) {
+	var total uint32
+
+	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.GetHistories(ctx, &npool.GetHistoriesRequest{
+			Conds:  conds,
+			Offset: offset,
+			Limit:  limit,
 		})
 		if err != nil {
 			return nil, err
 		}
-		return resp.Info, nil
+
+		total = resp.Total
+
+		return resp.Infos, nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return info.(*npool.Coin), nil
+	return infos.([]*npool.Currency), total, nil
 }
