@@ -138,7 +138,9 @@ func getCoins(t *testing.T) {
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
 		assert.Equal(t, total, uint32(1))
-		assert.Equal(t, infos[0], ret)
+		if assert.Equal(t, len(infos), 1) {
+			assert.Equal(t, infos[0], ret)
+		}
 	}
 }
 

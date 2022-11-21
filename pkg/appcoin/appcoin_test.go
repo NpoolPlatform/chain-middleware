@@ -44,7 +44,6 @@ var ret = &npool.Coin{
 	Logo:                        uuid.NewString(),
 	Unit:                        coinUnit,
 	ENV:                         coinENV,
-	ForPay:                      true,
 	ReservedAmount:              "0.000000000000000000",
 	WithdrawFeeByStableUSD:      true,
 	WithdrawFeeAmount:           "0.000000000000000000",
@@ -67,7 +66,6 @@ var req = &npool.CoinReq{
 	AppID:         &ret.AppID,
 	Name:          &ret.Name,
 	Logo:          &ret.Logo,
-	ForPay:        &ret.ForPay,
 	SettlePercent: &ret.SettlePercent,
 	Setter:        &ret.Setter,
 }

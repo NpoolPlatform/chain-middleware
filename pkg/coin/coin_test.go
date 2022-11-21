@@ -96,5 +96,5 @@ func TestTx(t *testing.T) {
 		return
 	}
 	t.Run("create", create)
-	t.Run("create", update)
+	t.Run("update", update)
 }
