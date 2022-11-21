@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	feedmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/feed"
 	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
 
@@ -47,6 +48,8 @@ func GetCurrency(ctx context.Context, id string) (*npool.Currency, error) {
 		return nil, fmt.Errorf("too many record")
 	}
 
+	infos = expand(infos)
+
 	return infos[0], nil
 }
 
@@ -75,6 +78,8 @@ func GetCoinCurrency(ctx context.Context, coinTypeID string) (*npool.Currency, e
 	if len(infos) > 1 {
 		return nil, fmt.Errorf("too many record")
 	}
+
+	infos = expand(infos)
 
 	return infos[0], nil
 }
@@ -119,6 +124,8 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 	if err != nil {
 		return nil, err
 	}
+
+	infos = expand(infos)
 
 	return infos, nil
 }
@@ -169,6 +176,8 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 		return nil, 0, err
 	}
 
+	infos = expand(infos)
+
 	return infos, total, nil
 }
 
@@ -209,4 +218,11 @@ func join(stm *ent.CurrencyValueQuery) *ent.CurrencyValueSelect {
 					sql.As(t2.C(entfeed.FieldFeedSource), "feed_source"),
 				)
 		})
+}
+
+func expand(infos []*npool.Currency) []*npool.Currency {
+	for _, info := range infos {
+		info.FeedType = feedmgrpb.FeedType(feedmgrpb.FeedType_value[info.FeedTypeStr])
+	}
+	return infos
 }

@@ -67,8 +67,8 @@ github.com/Masterminds/sprig v2.15.0+incompatible/go.mod h1:y6hNFY5UBTIWBxnzTeuN
 github.com/Masterminds/sprig v2.22.0+incompatible/go.mod h1:y6hNFY5UBTIWBxnzTeuNhlNS5hqE0NB0E6fgfo2Br3o=
 github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0 h1:yIEwS7NTQhBBmfpf6yigvPCbxffMOrtBK/yUPM5ukbo=
 github.com/NpoolPlatform/api-manager v0.0.0-20220826022307-d72866fe3ec0/go.mod h1:+Xj8fVgWZWGakBtqZbFn/zY0qd47AywCjLPOGdTqJDU=
-github.com/NpoolPlatform/chain-manager v0.0.0-20221118181315-255c60feb810 h1:qeMtjqmkV39p52ZM0MM+WtqSARWyDkrz7uqzTZVIF+4=
-github.com/NpoolPlatform/chain-manager v0.0.0-20221118181315-255c60feb810/go.mod h1:G8PMnaG1JwhFuAgjlG8LNFVah/ZxGU46funRHMsa/Yo=
+github.com/NpoolPlatform/chain-manager v0.0.0-20221121081953-8a78cc683eef h1:img9jgClZnRvf2FeaVWskXnRo7ArqVPagjKmXh0lkDQ=
+github.com/NpoolPlatform/chain-manager v0.0.0-20221121081953-8a78cc683eef/go.mod h1:OeYqzygPGGu9iriEkfPVmpGSMGNv794r9xxQdFmtIAw=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20220818105452-9457611ae070/go.mod h1:QPI3Fu/AU5iUOUnf9EictZP1lqPQdPcVLqveIB2HovI=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20220927113434-7c153f087a8c h1:VRcs8tOeXU9ryZ/rB656qCYzxx7TXNXbTsW2GSNOpXQ=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20220927113434-7c153f087a8c/go.mod h1:/sor3E0i0XR8BaKInJwWC85aXLmbMFRNLdIuw+ed+ig=
@@ -77,8 +77,8 @@ github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQ
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb/go.mod h1:zvvqlRwbOdTUauPQ9dFDhDuxa91ILV0CQfVdPBZj+eA=
 github.com/NpoolPlatform/message v0.0.0-20220501030927-34f296682c0c/go.mod h1:i/F/sQWjQk44RGvfgEB0zH0oAK/0qLvgJ1AsJDZQDkk=
 github.com/NpoolPlatform/message v0.0.0-20220819134247-1dc75c85fe43/go.mod h1:8YXp4MghMHLZ9bBdQQyfjcRtLI2RbEHAQoNCejT2nZU=
-github.com/NpoolPlatform/message v0.0.0-20221121064518-06563cbfabca h1:OiLMwDeUZi26pU9PrJ4gAGOqgBTEEEgsWJwJ8/oa/q4=
-github.com/NpoolPlatform/message v0.0.0-20221121064518-06563cbfabca/go.mod h1:PPu6xSY6EEmKktC6azkYreJVM4gaGkmxuusqHok2IEA=
+github.com/NpoolPlatform/message v0.0.0-20221121082741-5e2032fa8f42 h1:d03dALGA59ufBB2OavwuBhw6S7KeMlxidpEMdmkLQhY=
+github.com/NpoolPlatform/message v0.0.0-20221121082741-5e2032fa8f42/go.mod h1:PPu6xSY6EEmKktC6azkYreJVM4gaGkmxuusqHok2IEA=
 github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/Shonminh/apollo-client v0.4.0 h1:AXGp4wOahrEKjheMXehgsG9B8dEfLQHttRLHeEefvus=
