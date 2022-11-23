@@ -106,7 +106,6 @@ func getCurrencies(t *testing.T) {
 	}, 0, 1)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
-		// assert.Equal(t, total, uint32(1))
 		assert.Equal(t, infos[0], ret)
 	}
 }

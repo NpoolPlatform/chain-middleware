@@ -56,6 +56,13 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 			return nil, fmt.Errorf("WithdrawAutoReviewAmount is invalid: %v", err)
 		}
 	}
+	if in.DailyRewardAmount != nil {
+		amount, err := decimal.NewFromString(in.GetDailyRewardAmount())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("CreateCoin", "DailyRewardAmount", in.GetDailyRewardAmount(), "error", err)
+			return nil, fmt.Errorf("DailyRewardAmount is invalid: %v", err)
+		}
+	}
 	if in.MarketValue != nil {
 		amount, err := decimal.NewFromString(in.GetMarketValue())
 		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {

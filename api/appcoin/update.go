@@ -50,6 +50,13 @@ func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error { //nolint
 			return fmt.Errorf("WithdrawAutoReviewAmount is invalid: %v", err)
 		}
 	}
+	if in.DailyRewardAmount != nil {
+		amount, err := decimal.NewFromString(in.GetDailyRewardAmount())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("UpdateCoin", "DailyRewardAmount", in.GetDailyRewardAmount(), "error", err)
+			return fmt.Errorf("DailyRewardAmount is invalid: %v", err)
+		}
+	}
 	if in.MarketValue != nil {
 		amount, err := decimal.NewFromString(in.GetMarketValue())
 		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
