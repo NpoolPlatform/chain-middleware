@@ -74,3 +74,21 @@ func (s *Server) CreateCurrency(ctx context.Context, in *npool.CreateCurrencyReq
 		Info: info,
 	}, nil
 }
+
+func (s *Server) CreateCurrencies(ctx context.Context, in *npool.CreateCurrenciesRequest) (*npool.CreateCurrenciesResponse, error) {
+	for _, val := range in.GetInfos() {
+		if err := ValidateCreate(ctx, val); err != nil {
+			return &npool.CreateCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+
+	info, err := value1.CreateCurrencies(ctx, in.GetInfos())
+	if err != nil {
+		logger.Sugar().Errorw("CreateCurrency", "error", err)
+		return &npool.CreateCurrenciesResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.CreateCurrenciesResponse{
+		Infos: info,
+	}, nil
+}
