@@ -50,8 +50,8 @@ func CreateCurrency(ctx context.Context, in *valuemgrpb.CurrencyReq) (*npool.Cur
 	return info.(*npool.Currency), nil
 }
 
-func CreateCurrencies(ctx context.Context) ([]*npool.Currency, error) {
-	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+func CreateCurrencies(ctx context.Context) error {
+	_, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.CreateCurrencies(ctx, &npool.CreateCurrenciesRequest{})
 		if err != nil {
 			return nil, err
@@ -59,9 +59,9 @@ func CreateCurrencies(ctx context.Context) ([]*npool.Currency, error) {
 		return resp, nil
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return infos.([]*npool.Currency), nil
+	return nil
 }
 
 func GetCurrency(ctx context.Context, id string) (*npool.Currency, error) {
