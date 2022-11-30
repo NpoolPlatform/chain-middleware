@@ -192,6 +192,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 					AppendSelect(
 						sql.As(t1.C(entextra.FieldHomePage), "home_page"),
 						sql.As(t1.C(entextra.FieldSpecs), "specs"),
+						sql.As(t1.C(entextra.FieldStableUsd), "stable_usd"),
 					)
 
 				t2 := sql.Table(entsetting.Table)

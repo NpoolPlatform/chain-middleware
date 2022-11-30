@@ -207,6 +207,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 				AppendSelect(
 					sql.As(t1.C(entcoinextra.FieldHomePage), "home_page"),
 					sql.As(t1.C(entcoinextra.FieldSpecs), "specs"),
+					sql.As(t1.C(entcoinextra.FieldStableUsd), "stable_usd"),
 				)
 
 			t2 := sql.Table(entsetting.Table)
