@@ -89,12 +89,13 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm, err := crud.SetQueryConds(&appcoinmgrpb.Conds{
-			ID:         conds.ID,
-			AppID:      conds.AppID,
-			CoinTypeID: conds.CoinTypeID,
-			ForPay:     conds.ForPay,
-			Disabled:   conds.Disabled,
-			IDs:        conds.IDs,
+			ID:          conds.ID,
+			AppID:       conds.AppID,
+			CoinTypeID:  conds.CoinTypeID,
+			ForPay:      conds.ForPay,
+			Disabled:    conds.Disabled,
+			IDs:         conds.IDs,
+			CoinTypeIDs: conds.CoinTypeIDs,
 		}, cli)
 		if err != nil {
 			return err
