@@ -1,4 +1,4 @@
-package currencyvalue
+package currency
 
 import (
 	"context"
@@ -8,13 +8,11 @@ import (
 	"testing"
 
 	testinit "github.com/NpoolPlatform/chain-middleware/pkg/testinit"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 
-	feedmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/feed"
-	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
+	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
-	feed1 "github.com/NpoolPlatform/chain-middleware/pkg/coin/currency/feed"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	"github.com/google/uuid"
@@ -35,9 +33,8 @@ var ret = &npool.Currency{
 	CoinName:        uuid.NewString(),
 	CoinUnit:        uuid.NewString(),
 	CoinENV:         uuid.NewString(),
-	FeedType:        feedmgrpb.FeedType_CoinBase,
-	FeedTypeStr:     feedmgrpb.FeedType_CoinBase.String(),
-	FeedSource:      uuid.NewString(),
+	FeedType:        currencymgrpb.FeedType_CoinBase,
+	FeedTypeStr:     currencymgrpb.FeedType_CoinBase.String(),
 	MarketValueHigh: "12.001000000000000000",
 	MarketValueLow:  "11.001000000000000000",
 }
@@ -48,13 +45,9 @@ var coin = &coinmwpb.CoinReq{
 	ENV:  &ret.CoinENV,
 }
 
-var source = &feedmgrpb.CurrencyFeedReq{
-	FeedSource: &ret.FeedSource,
-	FeedType:   &ret.FeedType,
-}
-
-var req = &valuemgrpb.CurrencyReq{
+var req = &currencymgrpb.CurrencyReq{
 	ID:              &ret.ID,
+	FeedType:        &ret.FeedType,
 	MarketValueHigh: &ret.MarketValueHigh,
 	MarketValueLow:  &ret.MarketValueLow,
 }
@@ -63,12 +56,7 @@ func create(t *testing.T) {
 	coinRet, err := coin1.CreateCoin(context.Background(), coin)
 	assert.Nil(t, err)
 
-	source.CoinTypeID = &coinRet.ID
-	feedSource, err := feed1.CreateCurrencyFeed(context.Background(), source)
-	assert.Nil(t, err)
-
 	req.CoinTypeID = &coinRet.ID
-	req.FeedSourceID = &feedSource.ID
 	ret.CoinTypeID = coinRet.ID
 
 	info, err := CreateCurrency(context.Background(), req)

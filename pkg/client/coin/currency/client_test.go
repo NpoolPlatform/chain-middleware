@@ -1,4 +1,4 @@
-package currencyvalue
+package currency
 
 import (
 	"context"
@@ -17,14 +17,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	commonpb "github.com/NpoolPlatform/message/npool"
-	feedmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/feed"
-	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
+	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 	"github.com/stretchr/testify/assert"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
-	feed1 "github.com/NpoolPlatform/chain-middleware/pkg/client/coin/currency/feed"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
@@ -45,9 +43,8 @@ var ret = &npool.Currency{
 	CoinName:        uuid.NewString(),
 	CoinUnit:        uuid.NewString(),
 	CoinENV:         "test",
-	FeedType:        feedmgrpb.FeedType_CoinBase,
-	FeedTypeStr:     feedmgrpb.FeedType_CoinBase.String(),
-	FeedSource:      uuid.NewString(),
+	FeedType:        currencymgrpb.FeedType_CoinBase,
+	FeedTypeStr:     currencymgrpb.FeedType_CoinBase.String(),
 	MarketValueHigh: "12.001000000000000000",
 	MarketValueLow:  "11.001000000000000000",
 }
@@ -58,13 +55,9 @@ var coin = &coinmwpb.CoinReq{
 	ENV:  &ret.CoinENV,
 }
 
-var source = &feedmgrpb.CurrencyFeedReq{
-	FeedType:   &ret.FeedType,
-	FeedSource: &ret.FeedSource,
-}
-
-var req = &valuemgrpb.CurrencyReq{
+var req = &currencymgrpb.CurrencyReq{
 	ID:              &ret.ID,
+	FeedType:        &ret.FeedType,
 	MarketValueHigh: &ret.MarketValueHigh,
 	MarketValueLow:  &ret.MarketValueLow,
 }
@@ -74,14 +67,8 @@ func createCurrency(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, coinRet)
 
-	source.CoinTypeID = &coinRet.ID
-	feedSource, err := feed1.CreateCurrencyFeed(context.Background(), source)
-	assert.Nil(t, err)
-	assert.NotNil(t, feedSource)
-
 	ret.CoinTypeID = coinRet.ID
 	req.CoinTypeID = &coinRet.ID
-	req.FeedSourceID = &feedSource.ID
 
 	info, err := CreateCurrency(context.Background(), req)
 	if assert.Nil(t, err) {

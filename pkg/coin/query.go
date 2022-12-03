@@ -52,13 +52,16 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 			)
 
 		return join(stm).
-			Scan(_ctx, infos)
+			Scan(_ctx, &infos)
 	})
 	if err != nil {
 		return nil, err
 	}
 	if len(infos) == 0 {
 		return nil, fmt.Errorf("no record")
+	}
+	if len(infos) > 1 {
+		return nil, fmt.Errorf("too many record")
 	}
 
 	return infos[0], nil
@@ -112,7 +115,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 			Limit(int(limit))
 
 		return join(stm).
-			Scan(_ctx, infos)
+			Scan(_ctx, &infos)
 	})
 	if err != nil {
 		return nil, 0, err
@@ -153,7 +156,7 @@ func GetManyCoins(ctx context.Context, coinTypeIDs []string) (infos []*npool.Coi
 		}
 
 		return join(stm).
-			Scan(_ctx, infos)
+			Scan(_ctx, &infos)
 	})
 	if err != nil {
 		return nil, err

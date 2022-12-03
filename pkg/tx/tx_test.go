@@ -67,6 +67,7 @@ var req = &txmgrpb.TxReq{
 func create(t *testing.T) {
 	coin, err := coinmw.CreateCoin(context.Background(), coinReq)
 	assert.Nil(t, err)
+	assert.NotNil(t, coin)
 
 	req.CoinTypeID = &coin.ID
 

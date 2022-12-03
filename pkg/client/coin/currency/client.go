@@ -1,5 +1,5 @@
 //nolint:dupl
-package currencyvalue
+package currency
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
+	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 )
@@ -34,7 +34,7 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 	return handler(_ctx, cli)
 }
 
-func CreateCurrency(ctx context.Context, in *valuemgrpb.CurrencyReq) (*npool.Currency, error) {
+func CreateCurrency(ctx context.Context, in *currencymgrpb.CurrencyReq) (*npool.Currency, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.CreateCurrency(ctx, &npool.CreateCurrencyRequest{
 			Info: in,

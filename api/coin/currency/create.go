@@ -1,5 +1,5 @@
 //nolint:dupl
-package currencyvalue
+package currency
 
 import (
 	"context"
@@ -7,10 +7,10 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
-	value1 "github.com/NpoolPlatform/chain-middleware/pkg/coin/currency/value"
+	currency1 "github.com/NpoolPlatform/chain-middleware/pkg/coin/currency"
 
-	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
+	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
 
@@ -22,7 +22,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func ValidateCreate(ctx context.Context, in *valuemgrpb.CurrencyReq) error {
+func ValidateCreate(ctx context.Context, in *currencymgrpb.CurrencyReq) error {
 	if in.ID != nil {
 		if _, err := uuid.Parse(in.GetID()); err != nil {
 			logger.Sugar().Errorw("CreateCurrency", "ID", in.GetID(), "error", err)
@@ -64,7 +64,7 @@ func ValidateCreate(ctx context.Context, in *valuemgrpb.CurrencyReq) error {
 	return nil
 }
 
-func ValidateCreates(ctx context.Context, in []*valuemgrpb.CurrencyReq) error {
+func ValidateCreates(ctx context.Context, in []*currencymgrpb.CurrencyReq) error {
 	for _, info := range in {
 		if err := ValidateCreate(ctx, info); err != nil {
 			return err
@@ -78,7 +78,7 @@ func (s *Server) CreateCurrency(ctx context.Context, in *npool.CreateCurrencyReq
 		return &npool.CreateCurrencyResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	info, err := value1.CreateCurrency(ctx, in.GetInfo())
+	info, err := currency1.CreateCurrency(ctx, in.GetInfo())
 	if err != nil {
 		logger.Sugar().Errorw("CreateCurrency", "error", err)
 		return &npool.CreateCurrencyResponse{}, status.Error(codes.Internal, err.Error())
@@ -94,7 +94,7 @@ func (s *Server) CreateCurrencies(ctx context.Context, in *npool.CreateCurrencie
 		return &npool.CreateCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, err := value1.CreateCurrencies(ctx, in.GetInfos())
+	infos, err := currency1.CreateCurrencies(ctx, in.GetInfos())
 	if err != nil {
 		logger.Sugar().Errorw("CreateCurrencies", "error", err)
 		return &npool.CreateCurrenciesResponse{}, status.Error(codes.Internal, err.Error())

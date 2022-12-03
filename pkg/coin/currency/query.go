@@ -1,13 +1,12 @@
-package currencyvalue
+package currency
 
 import (
 	"context"
 	"fmt"
 	"time"
 
-	feedmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/feed"
-	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
+	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
@@ -18,10 +17,9 @@ import (
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
 
 	entcoinbase "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinbase"
-	entfeed "github.com/NpoolPlatform/chain-manager/pkg/db/ent/currencyfeed"
-	entvalue "github.com/NpoolPlatform/chain-manager/pkg/db/ent/currencyvalue"
+	entcurrency "github.com/NpoolPlatform/chain-manager/pkg/db/ent/currency"
 
-	crud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/currency/value"
+	crud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/currency"
 
 	constuuid "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
 
@@ -34,10 +32,10 @@ func GetCurrency(ctx context.Context, id string) (*npool.Currency, error) {
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
-			CurrencyValue.
+			Currency.
 			Query().
 			Where(
-				entvalue.ID(uuid.MustParse(id)),
+				entcurrency.ID(uuid.MustParse(id)),
 			)
 
 		return join(stm).
@@ -79,20 +77,20 @@ func GetCoinCurrency(ctx context.Context, coinTypeID string) (*npool.Currency, e
 			UpdatedAt:       now,
 			MarketValueHigh: "1",
 			MarketValueLow:  "1",
-			FeedTypeStr:     feedmgrpb.FeedType_StableUSDHardCode.String(),
-			FeedType:        feedmgrpb.FeedType_StableUSDHardCode,
-			FeedSource:      feedmgrpb.FeedType_StableUSDHardCode.String(),
+			FeedTypeStr:     currencymgrpb.FeedType_StableUSDHardCode.String(),
+			FeedType:        currencymgrpb.FeedType_StableUSDHardCode,
+			FeedSource:      currencymgrpb.FeedType_StableUSDHardCode.String(),
 		}, nil
 	}
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
-			CurrencyValue.
+			Currency.
 			Query().
 			Where(
-				entvalue.CoinTypeID(uuid.MustParse(coinTypeID)),
+				entcurrency.CoinTypeID(uuid.MustParse(coinTypeID)),
 			).
-			Order(ent.Desc(entvalue.FieldCreatedAt)).
+			Order(ent.Desc(entcurrency.FieldCreatedAt)).
 			Limit(1)
 
 		return join(stm).
@@ -140,7 +138,7 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 		for _, id := range ids {
 			var linfos []*npool.Currency
 
-			stm, err := crud.SetQueryConds(&valuemgrpb.Conds{
+			stm, err := crud.SetQueryConds(&currencymgrpb.Conds{
 				ID: conds.ID,
 				CoinTypeID: &commonpb.StringVal{
 					Op:    cruder.EQ,
@@ -152,7 +150,7 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 			}
 
 			stm.
-				Order(ent.Asc(entvalue.FieldCreatedAt)).
+				Order(ent.Asc(entcurrency.FieldCreatedAt)).
 				Limit(1)
 
 			if err := join(stm).Scan(_ctx, &linfos); err != nil {
@@ -187,9 +185,9 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 			UpdatedAt:       now,
 			MarketValueHigh: "1",
 			MarketValueLow:  "1",
-			FeedTypeStr:     feedmgrpb.FeedType_StableUSDHardCode.String(),
-			FeedType:        feedmgrpb.FeedType_StableUSDHardCode,
-			FeedSource:      feedmgrpb.FeedType_StableUSDHardCode.String(),
+			FeedTypeStr:     currencymgrpb.FeedType_StableUSDHardCode.String(),
+			FeedType:        currencymgrpb.FeedType_StableUSDHardCode,
+			FeedSource:      currencymgrpb.FeedType_StableUSDHardCode.String(),
 		})
 	}
 
@@ -208,7 +206,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm, err := crud.SetQueryConds(&valuemgrpb.Conds{
+		stm, err := crud.SetQueryConds(&currencymgrpb.Conds{
 			ID:         conds.ID,
 			CoinTypeID: conds.CoinTypeID,
 			StartAt:    conds.StartAt,
@@ -220,7 +218,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 
 		if len(ids) > 0 {
 			stm.Where(
-				entvalue.CoinTypeIDIn(ids...),
+				entcurrency.CoinTypeIDIn(ids...),
 			)
 		}
 
@@ -233,7 +231,8 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 
 		stm.
 			Offset(int(offset)).
-			Limit(int(limit))
+			Limit(int(limit)).
+			Order(ent.Desc(entcurrency.FieldCreatedAt))
 
 		return join(stm).
 			Scan(_ctx, &infos)
@@ -247,22 +246,23 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	return infos, total, nil
 }
 
-func join(stm *ent.CurrencyValueQuery) *ent.CurrencyValueSelect {
+func join(stm *ent.CurrencyQuery) *ent.CurrencySelect {
 	return stm.
 		Select(
-			entvalue.FieldID,
-			entvalue.FieldCoinTypeID,
-			entvalue.FieldMarketValueHigh,
-			entvalue.FieldMarketValueLow,
-			entvalue.FieldCreatedAt,
-			entvalue.FieldUpdatedAt,
+			entcurrency.FieldID,
+			entcurrency.FieldCoinTypeID,
+			entcurrency.FieldFeedType,
+			entcurrency.FieldMarketValueHigh,
+			entcurrency.FieldMarketValueLow,
+			entcurrency.FieldCreatedAt,
+			entcurrency.FieldUpdatedAt,
 		).
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entcoinbase.Table)
 			s.
 				LeftJoin(t1).
 				On(
-					s.C(entvalue.FieldCoinTypeID),
+					s.C(entcurrency.FieldCoinTypeID),
 					t1.C(entcoinbase.FieldID),
 				).
 				AppendSelect(
@@ -271,24 +271,12 @@ func join(stm *ent.CurrencyValueQuery) *ent.CurrencyValueSelect {
 					sql.As(t1.C(entcoinbase.FieldUnit), "coin_unit"),
 					sql.As(t1.C(entcoinbase.FieldEnv), "coin_env"),
 				)
-
-			t2 := sql.Table(entfeed.Table)
-			s.
-				LeftJoin(t2).
-				On(
-					s.C(entvalue.FieldFeedSourceID),
-					t2.C(entfeed.FieldID),
-				).
-				AppendSelect(
-					sql.As(t2.C(entfeed.FieldFeedType), "feed_type"),
-					sql.As(t2.C(entfeed.FieldFeedSource), "feed_source"),
-				)
 		})
 }
 
 func expand(infos []*npool.Currency) []*npool.Currency {
 	for _, info := range infos {
-		info.FeedType = feedmgrpb.FeedType(feedmgrpb.FeedType_value[info.FeedTypeStr])
+		info.FeedType = currencymgrpb.FeedType(currencymgrpb.FeedType_value[info.FeedTypeStr])
 	}
 	return infos
 }

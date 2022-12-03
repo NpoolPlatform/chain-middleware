@@ -1,14 +1,14 @@
 //nolint:dupl
-package currencyvalue
+package currency
 
 import (
 	"context"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
-	value1 "github.com/NpoolPlatform/chain-middleware/pkg/coin/currency/value"
+	currency1 "github.com/NpoolPlatform/chain-middleware/pkg/coin/currency"
 
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 
@@ -24,7 +24,7 @@ func (s *Server) GetCurrency(ctx context.Context, in *npool.GetCurrencyRequest) 
 		return &npool.GetCurrencyResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	info, err := value1.GetCurrency(ctx, in.GetID())
+	info, err := currency1.GetCurrency(ctx, in.GetID())
 	if err != nil {
 		logger.Sugar().Errorw("GetCurrency", "ID", in.GetID(), "error", err)
 		return &npool.GetCurrencyResponse{}, status.Error(codes.Internal, err.Error())
@@ -41,7 +41,7 @@ func (s *Server) GetCoinCurrency(ctx context.Context, in *npool.GetCoinCurrencyR
 		return &npool.GetCoinCurrencyResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	info, err := value1.GetCoinCurrency(ctx, in.GetCoinTypeID())
+	info, err := currency1.GetCoinCurrency(ctx, in.GetCoinTypeID())
 	if err != nil {
 		logger.Sugar().Errorw("GetCoinCurrency", "CoinTypeID", in.GetCoinTypeID(), "error", err)
 		return &npool.GetCoinCurrencyResponse{}, status.Error(codes.Internal, err.Error())
@@ -83,7 +83,7 @@ func (s *Server) GetCurrencies(ctx context.Context, in *npool.GetCurrenciesReque
 		return &npool.GetCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, err := value1.GetCurrencies(ctx, in.GetConds())
+	infos, err := currency1.GetCurrencies(ctx, in.GetConds())
 	if err != nil {
 		logger.Sugar().Errorw("GetCurrencies", "error", err)
 		return &npool.GetCurrenciesResponse{}, status.Error(codes.Internal, err.Error())
@@ -108,7 +108,7 @@ func (s *Server) GetHistories(ctx context.Context, in *npool.GetHistoriesRequest
 		limit = in.GetLimit()
 	}
 
-	infos, total, err := value1.GetHistories(ctx, in.GetConds(), in.GetOffset(), limit)
+	infos, total, err := currency1.GetHistories(ctx, in.GetConds(), in.GetOffset(), limit)
 	if err != nil {
 		logger.Sugar().Errorw("GetHistories", "error", err)
 		return &npool.GetHistoriesResponse{}, status.Error(codes.Internal, err.Error())

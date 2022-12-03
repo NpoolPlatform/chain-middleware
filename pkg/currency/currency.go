@@ -5,7 +5,7 @@ import (
 
 	coinbase "github.com/NpoolPlatform/chain-middleware/pkg/currency/coinbase"
 	coingecko "github.com/NpoolPlatform/chain-middleware/pkg/currency/coingecko"
-	feedtype "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/feed"
+	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 
 	"github.com/shopspring/decimal"
 )
@@ -27,7 +27,7 @@ func stableUSD(coinName string) bool {
 	return ok
 }
 
-func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.Decimal, feedtype.FeedType, error) {
+func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.Decimal, currencymgrpb.FeedType, error) {
 	prices := map[string]decimal.Decimal{}
 	names := []string{}
 
@@ -44,21 +44,21 @@ func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.
 		for name, price := range prices1 {
 			prices[name] = price
 		}
-		return prices, feedtype.FeedType_CoinGecko, nil
+		return prices, currencymgrpb.FeedType_CoinGecko, nil
 	}
 
 	prices1, err = coinbase.CoinBaseUSDPrices(names)
 	if err != nil {
-		return nil, feedtype.FeedType_DefaultFeedType, err
+		return nil, currencymgrpb.FeedType_DefaultFeedType, err
 	}
 
 	for name, price := range prices1 {
 		prices[name] = price
 	}
 
-	return prices, feedtype.FeedType_CoinBase, nil
+	return prices, currencymgrpb.FeedType_CoinBase, nil
 }
 
-func CoinCurrencyPrice(ctx context.Context, coinName, currency string) (decimal.Decimal, feedtype.FeedType, error) {
-	return decimal.Decimal{}, feedtype.FeedType_DefaultFeedType, nil
+func CoinCurrencyPrice(ctx context.Context, coinName, currency string) (decimal.Decimal, currencymgrpb.FeedType, error) {
+	return decimal.Decimal{}, currencymgrpb.FeedType_DefaultFeedType, nil
 }
