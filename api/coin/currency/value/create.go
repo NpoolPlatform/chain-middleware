@@ -1,3 +1,4 @@
+//nolint:dupl
 package currencyvalue
 
 import (
@@ -59,6 +60,15 @@ func ValidateCreate(ctx context.Context, in *valuemgrpb.CurrencyReq) error {
 	return nil
 }
 
+func ValidateCreates(ctx context.Context, in []*valuemgrpb.CurrencyReq) error {
+	for _, info := range in {
+		if err := ValidateCreate(ctx, info); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (s *Server) CreateCurrency(ctx context.Context, in *npool.CreateCurrencyRequest) (*npool.CreateCurrencyResponse, error) {
 	if err := ValidateCreate(ctx, in.GetInfo()); err != nil {
 		return &npool.CreateCurrencyResponse{}, status.Error(codes.InvalidArgument, err.Error())
@@ -76,11 +86,17 @@ func (s *Server) CreateCurrency(ctx context.Context, in *npool.CreateCurrencyReq
 }
 
 func (s *Server) CreateCurrencies(ctx context.Context, in *npool.CreateCurrenciesRequest) (*npool.CreateCurrenciesResponse, error) {
-	err := value1.CreateCurrencies(ctx)
+	if err := ValidateCreates(ctx, in.GetInfos()); err != nil {
+		return &npool.CreateCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	infos, err := value1.CreateCurrencies(ctx, in.GetInfos())
 	if err != nil {
-		logger.Sugar().Errorw("CreateCurrency", "error", err)
+		logger.Sugar().Errorw("CreateCurrencies", "error", err)
 		return &npool.CreateCurrenciesResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.CreateCurrenciesResponse{}, nil
+	return &npool.CreateCurrenciesResponse{
+		Infos: infos,
+	}, nil
 }
