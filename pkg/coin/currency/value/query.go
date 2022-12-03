@@ -3,6 +3,7 @@ package currencyvalue
 import (
 	"context"
 	"fmt"
+	"time"
 
 	feedmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/feed"
 	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
@@ -14,11 +15,15 @@ import (
 	"github.com/NpoolPlatform/chain-manager/pkg/db"
 	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
 
+	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
+
 	entcoinbase "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinbase"
 	entfeed "github.com/NpoolPlatform/chain-manager/pkg/db/ent/currencyfeed"
 	entvalue "github.com/NpoolPlatform/chain-manager/pkg/db/ent/currencyvalue"
 
 	crud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/currency/value"
+
+	constuuid "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
@@ -56,7 +61,31 @@ func GetCurrency(ctx context.Context, id string) (*npool.Currency, error) {
 func GetCoinCurrency(ctx context.Context, coinTypeID string) (*npool.Currency, error) {
 	var infos []*npool.Currency
 
-	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+	coin, err := coin1.GetCoin(ctx, coinTypeID)
+	if err != nil {
+		return nil, err
+	}
+	if coin.StableUSD {
+		now := uint32(time.Now().Unix())
+
+		return &npool.Currency{
+			ID:              constuuid.InvalidUUIDStr,
+			CoinTypeID:      coinTypeID,
+			CoinName:        coin.Name,
+			CoinLogo:        coin.Logo,
+			CoinUnit:        coin.Unit,
+			CoinENV:         coin.ENV,
+			CreatedAt:       now,
+			UpdatedAt:       now,
+			MarketValueHigh: "1",
+			MarketValueLow:  "1",
+			FeedTypeStr:     feedmgrpb.FeedType_StableUSDHardCode.String(),
+			FeedType:        feedmgrpb.FeedType_StableUSDHardCode,
+			FeedSource:      feedmgrpb.FeedType_StableUSDHardCode.String(),
+		}, nil
+	}
+
+	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
 			CurrencyValue.
 			Query().
@@ -94,7 +123,20 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 		ids = append(ids, conds.GetCoinTypeID().GetValue())
 	}
 
-	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+	coins, err := coin1.GetManyCoins(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	ids = []string{}
+	for _, coin := range coins {
+		if coin.StableUSD {
+			continue
+		}
+		ids = append(ids, coin.ID)
+	}
+
+	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		for _, id := range ids {
 			var linfos []*npool.Currency
 
@@ -126,6 +168,30 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 	}
 
 	infos = expand(infos)
+
+	for _, coin := range coins {
+		if !coin.StableUSD {
+			continue
+		}
+
+		now := uint32(time.Now().Unix())
+
+		infos = append(infos, &npool.Currency{
+			ID:              constuuid.InvalidUUIDStr,
+			CoinTypeID:      coin.ID,
+			CoinName:        coin.Name,
+			CoinLogo:        coin.Logo,
+			CoinUnit:        coin.Unit,
+			CoinENV:         coin.ENV,
+			CreatedAt:       now,
+			UpdatedAt:       now,
+			MarketValueHigh: "1",
+			MarketValueLow:  "1",
+			FeedTypeStr:     feedmgrpb.FeedType_StableUSDHardCode.String(),
+			FeedType:        feedmgrpb.FeedType_StableUSDHardCode,
+			FeedSource:      feedmgrpb.FeedType_StableUSDHardCode.String(),
+		})
+	}
 
 	return infos, nil
 }

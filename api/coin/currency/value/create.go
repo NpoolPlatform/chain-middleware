@@ -12,7 +12,7 @@ import (
 	valuemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency/value"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/value"
 
-	coinmgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/coin/base"
+	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
 
 	"github.com/shopspring/decimal"
 
@@ -35,10 +35,14 @@ func ValidateCreate(ctx context.Context, in *valuemgrpb.CurrencyReq) error {
 		return err
 	}
 
-	_, err := coinmgrcli.GetCoinBase(ctx, in.GetCoinTypeID())
+	coin, err := coin1.GetCoin(ctx, in.GetCoinTypeID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateCurrency", "CoinTypeID", in.GetCoinTypeID(), "error", err)
 		return err
+	}
+	if coin.StableUSD {
+		logger.Sugar().Errorw("CreateCurrency", "CoinTypeID", in.GetCoinTypeID(), "error", "stable usd")
+		return fmt.Errorf("cannot set currency for stable usd")
 	}
 
 	lowValue, err := decimal.NewFromString(in.GetMarketValueLow())
