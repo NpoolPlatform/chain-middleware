@@ -99,7 +99,7 @@ func CoinBaseUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 		}
 		prices[name] = price
 
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond) //nolint
 	}
 
 	return prices, nil

@@ -15,6 +15,8 @@ import (
 	entcoinbase "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinbase"
 	enttran "github.com/NpoolPlatform/chain-manager/pkg/db/ent/tran"
 
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+
 	"github.com/google/uuid"
 )
 
@@ -112,9 +114,16 @@ func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*
 			)
 		}
 		if conds.State != nil {
-			stm.Where(
-				enttran.State(txmgrpb.TxState(conds.GetState().GetValue()).String()),
-			)
+			switch conds.GetState().GetOp() {
+			case cruder.EQ:
+				stm.Where(
+					enttran.State(txmgrpb.TxState(conds.GetState().GetValue()).String()),
+				)
+			case cruder.NEQ:
+				stm.Where(
+					enttran.StateNEQ(txmgrpb.TxState(conds.GetState().GetValue()).String()),
+				)
+			}
 		}
 		if conds.Type != nil {
 			stm.Where(
