@@ -24,41 +24,14 @@ func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 	var infos []*npool.Tx
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		return cli.
+		stm := cli.
 			Tran.
 			Query().
 			Where(
 				enttran.ID(uuid.MustParse(id)),
-			).
-			Select(
-				enttran.FieldID,
-				enttran.FieldCoinTypeID,
-				enttran.FieldFromAccountID,
-				enttran.FieldToAccountID,
-				enttran.FieldAmount,
-				enttran.FieldFeeAmount,
-				enttran.FieldState,
-				enttran.FieldChainTxID,
-				enttran.FieldType,
-				enttran.FieldExtra,
-				enttran.FieldCreatedAt,
-				enttran.FieldUpdatedAt,
-			).
-			Modify(func(s *sql.Selector) {
-				t1 := sql.Table(entcoinbase.Table)
-				s.
-					LeftJoin(t1).
-					On(
-						s.C(enttran.FieldCoinTypeID),
-						t1.C(entcoinbase.FieldID),
-					).
-					AppendSelect(
-						sql.As(t1.C(entcoinbase.FieldName), "coin_name"),
-						sql.As(t1.C(entcoinbase.FieldLogo), "coin_logo"),
-						sql.As(t1.C(entcoinbase.FieldUnit), "coin_unit"),
-						sql.As(t1.C(entcoinbase.FieldEnv), "coin_env"),
-					)
-			}).
+			)
+
+		return join(stm).
 			Scan(_ctx, &infos)
 	})
 	if err != nil {
@@ -138,38 +111,12 @@ func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*
 
 		total = uint32(_total)
 
-		return stm.
-			Select(
-				enttran.FieldID,
-				enttran.FieldCoinTypeID,
-				enttran.FieldFromAccountID,
-				enttran.FieldToAccountID,
-				enttran.FieldAmount,
-				enttran.FieldFeeAmount,
-				enttran.FieldState,
-				enttran.FieldChainTxID,
-				enttran.FieldType,
-				enttran.FieldExtra,
-				enttran.FieldCreatedAt,
-				enttran.FieldUpdatedAt,
-			).
+		stm = stm.
+			Order(ent.Desc(enttran.FieldUpdatedAt)).
 			Offset(int(offset)).
-			Limit(int(limit)).
-			Modify(func(s *sql.Selector) {
-				t1 := sql.Table(entcoinbase.Table)
-				s.
-					LeftJoin(t1).
-					On(
-						s.C(enttran.FieldCoinTypeID),
-						t1.C(entcoinbase.FieldID),
-					).
-					AppendSelect(
-						sql.As(t1.C(entcoinbase.FieldName), "coin_name"),
-						sql.As(t1.C(entcoinbase.FieldLogo), "coin_logo"),
-						sql.As(t1.C(entcoinbase.FieldUnit), "coin_unit"),
-						sql.As(t1.C(entcoinbase.FieldEnv), "coin_env"),
-					)
-			}).
+			Limit(int(limit))
+
+		return join(stm).
 			Scan(_ctx, &infos)
 	})
 	if err != nil {
@@ -179,6 +126,39 @@ func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*
 	infos = expand(infos)
 
 	return infos, total, nil
+}
+
+func join(stm *ent.TranQuery) *ent.TranSelect {
+	return stm.
+		Select(
+			enttran.FieldID,
+			enttran.FieldCoinTypeID,
+			enttran.FieldFromAccountID,
+			enttran.FieldToAccountID,
+			enttran.FieldAmount,
+			enttran.FieldFeeAmount,
+			enttran.FieldState,
+			enttran.FieldChainTxID,
+			enttran.FieldType,
+			enttran.FieldExtra,
+			enttran.FieldCreatedAt,
+			enttran.FieldUpdatedAt,
+		).
+		Modify(func(s *sql.Selector) {
+			t1 := sql.Table(entcoinbase.Table)
+			s.
+				LeftJoin(t1).
+				On(
+					s.C(enttran.FieldCoinTypeID),
+					t1.C(entcoinbase.FieldID),
+				).
+				AppendSelect(
+					sql.As(t1.C(entcoinbase.FieldName), "coin_name"),
+					sql.As(t1.C(entcoinbase.FieldLogo), "coin_logo"),
+					sql.As(t1.C(entcoinbase.FieldUnit), "coin_unit"),
+					sql.As(t1.C(entcoinbase.FieldEnv), "coin_env"),
+				)
+		})
 }
 
 func expand(infos []*npool.Tx) []*npool.Tx {

@@ -228,9 +228,9 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 		total = uint32(_total)
 
 		stm.
+			Order(ent.Desc(entcurrency.FieldCreatedAt)).
 			Offset(int(offset)).
-			Limit(int(limit)).
-			Order(ent.Desc(entcurrency.FieldCreatedAt))
+			Limit(int(limit))
 
 		return join(stm).
 			Scan(_ctx, &infos)
