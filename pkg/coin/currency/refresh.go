@@ -13,7 +13,7 @@ import (
 
 func RefreshCurrencies(ctx context.Context) error {
 	offset := int32(0)
-	limit := int32(100)
+	const limit = int32(100)
 
 	for {
 		coins, _, err := coin1.GetCoins(ctx, &coinmwpb.Conds{}, offset, limit)
@@ -68,6 +68,4 @@ func RefreshCurrencies(ctx context.Context) error {
 			return err
 		}
 	}
-
-	return nil
 }

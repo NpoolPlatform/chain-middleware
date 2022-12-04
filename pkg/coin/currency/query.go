@@ -79,7 +79,6 @@ func GetCoinCurrency(ctx context.Context, coinTypeID string) (*npool.Currency, e
 			MarketValueLow:  "1",
 			FeedTypeStr:     currencymgrpb.FeedType_StableUSDHardCode.String(),
 			FeedType:        currencymgrpb.FeedType_StableUSDHardCode,
-			FeedSource:      currencymgrpb.FeedType_StableUSDHardCode.String(),
 		}, nil
 	}
 
@@ -187,7 +186,6 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 			MarketValueLow:  "1",
 			FeedTypeStr:     currencymgrpb.FeedType_StableUSDHardCode.String(),
 			FeedType:        currencymgrpb.FeedType_StableUSDHardCode,
-			FeedSource:      currencymgrpb.FeedType_StableUSDHardCode.String(),
 		})
 	}
 
