@@ -67,5 +67,7 @@ func RefreshCurrencies(ctx context.Context) error {
 		if _, err = CreateCurrencies(ctx, currencies); err != nil {
 			return err
 		}
+
+		offset += limit
 	}
 }
