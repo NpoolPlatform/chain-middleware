@@ -3,6 +3,7 @@ package coin
 import (
 	"context"
 	"fmt"
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
@@ -91,6 +92,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 			Presale: conds.Presale,
 			ENV:     conds.ENV,
 			ForPay:  conds.ForPay,
+			Name:    conds.Name,
 		}, cli)
 		if err != nil {
 			return err
@@ -163,6 +165,59 @@ func GetManyCoins(ctx context.Context, coinTypeIDs []string) (infos []*npool.Coi
 	}
 
 	return infos, nil
+}
+
+func GetCoinOnly(ctx context.Context, conds *npool.Conds) (info *npool.Coin, err error) {
+	infos := []*npool.Coin{}
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoins")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
+
+	ids := []uuid.UUID{}
+	for _, id := range conds.GetIDs().GetValue() {
+		ids = append(ids, uuid.MustParse(id))
+	}
+
+	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm, err := basecrud.SetQueryConds(&basemgrpb.Conds{
+			ID:      conds.ID,
+			Presale: conds.Presale,
+			ENV:     conds.ENV,
+			ForPay:  conds.ForPay,
+			Name:    conds.Name,
+		}, cli)
+		if err != nil {
+			return err
+		}
+
+		if len(ids) > 0 {
+			stm = stm.
+				Where(
+					entbase.IDIn(ids...),
+				)
+		}
+
+		return join(stm).
+			Scan(_ctx, &infos)
+	})
+
+	if len(infos) == 0 {
+		return nil, nil
+	}
+	if len(infos) > 1 {
+		logger.Sugar().Errorw("err", "too many records")
+		return nil, fmt.Errorf("too many records")
+	}
+
+	return infos[0], nil
 }
 
 func join(stm *ent.CoinBaseQuery) *ent.CoinBaseSelect {

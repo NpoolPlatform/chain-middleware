@@ -27,6 +27,7 @@ import (
 	"github.com/google/uuid"
 )
 
+//nolint
 func ValidateCreate(in *npool.CoinReq) error {
 	if in.ID != nil {
 		if _, err := uuid.Parse(in.GetID()); err != nil {
