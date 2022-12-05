@@ -17,7 +17,7 @@ const (
 	timeout      = 5
 )
 
-func coinNameMap(coinName string) string {
+func coinNameMap(coinName string) (string, bool) {
 	coinMap := map[string]string{
 		"fil":          "filecoin",
 		"filecoin":     "filecoin",
@@ -47,20 +47,24 @@ func coinNameMap(coinName string) string {
 		"usdcerc20":    "usdcerc20",
 	}
 	if coin, ok := coinMap[coinName]; ok {
-		return coin
+		return coin, true
 	}
-	return ""
+	return coinName, false
 }
 
 func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 	coins := ""
+
 	for _, val := range coinNames {
-		coin := coinNameMap(strings.ToLower(val))
-		if coin != "" {
-			coins += fmt.Sprintf("%v,", coinNameMap(strings.ToLower(val)))
+		coin, ok := coinNameMap(strings.ToLower(val))
+		if !ok {
+			return nil, fmt.Errorf("not supported coin: %v", val)
 		}
+		if coins != "" {
+			coins += ","
+		}
+		coins += fmt.Sprintf("%v", coin)
 	}
-	coins = coins[:len(coins)-1]
 
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 	url := fmt.Sprintf("%v%v?ids=%v&vs_currencies=usd", coinGeckoAPI, "/simple/price", coins)

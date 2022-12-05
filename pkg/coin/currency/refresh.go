@@ -29,6 +29,9 @@ func RefreshCurrencies(ctx context.Context) error {
 			if coin.StableUSD {
 				continue
 			}
+			if coin.Presale {
+				continue
+			}
 			names = append(names, coin.Name)
 		}
 

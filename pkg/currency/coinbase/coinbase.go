@@ -7,12 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	"github.com/shopspring/decimal"
 
 	"github.com/go-resty/resty/v2"
 )
 
-func coinNameMap(coinName string) string {
+func coinNameMap(coinName string) (string, bool) {
 	coinMap := map[string]string{
 		"fil":          "FIL",
 		"filecoin":     "FIL",
@@ -34,9 +36,9 @@ func coinNameMap(coinName string) string {
 		"usdcerc20":    "usdcerc20",
 	}
 	if coin, ok := coinMap[coinName]; ok {
-		return coin
+		return coin, true
 	}
-	return ""
+	return coinName, false
 }
 
 const (
@@ -55,7 +57,10 @@ type apiResp struct {
 }
 
 func CoinBaseUSDPrice(coinName string) (decimal.Decimal, error) {
-	coin := coinNameMap(strings.ToLower(coinName))
+	coin, ok := coinNameMap(strings.ToLower(coinName))
+	if !ok {
+		return decimal.Decimal{}, fmt.Errorf("not supported coin")
+	}
 
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 
@@ -95,6 +100,7 @@ func CoinBaseUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 	for _, name := range coinNames {
 		price, err := CoinBaseUSDPrice(name)
 		if err != nil {
+			logger.Sugar().Errorw("CoinBaseUSDPrices", "Coin", name, "error", err)
 			return nil, err
 		}
 		prices[name] = price
