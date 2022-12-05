@@ -66,7 +66,7 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 		if coins != "" {
 			coins += ","
 		}
-		coins += fmt.Sprintf("%v", coin)
+		coins += coin
 	}
 
 	if coins == "" {
