@@ -3,6 +3,7 @@ package coin
 import (
 	"context"
 	"fmt"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"

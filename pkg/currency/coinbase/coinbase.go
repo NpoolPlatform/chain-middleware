@@ -101,11 +101,15 @@ func CoinBaseUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 		price, err := CoinBaseUSDPrice(name)
 		if err != nil {
 			logger.Sugar().Errorw("CoinBaseUSDPrices", "Coin", name, "error", err)
-			return nil, err
+			continue
 		}
 		prices[name] = price
 
 		time.Sleep(500 * time.Millisecond) //nolint
+	}
+
+	if len(prices) == 0 {
+		return nil, fmt.Errorf("invalid coins")
 	}
 
 	return prices, nil

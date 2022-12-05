@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	"github.com/shopspring/decimal"
 
 	"github.com/go-resty/resty/v2"
@@ -58,12 +60,17 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 	for _, val := range coinNames {
 		coin, ok := coinNameMap(strings.ToLower(val))
 		if !ok {
-			return nil, fmt.Errorf("not supported coin: %v", val)
+			logger.Sugar().Errorw("CoinGeckoUSDPrices", "Coin", val)
+			continue
 		}
 		if coins != "" {
 			coins += ","
 		}
 		coins += fmt.Sprintf("%v", coin)
+	}
+
+	if coins == "" {
+		return nil, fmt.Errorf("invalid coins")
 	}
 
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
