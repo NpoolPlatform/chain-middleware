@@ -50,6 +50,7 @@ var logo = uuid.NewString()
 var ret = &npool.Coin{
 	ID:                          uuid.NewString(),
 	AppID:                       uuid.NewString(),
+	CoinName:                    name,
 	Name:                        name,
 	Logo:                        logo,
 	Unit:                        unit,

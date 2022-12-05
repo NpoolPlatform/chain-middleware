@@ -40,6 +40,7 @@ var coinReq = &coinmwpb.CoinReq{
 
 var ret = &npool.Coin{
 	AppID:                       uuid.NewString(),
+	CoinName:                    coinName,
 	Name:                        "My BTC1",
 	Logo:                        uuid.NewString(),
 	Unit:                        coinUnit,
