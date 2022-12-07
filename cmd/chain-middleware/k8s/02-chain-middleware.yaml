@@ -38,6 +38,11 @@ spec:
                 configMapKeyRef:
                   name: system-environment
                   key: environment.consul_port
+            - name: ENV_CURRENCY_REQUEST_PROXY
+              valueFrom:
+                configMapKeyRef:
+                  name: currency-proxy-environment
+                  key: environment.currency_proxy
             - name: ENV_CLUSTER_NAMESPACE
               valueFrom:
                 fieldRef:
