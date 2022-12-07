@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: currency-proxy-environment
+  namespace: kube-system
+data:
+  environment.currency_proxy: ""
