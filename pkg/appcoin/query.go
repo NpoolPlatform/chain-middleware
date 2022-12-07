@@ -251,6 +251,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 					t4.C(entcoinbase.FieldID),
 				).
 				AppendSelect(
+					sql.As(t4.C(entcoinbase.FieldName), "coin_name"),
 					sql.As(t4.C(entcoinbase.FieldUnit), "unit"),
 					sql.As(t4.C(entcoinbase.FieldEnv), "env"),
 					sql.As(t4.C(entcoinbase.FieldPresale), "presale"),
