@@ -66,6 +66,8 @@ func CoinBaseUSDPrice(coinName string) (decimal.Decimal, error) {
 
 	url := strings.ReplaceAll(coinbaseAPI, "COIN", coin)
 
+	logger.Sugar().Errorw("CoinBaseUSDPrice", "URL", url)
+
 	cli := resty.New()
 	cli = cli.SetTimeout(timeout * time.Second)
 	if socksProxy != "" {
@@ -74,20 +76,24 @@ func CoinBaseUSDPrice(coinName string) (decimal.Decimal, error) {
 
 	resp, err := cli.R().Get(url)
 	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
 		return decimal.Decimal{}, err
 	}
 	r := apiResp{}
 	err = json.Unmarshal(resp.Body(), &r)
 	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
 		return decimal.Decimal{}, err
 	}
 
 	if coin != r.Data.Base {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", "invalid coinbase")
 		return decimal.Decimal{}, fmt.Errorf("invalid coin currency %v: %v", url, string(resp.Body()))
 	}
 
 	amount, err := decimal.NewFromString(r.Data.Amount)
 	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
 		return decimal.Decimal{}, err
 	}
 

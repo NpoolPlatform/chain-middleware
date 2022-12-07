@@ -56,6 +56,7 @@ func coinNameMap(coinName string) (string, bool) {
 
 func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 	coins := ""
+	coinMap := map[string]string{}
 
 	for _, val := range coinNames {
 		coin, ok := coinNameMap(strings.ToLower(val))
@@ -67,11 +68,14 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 			coins += ","
 		}
 		coins += coin
+		coinMap[coin] = val
 	}
 
 	if coins == "" {
 		return nil, fmt.Errorf("invalid coins")
 	}
+
+	logger.Sugar().Errorw("CoinGeckoUSDPrices", "Coins", coins)
 
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 	url := fmt.Sprintf("%v%v?ids=%v&vs_currencies=usd", coinGeckoAPI, "/simple/price", coins)
@@ -88,16 +92,21 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 	respMap := map[string]map[string]float64{}
 	err = json.Unmarshal(resp.Body(), &respMap)
 	if err != nil {
+		logger.Sugar().Errorw("CoinGeckoUSDPrices", "error", err)
 		return nil, err
 	}
 
 	infoMap := map[string]decimal.Decimal{}
 	for key, val := range respMap {
+		coin, ok := coinMap[key]
+		if !ok {
+			return nil, fmt.Errorf("invalid coin")
+		}
 		price := decimal.NewFromInt(0)
 		for _, v := range val {
 			price = decimal.NewFromFloat(v)
 		}
-		infoMap[key] = price
+		infoMap[coin] = price
 	}
 
 	return infoMap, nil
