@@ -29,6 +29,9 @@ func RefreshCurrencies(ctx context.Context) error {
 			if coin.StableUSD {
 				continue
 			}
+			if coin.Presale {
+				continue
+			}
 			names = append(names, coin.Name)
 		}
 
@@ -51,7 +54,7 @@ func RefreshCurrencies(ctx context.Context) error {
 		for name, currency := range prices {
 			coin, ok := coinMap[name]
 			if !ok {
-				return fmt.Errorf("invalid coin")
+				return fmt.Errorf("invalid coin: %v", name)
 			}
 
 			curr := currency.String()

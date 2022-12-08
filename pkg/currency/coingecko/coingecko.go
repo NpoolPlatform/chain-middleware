@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	"github.com/shopspring/decimal"
 
 	"github.com/go-resty/resty/v2"
@@ -17,7 +19,7 @@ const (
 	timeout      = 5
 )
 
-func coinNameMap(coinName string) string {
+func coinNameMap(coinName string) (string, bool) {
 	coinMap := map[string]string{
 		"fil":          "filecoin",
 		"filecoin":     "filecoin",
@@ -47,20 +49,33 @@ func coinNameMap(coinName string) string {
 		"usdcerc20":    "usdcerc20",
 	}
 	if coin, ok := coinMap[coinName]; ok {
-		return coin
+		return coin, true
 	}
-	return ""
+	return coinName, false
 }
 
 func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 	coins := ""
+	coinMap := map[string]string{}
+
 	for _, val := range coinNames {
-		coin := coinNameMap(strings.ToLower(val))
-		if coin != "" {
-			coins += fmt.Sprintf("%v,", coinNameMap(strings.ToLower(val)))
+		coin, ok := coinNameMap(strings.ToLower(val))
+		if !ok {
+			logger.Sugar().Errorw("CoinGeckoUSDPrices", "Coin", val)
+			continue
 		}
+		if coins != "" {
+			coins += ","
+		}
+		coins += coin
+		coinMap[coin] = val
 	}
-	coins = coins[:len(coins)-1]
+
+	if coins == "" {
+		return nil, fmt.Errorf("invalid coins")
+	}
+
+	logger.Sugar().Errorw("CoinGeckoUSDPrices", "Coins", coins)
 
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 	url := fmt.Sprintf("%v%v?ids=%v&vs_currencies=usd", coinGeckoAPI, "/simple/price", coins)
@@ -77,16 +92,21 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 	respMap := map[string]map[string]float64{}
 	err = json.Unmarshal(resp.Body(), &respMap)
 	if err != nil {
+		logger.Sugar().Errorw("CoinGeckoUSDPrices", "error", err)
 		return nil, err
 	}
 
 	infoMap := map[string]decimal.Decimal{}
 	for key, val := range respMap {
+		coin, ok := coinMap[key]
+		if !ok {
+			return nil, fmt.Errorf("invalid coin")
+		}
 		price := decimal.NewFromInt(0)
 		for _, v := range val {
 			price = decimal.NewFromFloat(v)
 		}
-		infoMap[key] = price
+		infoMap[coin] = price
 	}
 
 	return infoMap, nil

@@ -13,6 +13,7 @@ import (
 	scodes "go.opentelemetry.io/otel/codes"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/shopspring/decimal"
 
 	"github.com/NpoolPlatform/chain-manager/pkg/db"
 	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
@@ -178,6 +179,12 @@ func expand(infos []*npool.Coin) []*npool.Coin {
 		if info.Disabled {
 			info.Disabled = info.CoinDisabled
 		}
+		if info.MarketValue == "" {
+			info.MarketValue = decimal.NewFromInt(0).String()
+		}
+		if info.SettleValue == "" {
+			info.SettleValue = decimal.NewFromInt(0).String()
+		}
 	}
 	return infos
 }
@@ -251,6 +258,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 					t4.C(entcoinbase.FieldID),
 				).
 				AppendSelect(
+					sql.As(t4.C(entcoinbase.FieldName), "coin_name"),
 					sql.As(t4.C(entcoinbase.FieldUnit), "unit"),
 					sql.As(t4.C(entcoinbase.FieldEnv), "env"),
 					sql.As(t4.C(entcoinbase.FieldPresale), "presale"),

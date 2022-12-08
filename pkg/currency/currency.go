@@ -3,6 +3,8 @@ package currency
 import (
 	"context"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	coinbase "github.com/NpoolPlatform/chain-middleware/pkg/currency/coinbase"
 	coingecko "github.com/NpoolPlatform/chain-middleware/pkg/currency/coingecko"
 	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
@@ -47,8 +49,11 @@ func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.
 		return prices, currencymgrpb.FeedType_CoinGecko, nil
 	}
 
+	logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinGecko", "error", err)
+
 	prices1, err = coinbase.CoinBaseUSDPrices(names)
 	if err != nil {
+		logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinBase", "error", err)
 		return nil, currencymgrpb.FeedType_DefaultFeedType, err
 	}
 

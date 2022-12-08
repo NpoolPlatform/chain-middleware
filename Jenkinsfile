@@ -304,6 +304,7 @@ pipeline {
       }
       steps {
         sh 'sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml'
+        sh 'sed -i "s#currency_proxy: \\\"\\\"#currency_proxy: \\\"$CURRENCY_REQUEST_PROXY\\\"#g" cmd/chain-middleware/k8s/00-configmap.yaml'
         sh 'TAG=latest make deploy-to-k8s-cluster'
       }
     }
@@ -322,6 +323,7 @@ pipeline {
           git checkout $tag
           sed -i "s/chain-middleware:latest/chain-middleware:$tag/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
+          sed -i "s#currency_proxy: \\\"\\\"#currency_proxy: \\\"$CURRENCY_REQUEST_PROXY\\\"#g" cmd/chain-middleware/k8s/00-configmap.yaml
           TAG=$tag make deploy-to-k8s-cluster
         '''.stripIndent())
       }

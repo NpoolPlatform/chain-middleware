@@ -7,12 +7,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
 	"github.com/shopspring/decimal"
 
 	"github.com/go-resty/resty/v2"
 )
 
-func coinNameMap(coinName string) string {
+func coinNameMap(coinName string) (string, bool) {
 	coinMap := map[string]string{
 		"fil":          "FIL",
 		"filecoin":     "FIL",
@@ -34,9 +36,9 @@ func coinNameMap(coinName string) string {
 		"usdcerc20":    "usdcerc20",
 	}
 	if coin, ok := coinMap[coinName]; ok {
-		return coin
+		return coin, true
 	}
-	return ""
+	return coinName, false
 }
 
 const (
@@ -55,11 +57,16 @@ type apiResp struct {
 }
 
 func CoinBaseUSDPrice(coinName string) (decimal.Decimal, error) {
-	coin := coinNameMap(strings.ToLower(coinName))
+	coin, ok := coinNameMap(strings.ToLower(coinName))
+	if !ok {
+		return decimal.Decimal{}, fmt.Errorf("not supported coin")
+	}
 
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 
 	url := strings.ReplaceAll(coinbaseAPI, "COIN", coin)
+
+	logger.Sugar().Errorw("CoinBaseUSDPrice", "URL", url)
 
 	cli := resty.New()
 	cli = cli.SetTimeout(timeout * time.Second)
@@ -69,20 +76,24 @@ func CoinBaseUSDPrice(coinName string) (decimal.Decimal, error) {
 
 	resp, err := cli.R().Get(url)
 	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
 		return decimal.Decimal{}, err
 	}
 	r := apiResp{}
 	err = json.Unmarshal(resp.Body(), &r)
 	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
 		return decimal.Decimal{}, err
 	}
 
 	if coin != r.Data.Base {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", "invalid coinbase")
 		return decimal.Decimal{}, fmt.Errorf("invalid coin currency %v: %v", url, string(resp.Body()))
 	}
 
 	amount, err := decimal.NewFromString(r.Data.Amount)
 	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
 		return decimal.Decimal{}, err
 	}
 
@@ -95,11 +106,16 @@ func CoinBaseUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 	for _, name := range coinNames {
 		price, err := CoinBaseUSDPrice(name)
 		if err != nil {
-			return nil, err
+			logger.Sugar().Errorw("CoinBaseUSDPrices", "Coin", name, "error", err)
+			continue
 		}
 		prices[name] = price
 
 		time.Sleep(500 * time.Millisecond) //nolint
+	}
+
+	if len(prices) == 0 {
+		return nil, fmt.Errorf("invalid coins")
 	}
 
 	return prices, nil
