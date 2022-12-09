@@ -75,6 +75,9 @@ func DeleteCoin(ctx context.Context, id string) (*npool.Coin, error) {
 				return err
 			}
 		}
+		if info1 == nil {
+			return nil
+		}
 
 		_, err = appexratemgrcrud.UpdateSet(
 			info1,
