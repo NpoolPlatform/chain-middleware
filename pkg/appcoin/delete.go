@@ -75,15 +75,16 @@ func DeleteCoin(ctx context.Context, id string) (*npool.Coin, error) {
 				return err
 			}
 		}
-
-		_, err = appexratemgrcrud.UpdateSet(
-			info1,
-			&appexratemgrpb.ExchangeRateReq{
-				DeletedAt: &now,
-			},
-		).Save(_ctx)
-		if err != nil {
-			return err
+		if info1 != nil {
+			_, err = appexratemgrcrud.UpdateSet(
+				info1,
+				&appexratemgrpb.ExchangeRateReq{
+					DeletedAt: &now,
+				},
+			).Save(_ctx)
+			if err != nil {
+				return err
+			}
 		}
 
 		infos, err := tx.CoinDescription.Query().Where(
