@@ -67,15 +67,17 @@ func ValidateCreate(ctx context.Context, in *txmgrpb.TxReq) error { //nolint
 			"error", err)
 		return fmt.Errorf("amount is invalid")
 	}
-	switch in.GetState() {
-	case txmgrpb.TxState_StateCreated:
-	case txmgrpb.TxState_StateWait:
-	case txmgrpb.TxState_StateTransferring:
-	case txmgrpb.TxState_StateSuccessful:
-	case txmgrpb.TxState_StateFail:
-	default:
-		logger.Sugar().Errorw("CreateTx", "State", in.GetState(), "error", "State is invalid")
-		return fmt.Errorf("state is invalid")
+	if in.State != nil {
+		switch in.GetState() {
+		case txmgrpb.TxState_StateCreated:
+		case txmgrpb.TxState_StateWait:
+		case txmgrpb.TxState_StateTransferring:
+		case txmgrpb.TxState_StateSuccessful:
+		case txmgrpb.TxState_StateFail:
+		default:
+			logger.Sugar().Errorw("CreateTx", "State", in.GetState(), "error", "State is invalid")
+			return fmt.Errorf("state is invalid")
+		}
 	}
 	switch in.GetType() {
 	case txmgrpb.TxType_TxWithdraw:
