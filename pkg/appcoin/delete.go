@@ -71,7 +71,9 @@ func DeleteCoin(ctx context.Context, id string) (*npool.Coin, error) {
 			entappexrate.CoinTypeID(info.CoinTypeID),
 		).ForUpdate().Only(_ctx)
 		if err != nil {
-			return err
+			if !ent.IsNotFound(err) {
+				return err
+			}
 		}
 
 		_, err = appexratemgrcrud.UpdateSet(
@@ -89,7 +91,9 @@ func DeleteCoin(ctx context.Context, id string) (*npool.Coin, error) {
 			entdescription.CoinTypeID(info.CoinTypeID),
 		).ForUpdate().All(_ctx)
 		if err != nil {
-			return err
+			if !ent.IsNotFound(err) {
+				return err
+			}
 		}
 
 		for _, info2 := range infos {
