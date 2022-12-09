@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	npool2 "github.com/NpoolPlatform/message/npool"
+
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 
@@ -93,6 +96,22 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 		in.Logo = &info.Logo
 	}
 
+	coinInfo, err := appcoin1.GetCoinOnly(ctx, &npool.Conds{
+		AppID: &npool2.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetAppID(),
+		},
+		CoinTypeID: &npool2.StringVal{
+			Op:    cruder.EQ,
+			Value: in.GetCoinTypeID(),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if coinInfo != nil {
+		return nil, fmt.Errorf("app coin already exists")
+	}
 	return in, nil
 }
 
