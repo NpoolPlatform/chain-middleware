@@ -1,4 +1,3 @@
-//nolint:dupl
 package currency
 
 import (
@@ -112,27 +111,21 @@ func GetCoinCurrency(ctx context.Context, coinTypeID string) (*npool.Currency, e
 	return info.(*npool.Currency), nil
 }
 
-func GetCurrencies(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Currency, uint32, error) {
-	var total uint32
-
+func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetCurrencies(ctx, &npool.GetCurrenciesRequest{
-			Conds:  conds,
-			Offset: offset,
-			Limit:  limit,
+			Conds: conds,
 		})
 		if err != nil {
 			return nil, err
 		}
 
-		total = resp.Total
-
 		return resp.Infos, nil
 	})
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-	return infos.([]*npool.Currency), total, nil
+	return infos.([]*npool.Currency), nil
 }
 
 func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Currency, uint32, error) {

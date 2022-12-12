@@ -85,12 +85,12 @@ func getCurrency(t *testing.T) {
 }
 
 func getCurrencies(t *testing.T) {
-	infos, _, err := GetCurrencies(context.Background(), &npool.Conds{
+	infos, err := GetCurrencies(context.Background(), &npool.Conds{
 		CoinTypeID: &commonpb.StringVal{
 			Op:    cruder.EQ,
 			Value: ret.CoinTypeID,
 		},
-	}, 0, 1)
+	})
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
 		assert.Equal(t, infos[0], ret)
