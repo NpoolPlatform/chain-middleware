@@ -55,6 +55,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 			Presale:        in.Presale,
 			ReservedAmount: in.ReservedAmount,
 			ForPay:         in.ForPay,
+			Disabled:       in.Disabled,
 		}).Save(_ctx)
 		if err != nil {
 			return err
@@ -66,8 +67,9 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 		}
 
 		_, err = extracrud.UpdateSet(info1, &extramgrpb.CoinExtraReq{
-			HomePage: in.HomePage,
-			Specs:    in.Specs,
+			HomePage:  in.HomePage,
+			Specs:     in.Specs,
+			StableUSD: in.StableUSD,
 		}).Save(_ctx)
 		if err != nil {
 			return err
