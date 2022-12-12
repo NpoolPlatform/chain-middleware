@@ -194,7 +194,7 @@ func expand(infos []*npool.Coin) []*npool.Coin {
 	return infos
 }
 
-func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
+func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 	return stm.
 		Select(
 			entappcoin.FieldID,
