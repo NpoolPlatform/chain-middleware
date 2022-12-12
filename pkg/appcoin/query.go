@@ -48,6 +48,7 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
+			Debug().
 			AppCoin.
 			Query().
 			Where(
@@ -63,6 +64,10 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 		return nil, fmt.Errorf("no record")
 	}
 	if len(infos) > 1 {
+		fmt.Printf("too many record\n")
+		for _, info := range infos {
+			fmt.Printf(" %v\n", info)
+		}
 		return nil, fmt.Errorf("too many records")
 	}
 
@@ -212,6 +217,9 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 					s.C(entappcoin.FieldCoinTypeID),
 					t1.C(entcoinextra.FieldCoinTypeID),
 				).
+				Where(
+					sql.EQ(t1.C(entcoinextra.FieldDeletedAt), 0),
+				).
 				AppendSelect(
 					sql.As(t1.C(entcoinextra.FieldHomePage), "home_page"),
 					sql.As(t1.C(entcoinextra.FieldSpecs), "specs"),
@@ -224,6 +232,9 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 				On(
 					s.C(entappcoin.FieldCoinTypeID),
 					t2.C(entsetting.FieldCoinTypeID),
+				).
+				Where(
+					sql.EQ(t2.C(entsetting.FieldDeletedAt), 0),
 				).
 				AppendSelect(
 					sql.As(t2.C(entsetting.FieldFeeCoinTypeID), "fee_coin_type_id"),
@@ -243,6 +254,9 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 					t2.C(entsetting.FieldFeeCoinTypeID),
 					t3.C(entcoinbase.FieldID),
 				).
+				Where(
+					sql.EQ(t3.C(entcoinbase.FieldDeletedAt), 0),
+				).
 				AppendSelect(
 					sql.As(t3.C(entcoinbase.FieldName), "fee_coin_name"),
 					sql.As(t3.C(entcoinbase.FieldLogo), "fee_coin_logo"),
@@ -256,6 +270,9 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 				On(
 					s.C(entappcoin.FieldCoinTypeID),
 					t4.C(entcoinbase.FieldID),
+				).
+				Where(
+					sql.EQ(t4.C(entcoinbase.FieldDeletedAt), 0),
 				).
 				AppendSelect(
 					sql.As(t4.C(entcoinbase.FieldName), "coin_name"),
@@ -277,6 +294,9 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect {
 				On(
 					s.C(entappcoin.FieldAppID),
 					t5.C(entappexrate.FieldAppID),
+				).
+				Where(
+					sql.EQ(t5.C(entappexrate.FieldDeletedAt), 0),
 				).
 				AppendSelect(
 					sql.As(t5.C(entappexrate.FieldMarketValue), "market_value"),
