@@ -217,7 +217,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					s.C(entappcoin.FieldCoinTypeID),
 					t1.C(entcoinextra.FieldCoinTypeID),
 				).
-				Where(
+				OnP(
 					sql.EQ(t1.C(entcoinextra.FieldDeletedAt), 0),
 				).
 				AppendSelect(
@@ -233,7 +233,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					s.C(entappcoin.FieldCoinTypeID),
 					t2.C(entsetting.FieldCoinTypeID),
 				).
-				Where(
+				OnP(
 					sql.EQ(t2.C(entsetting.FieldDeletedAt), 0),
 				).
 				AppendSelect(
@@ -254,7 +254,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					t2.C(entsetting.FieldFeeCoinTypeID),
 					t3.C(entcoinbase.FieldID),
 				).
-				Where(
+				OnP(
 					sql.EQ(t3.C(entcoinbase.FieldDeletedAt), 0),
 				).
 				AppendSelect(
@@ -271,7 +271,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					s.C(entappcoin.FieldCoinTypeID),
 					t4.C(entcoinbase.FieldID),
 				).
-				Where(
+				OnP(
 					sql.EQ(t4.C(entcoinbase.FieldDeletedAt), 0),
 				).
 				AppendSelect(
@@ -295,7 +295,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					s.C(entappcoin.FieldAppID),
 					t5.C(entappexrate.FieldAppID),
 				).
-				Where(
+				OnP(
 					sql.EQ(t5.C(entappexrate.FieldDeletedAt), 0),
 				).
 				AppendSelect(
