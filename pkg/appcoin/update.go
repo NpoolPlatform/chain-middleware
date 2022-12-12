@@ -66,7 +66,26 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 			entappexrate.CoinTypeID(uuid.MustParse(in.GetCoinTypeID())),
 		).ForUpdate().Only(_ctx)
 		if err != nil {
-			return err
+			if !ent.IsNotFound(err) {
+				return err
+			}
+		}
+
+		if info1 == nil {
+			_, err = appexratemgrcrud.CreateSet(
+				tx.ExchangeRate.Create(),
+				&appexratemgrpb.ExchangeRateReq{
+					AppID:         in.AppID,
+					CoinTypeID:    in.CoinTypeID,
+					MarketValue:   in.MarketValue,
+					SettlePercent: in.SettlePercent,
+					Setter:        in.Setter,
+				},
+			).Save(_ctx)
+			if err != nil {
+				return err
+			}
+			return nil
 		}
 
 		_, err = appexratemgrcrud.UpdateSet(
