@@ -64,10 +64,6 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 		return nil, fmt.Errorf("no record")
 	}
 	if len(infos) > 1 {
-		fmt.Printf("too many record\n")
-		for _, info := range infos {
-			fmt.Printf(" %v\n", info)
-		}
 		return nil, fmt.Errorf("too many records")
 	}
 
@@ -181,7 +177,7 @@ func expand(infos []*npool.Coin) []*npool.Coin {
 		if !info.CoinForPay {
 			info.ForPay = info.CoinForPay
 		}
-		if info.Disabled {
+		if !info.Disabled {
 			info.Disabled = info.CoinDisabled
 		}
 		if info.MarketValue == "" {
