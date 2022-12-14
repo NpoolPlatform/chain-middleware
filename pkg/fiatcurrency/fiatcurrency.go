@@ -1,8 +1,6 @@
 package currency
 
 import (
-	"context"
-
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
 	coinbase "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency/coinbase"
@@ -12,7 +10,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func CoinUSDPrices(ctx context.Context, fiatCurrencyNames []string) (map[string]decimal.Decimal, currencymgrpb.FeedType, error) {
+func CoinUSDPrices(fiatCurrencyNames []string) (map[string]decimal.Decimal, currencymgrpb.FeedType, error) {
 	prices := map[string]decimal.Decimal{}
 
 	prices1, err := coingecko.UsdFiatCurrency(fiatCurrencyNames)

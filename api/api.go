@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"github.com/NpoolPlatform/chain-middleware/api/coin/fiatcurrency"
 
 	chainmw "github.com/NpoolPlatform/message/npool/chain/mw/v1"
 
@@ -26,6 +27,7 @@ func Register(server grpc.ServiceRegistrar) {
 	coin.Register(server)
 	tran.Register(server)
 	currency.Register(server)
+	fiatcurrency.Register(server)
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {

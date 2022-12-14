@@ -61,7 +61,63 @@ func GetCoinFiatCurrency(ctx context.Context, coinTypeID string) (*npool.FiatCur
 			FiatCurrency.
 			Query().
 			Where(
-				entfiatcurrency.CoinTypeID(uuid.MustParse(coinTypeID)),
+				entfiatcurrency.FiatTypeID(uuid.MustParse(coinTypeID)),
+			).
+			Order(ent.Desc(entfiatcurrency.FieldCreatedAt)).
+			Limit(1)
+
+		return join(stm).
+			Scan(_ctx, &infos)
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(infos) == 0 {
+		return nil, fmt.Errorf("no record")
+	}
+	if len(infos) > 1 {
+		return nil, fmt.Errorf("too many record")
+	}
+
+	infos = expand(infos)
+
+	return infos[0], nil
+}
+
+func GetFiatCurrency(ctx context.Context, id string) (*npool.FiatCurrency, error) {
+	var infos []*npool.FiatCurrency
+
+	coin, err := coin1.GetCoin(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if coin.StableUSD {
+		now := uint32(time.Now().Unix())
+
+		return &npool.FiatCurrency{
+			ID:                 constuuid.InvalidUUIDStr,
+			FiatCurrencyTypeID: "",
+			FiatCurrencyName:   "",
+			CreatedAt:          now,
+			UpdatedAt:          now,
+			MarketValueHigh:    "1",
+			MarketValueLow:     "1",
+			FeedTypeStr:        currencymgrpb.FeedType_StableUSDHardCode.String(),
+			FeedType:           currencymgrpb.FeedType_StableUSDHardCode,
+			CoinTypeID:         "",
+			CoinName:           coin.Name,
+			CoinLogo:           coin.Logo,
+			CoinUnit:           coin.Unit,
+			CoinENV:            coin.ENV,
+		}, nil
+	}
+
+	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm := cli.
+			FiatCurrency.
+			Query().
+			Where(
+				entfiatcurrency.FiatTypeID(uuid.MustParse(id)),
 			).
 			Order(ent.Desc(entfiatcurrency.FieldCreatedAt)).
 			Limit(1)
@@ -113,7 +169,7 @@ func GetFiatCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.FiatCu
 
 			stm, err := crud.SetQueryConds(&fiatcurrencymgrpb.Conds{
 				ID: conds.ID,
-				CoinTypeID: &commonpb.StringVal{
+				FiatTypeID: &commonpb.StringVal{
 					Op:    cruder.EQ,
 					Value: id,
 				},
@@ -158,8 +214,8 @@ func GetFiatCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.FiatCu
 			UpdatedAt:       now,
 			MarketValueHigh: "1",
 			MarketValueLow:  "1",
-			FeedTypeStr:     fiatcurrencymgrpb.FeedType_StableUSDHardCode.String(),
-			FeedType:        fiatcurrencymgrpb.FeedType_StableUSDHardCode,
+			FeedTypeStr:     currencymgrpb.FeedType_StableUSDHardCode.String(),
+			FeedType:        currencymgrpb.FeedType_StableUSDHardCode,
 		})
 	}
 
@@ -180,7 +236,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm, err := crud.SetQueryConds(&fiatcurrencymgrpb.Conds{
 			ID:         conds.ID,
-			CoinTypeID: conds.CoinTypeID,
+			FiatTypeID: conds.CoinTypeID,
 			StartAt:    conds.StartAt,
 			EndAt:      conds.EndAt,
 		}, cli)
@@ -190,7 +246,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 
 		if len(ids) > 0 {
 			stm.Where(
-				entfiatcurrency.CoinTypeIDIn(ids...),
+				entfiatcurrency.FiatTypeIDIn(ids...),
 			)
 		}
 
@@ -222,7 +278,7 @@ func join(stm *ent.FiatCurrencyQuery) *ent.FiatCurrencySelect {
 	return stm.
 		Select(
 			entfiatcurrency.FieldID,
-			entfiatcurrency.FieldCoinTypeID,
+			entfiatcurrency.FieldFiatTypeID,
 			entfiatcurrency.FieldFeedType,
 			entfiatcurrency.FieldMarketValueHigh,
 			entfiatcurrency.FieldMarketValueLow,
@@ -234,7 +290,7 @@ func join(stm *ent.FiatCurrencyQuery) *ent.FiatCurrencySelect {
 			s.
 				LeftJoin(t1).
 				On(
-					s.C(entfiatcurrency.FieldCoinTypeID),
+					s.C(entfiatcurrency.FieldFiatTypeID),
 					t1.C(entcoinbase.FieldID),
 				).
 				AppendSelect(
@@ -248,7 +304,7 @@ func join(stm *ent.FiatCurrencyQuery) *ent.FiatCurrencySelect {
 
 func expand(infos []*npool.FiatCurrency) []*npool.FiatCurrency {
 	for _, info := range infos {
-		info.FeedType = fiatcurrencymgrpb.FeedType(fiatcurrencymgrpb.FeedType_value[info.FeedTypeStr])
+		info.FeedType = currencymgrpb.FeedType(currencymgrpb.FeedType_value[info.FeedTypeStr])
 	}
 	return infos
 }

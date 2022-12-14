@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
-	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
-	currency "github.com/NpoolPlatform/chain-middleware/pkg/currency"
+	fiatcurrency "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency"
 )
 
-func RefreshCurrencies(ctx context.Context) error {
+func RefreshFiatCurrencies(ctx context.Context) error {
 	offset := int32(0)
 	const limit = int32(100)
 
@@ -39,35 +39,35 @@ func RefreshCurrencies(ctx context.Context) error {
 			continue
 		}
 
-		prices, feedType, err := currency.CoinUSDPrices(ctx, names)
+		prices, feedType, err := fiatcurrency.CoinUSDPrices(names)
 		if err != nil {
 			return err
 		}
 
-		currencies := []*currencymgrpb.CurrencyReq{}
+		currencies := []*fiatcurrencymgrpb.FiatCurrencyReq{}
 
 		coinMap := map[string]*coinmwpb.Coin{}
 		for _, coin := range coins {
 			coinMap[coin.Name] = coin
 		}
 
-		for name, currency := range prices {
+		for name, fiatcurrency := range prices {
 			coin, ok := coinMap[name]
 			if !ok {
 				return fmt.Errorf("invalid coin: %v", name)
 			}
 
-			curr := currency.String()
+			curr := fiatcurrency.String()
 
-			currencies = append(currencies, &currencymgrpb.CurrencyReq{
-				CoinTypeID:      &coin.ID,
+			currencies = append(currencies, &fiatcurrencymgrpb.FiatCurrencyReq{
+				FiatTypeID:      &coin.ID,
 				FeedType:        &feedType,
 				MarketValueHigh: &curr,
 				MarketValueLow:  &curr,
 			})
 		}
 
-		if _, err = CreateCurrencies(ctx, currencies); err != nil {
+		if _, err = CreateFiatCurrencies(ctx, currencies); err != nil {
 			return err
 		}
 

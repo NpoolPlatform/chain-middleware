@@ -12,7 +12,7 @@ import (
 	commonpb "github.com/NpoolPlatform/message/npool"
 )
 
-func CreateFiatFiatCurrency(ctx context.Context, in *fiatcurrencymgrpb.FiatCurrencyReq) (*npool.FiatCurrency, error) {
+func CreateFiatCurrency(ctx context.Context, in *fiatcurrencymgrpb.FiatCurrencyReq) (*npool.FiatCurrency, error) {
 	info, err := fiatcurrencymgrcli.CreateFiatCurrency(ctx, in)
 	if err != nil {
 		return nil, err
