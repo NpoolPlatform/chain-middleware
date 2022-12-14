@@ -56,6 +56,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 				Disabled:                 in.Disabled,
 				DailyRewardAmount:        in.DailyRewardAmount,
 				ProductPage:              in.ProductPage,
+				Display:                  in.Display,
 			},
 		).Save(_ctx)
 		if err != nil {

@@ -120,7 +120,6 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 	if err != nil {
 		return nil, 0, err
 	}
-
 	infos = expand(infos)
 
 	return infos, total, nil
@@ -204,6 +203,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 			entappcoin.FieldDisabled,
 			entappcoin.FieldCreatedAt,
 			entappcoin.FieldUpdatedAt,
+			entappcoin.FieldDisplay,
 		).
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entcoinextra.Table)
