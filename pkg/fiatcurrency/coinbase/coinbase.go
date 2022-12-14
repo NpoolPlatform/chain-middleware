@@ -1,0 +1,51 @@
+package currencyvalue
+
+import (
+	"encoding/json"
+	"os"
+	"time"
+
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+
+	"github.com/go-resty/resty/v2"
+)
+
+const (
+	coinbaseAPI = "https://api.coinbase.com/v2/exchange-rates?currency=USD"
+	timeout     = 5
+)
+
+type apiData struct {
+	Base  string            `json:"base"`
+	Rates map[string]string `json:"rates"`
+}
+
+type apiResp struct {
+	Data apiData `json:"data"`
+}
+
+func UseFaitCurrency() (map[string]string, error) {
+	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
+
+	logger.Sugar().Errorw("CoinBaseUSDPrice", "URL", coinbaseAPI)
+
+	cli := resty.New()
+	cli = cli.SetTimeout(timeout * time.Second)
+	if socksProxy != "" {
+		cli = cli.SetProxy(socksProxy)
+	}
+
+	resp, err := cli.R().Get(coinbaseAPI)
+	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
+		return nil, err
+	}
+	r := apiResp{}
+	err = json.Unmarshal(resp.Body(), &r)
+	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
+		return nil, err
+	}
+
+	return r.Data.Rates, nil
+}
