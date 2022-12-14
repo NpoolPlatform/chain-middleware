@@ -61,7 +61,6 @@ var ret = &npool.Coin{
 	SettleValue:                 "0.000000000000000000",
 	SettlePercent:               90,
 	Setter:                      uuid.NewString(),
-	Disabled:                    true,
 }
 
 var req = &npool.CoinReq{
@@ -85,7 +84,7 @@ func create(t *testing.T) {
 		ret.ID = info.ID
 		ret.CoinTypeID = coin.ID
 		ret.FeeCoinTypeID = coin.ID
-
+		ret.Display = coin.Disabled
 		assert.Equal(t, info, ret)
 	}
 }
@@ -106,6 +105,7 @@ func update(t *testing.T) {
 
 	info, err := UpdateCoin(context.Background(), req)
 	if assert.Nil(t, err) {
+		ret.Display = info.Disabled
 		ret.UpdatedAt = info.UpdatedAt
 		assert.Equal(t, info, ret)
 	}

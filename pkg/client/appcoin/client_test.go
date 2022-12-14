@@ -100,6 +100,7 @@ func createCoin(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
 		ret.FeeCoinTypeID = info.FeeCoinTypeID
+		ret.Display = info.Display
 		assert.Equal(t, ret, info)
 	}
 }
@@ -117,6 +118,7 @@ func updateCoin(t *testing.T) {
 
 	info, err := UpdateCoin(context.Background(), req)
 	if assert.Nil(t, err) {
+		ret.Display = info.Display
 		ret.UpdatedAt = info.UpdatedAt
 		assert.Equal(t, info, ret)
 	}
