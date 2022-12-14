@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -18,7 +19,7 @@ const (
 	timeout      = 5
 )
 
-func CoinGeckoFiatCurrency(FiatCurrencyName []string) (map[string]decimal.Decimal, error) {
+func UsdFiatCurrency(FiatCurrencyName []string) (map[string]decimal.Decimal, error) {
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 	url := fmt.Sprintf("%v%v?ids=usd&vs_currencies=%v", coinGeckoAPI, "/simple/price", FiatCurrencyName)
 	cli := resty.New()
@@ -38,14 +39,13 @@ func CoinGeckoFiatCurrency(FiatCurrencyName []string) (map[string]decimal.Decima
 		return nil, err
 	}
 
-	infoMap := map[string]decimal.Decimal{}
-	for _, val := range respMap {
-		price := decimal.NewFromInt(0)
-		for _, v := range val {
-			price = decimal.NewFromFloat(v)
-		}
-		infoMap[coin] = price
-	}
+	respMap1 := map[string]decimal.Decimal{}
 
-	return infoMap, nil
+	if _, ok := respMap["usd"]; ok {
+		for key, val := range respMap["usd"] {
+			c := decimal.NewFromFloat(val)
+			respMap1[strings.ToLower(key)] = c
+		}
+	}
+	return respMap1, nil
 }

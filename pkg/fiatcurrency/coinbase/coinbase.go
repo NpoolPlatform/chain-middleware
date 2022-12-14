@@ -2,6 +2,7 @@ package currencyvalue
 
 import (
 	"encoding/json"
+	"github.com/shopspring/decimal"
 	"os"
 	"time"
 
@@ -24,7 +25,7 @@ type apiResp struct {
 	Data apiData `json:"data"`
 }
 
-func UseFaitCurrency() (map[string]string, error) {
+func UsdFaitCurrency() (map[string]decimal.Decimal, error) {
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 
 	logger.Sugar().Errorw("CoinBaseUSDPrice", "URL", coinbaseAPI)
@@ -47,5 +48,13 @@ func UseFaitCurrency() (map[string]string, error) {
 		return nil, err
 	}
 
-	return r.Data.Rates, nil
+	respMap := map[string]decimal.Decimal{}
+	for k, v := range r.Data.Rates {
+		c, err := decimal.NewFromString(v)
+		if err != nil {
+			return nil, err
+		}
+		respMap[k] = c
+	}
+	return respMap, nil
 }

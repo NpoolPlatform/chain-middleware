@@ -41,7 +41,7 @@ func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.
 		names = append(names, name)
 	}
 
-	prices1, err := coingecko.CoinGeckoUSDPrices(names)
+	prices1, err := coingecko.CoinGeckoFiatCurrency(names)
 	if err == nil {
 		for name, price := range prices1 {
 			prices[name] = price
