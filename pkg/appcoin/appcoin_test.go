@@ -61,6 +61,7 @@ var ret = &npool.Coin{
 	SettleValue:                 "0.000000000000000000",
 	SettlePercent:               90,
 	Setter:                      uuid.NewString(),
+	Disabled:                    true,
 }
 
 var req = &npool.CoinReq{
