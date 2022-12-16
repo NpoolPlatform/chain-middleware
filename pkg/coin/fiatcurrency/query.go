@@ -8,7 +8,6 @@ import (
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
 	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
 	currencymwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
 	"github.com/shopspring/decimal"
@@ -18,8 +17,6 @@ import (
 
 	entfiatcurrency "github.com/NpoolPlatform/chain-manager/pkg/db/ent/fiatcurrency"
 	entfiatcurrencytype "github.com/NpoolPlatform/chain-manager/pkg/db/ent/fiatcurrencytype"
-
-	crud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/fiatcurrency"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/chain-middleware/pkg/coin/currency"
@@ -190,21 +187,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm, err := crud.SetQueryConds(&fiatcurrencymgrpb.Conds{
-			ID:                 conds.ID,
-			FiatCurrencyTypeID: conds.FiatCurrencyTypeID,
-			StartAt:            conds.StartAt,
-			EndAt:              conds.EndAt,
-		}, cli)
-		if err != nil {
-			return err
-		}
-
-		if len(ids) > 0 {
-			stm.Where(
-				entfiatcurrency.FiatCurrencyTypeIDIn(ids...),
-			)
-		}
+		stm := cli.FiatCurrency.Query()
 
 		_total, err := stm.Count(_ctx)
 		if err != nil {
@@ -216,7 +199,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 		stm.
 			Offset(int(offset)).
 			Limit(int(limit))
-		return join(stm, nil).
+		return join(stm, conds).
 			Scan(_ctx, &infos)
 	})
 	if err != nil {
