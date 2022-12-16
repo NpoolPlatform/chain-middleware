@@ -19,19 +19,19 @@ const (
 	timeout      = 5
 )
 
-func UsdFiatCurrency(FiatCurrencyName []string) (map[string]decimal.Decimal, error) {
+func UsdFiatCurrency(fiatCurrencyName []string) (map[string]decimal.Decimal, error) {
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
-	url := fmt.Sprintf("%v%v?ids=usd&vs_currencies=%v", coinGeckoAPI, "/simple/price", FiatCurrencyName)
+	url := fmt.Sprintf("%v%v?ids=usd&vs_currencies=%v", coinGeckoAPI, "/simple/price", strings.Join(fiatCurrencyName, `,`))
 	cli := resty.New()
 	cli = cli.SetTimeout(timeout * time.Second)
 	if socksProxy != "" {
 		cli = cli.SetProxy(socksProxy)
 	}
-
 	resp, err := cli.R().Get(url)
 	if err != nil {
 		return nil, err
 	}
+
 	respMap := map[string]map[string]float64{}
 	err = json.Unmarshal(resp.Body(), &respMap)
 	if err != nil {

@@ -11,7 +11,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) RefreshFiatCurrencies(ctx context.Context, in *npool.RefreshFiatCurrenciesRequest) (*npool.RefreshFiatCurrenciesResponse, error) {
+func (s *Server) RefreshFiatCurrencies(
+	ctx context.Context,
+	in *npool.RefreshFiatCurrenciesRequest,
+) (
+	*npool.RefreshFiatCurrenciesResponse,
+	error,
+) {
 	if err := fiatcurrency1.RefreshFiatCurrencies(ctx); err != nil {
 		return &npool.RefreshFiatCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}

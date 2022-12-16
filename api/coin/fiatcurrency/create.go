@@ -30,14 +30,14 @@ func ValidateCreate(ctx context.Context, in *fiatcurrencymgrpb.FiatCurrencyReq) 
 		}
 	}
 
-	if _, err := uuid.Parse(in.GetFiatTypeID()); err != nil {
-		logger.Sugar().Errorw("CreateFiatCurrency", "FiatTypeID", in.GetFiatTypeID(), "error", err)
+	if _, err := uuid.Parse(in.GetFiatCurrencyTypeID()); err != nil {
+		logger.Sugar().Errorw("CreateFiatCurrency", "FiatTypeID", in.GetFiatCurrencyTypeID(), "error", err)
 		return err
 	}
 
-	_, err := fiatcurrencytype.GetFiatCurrencyType(ctx, in.GetFiatTypeID())
+	_, err := fiatcurrencytype.GetFiatCurrencyType(ctx, in.GetFiatCurrencyTypeID())
 	if err != nil {
-		logger.Sugar().Errorw("CreateFiatCurrency", "FiatTypeID", in.GetFiatTypeID(), "error", err)
+		logger.Sugar().Errorw("CreateFiatCurrency", "FiatTypeID", in.GetFiatCurrencyTypeID(), "error", err)
 		return err
 	}
 
@@ -85,7 +85,13 @@ func (s *Server) CreateFiatCurrency(ctx context.Context, in *npool.CreateFiatCur
 	}, nil
 }
 
-func (s *Server) CreateFiatCurrencies(ctx context.Context, in *npool.CreateFiatCurrenciesRequest) (*npool.CreateFiatCurrenciesResponse, error) {
+func (s *Server) CreateFiatCurrencies(
+	ctx context.Context,
+	in *npool.CreateFiatCurrenciesRequest,
+) (
+	*npool.CreateFiatCurrenciesResponse,
+	error,
+) {
 	if err := ValidateCreates(ctx, in.GetInfos()); err != nil {
 		return &npool.CreateFiatCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}

@@ -1,10 +1,11 @@
 package currency
 
 import (
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
+	"strings"
 
 	coinbase "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency/coinbase"
 	coingecko "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency/coingecko"
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 
 	"github.com/shopspring/decimal"
@@ -16,7 +17,7 @@ func CoinUSDPrices(fiatCurrencyNames []string) (map[string]decimal.Decimal, curr
 	prices1, err := coingecko.UsdFiatCurrency(fiatCurrencyNames)
 	if err == nil {
 		for name, price := range prices1 {
-			prices[name] = price
+			prices[strings.ToUpper(name)] = price
 		}
 		return prices, currencymgrpb.FeedType_CoinGecko, nil
 	}

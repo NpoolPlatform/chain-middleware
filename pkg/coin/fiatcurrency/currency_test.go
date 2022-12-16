@@ -8,12 +8,13 @@ import (
 	"testing"
 
 	testinit "github.com/NpoolPlatform/chain-middleware/pkg/testinit"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
 
-	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	"github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
 
-	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
+	fiatcurrencytypecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/fiatcurrencytype"
+	fiatcurrencytypepb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrencytype"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -28,24 +29,22 @@ func init() {
 	}
 }
 
-var ret = &npool.Currency{
+var ret = &npool.FiatCurrency{
 	ID:              uuid.NewString(),
 	CoinName:        uuid.NewString(),
 	CoinUnit:        uuid.NewString(),
 	CoinENV:         uuid.NewString(),
-	FeedType:        currencymgrpb.FeedType_CoinBase,
-	FeedTypeStr:     currencymgrpb.FeedType_CoinBase.String(),
+	FeedType:        currency.FeedType_CoinBase,
+	FeedTypeStr:     currency.FeedType_CoinBase.String(),
 	MarketValueHigh: "12.001000000000000000",
 	MarketValueLow:  "11.001000000000000000",
 }
 
-var coin = &coinmwpb.CoinReq{
+var fiat = &fiatcurrencytypepb.FiatCurrencyTypeReq{
 	Name: &ret.CoinName,
-	Unit: &ret.CoinUnit,
-	ENV:  &ret.CoinENV,
 }
 
-var req = &currencymgrpb.CurrencyReq{
+var req = &fiatcurrencymgrpb.FiatCurrencyReq{
 	ID:              &ret.ID,
 	FeedType:        &ret.FeedType,
 	MarketValueHigh: &ret.MarketValueHigh,
@@ -53,13 +52,14 @@ var req = &currencymgrpb.CurrencyReq{
 }
 
 func create(t *testing.T) {
-	coinRet, err := coin1.CreateCoin(context.Background(), coin)
+	coinRet, err := fiatcurrencytypecrud.Create(context.Background(), fiat)
 	assert.Nil(t, err)
 
-	req.CoinTypeID = &coinRet.ID
-	ret.CoinTypeID = coinRet.ID
+	id := coinRet.ID.String()
+	req.FiatCurrencyTypeID = &id
+	ret.CoinTypeID = coinRet.ID.String()
 
-	info, err := CreateCurrency(context.Background(), req)
+	info, err := CreateFiatCurrency(context.Background(), req)
 	if assert.Nil(t, err) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt

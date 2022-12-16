@@ -2,13 +2,13 @@ package fiatcurrency
 
 import (
 	"context"
-	"fmt"
 
+	typemgrent "github.com/NpoolPlatform/chain-manager/pkg/db/ent"
 	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
-	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
 	fiatcurrency "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency"
+
+	typecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/fiatcurrencytype"
 )
 
 func RefreshFiatCurrencies(ctx context.Context) error {
@@ -16,23 +16,17 @@ func RefreshFiatCurrencies(ctx context.Context) error {
 	const limit = int32(100)
 
 	for {
-		coins, _, err := coin1.GetCoins(ctx, &coinmwpb.Conds{}, offset, limit)
+		faitCurrencyTypes, _, err := typecrud.Rows(ctx, nil, int(offset), int(limit))
 		if err != nil {
 			return err
 		}
-		if len(coins) == 0 {
+		if len(faitCurrencyTypes) == 0 {
 			return nil
 		}
 
 		names := []string{}
-		for _, coin := range coins {
-			if coin.StableUSD {
-				continue
-			}
-			if coin.Presale {
-				continue
-			}
-			names = append(names, coin.Name)
+		for _, faitCurrencyType := range faitCurrencyTypes {
+			names = append(names, faitCurrencyType.Name)
 		}
 
 		if len(names) == 0 {
@@ -44,27 +38,25 @@ func RefreshFiatCurrencies(ctx context.Context) error {
 			return err
 		}
 
-		currencies := []*fiatcurrencymgrpb.FiatCurrencyReq{}
-
-		coinMap := map[string]*coinmwpb.Coin{}
-		for _, coin := range coins {
-			coinMap[coin.Name] = coin
+		typeMap := map[string]*typemgrent.FiatCurrencyType{}
+		for _, faitCurrencyType := range faitCurrencyTypes {
+			typeMap[faitCurrencyType.Name] = faitCurrencyType
 		}
 
+		currencies := []*fiatcurrencymgrpb.FiatCurrencyReq{}
+
 		for name, fiatcurrency := range prices {
-			coin, ok := coinMap[name]
-			if !ok {
-				return fmt.Errorf("invalid coin: %v", name)
+			tp, ok := typeMap[name]
+			if ok {
+				curr := fiatcurrency.String()
+				tpID := tp.ID.String()
+				currencies = append(currencies, &fiatcurrencymgrpb.FiatCurrencyReq{
+					FiatCurrencyTypeID: &tpID,
+					FeedType:           &feedType,
+					MarketValueHigh:    &curr,
+					MarketValueLow:     &curr,
+				})
 			}
-
-			curr := fiatcurrency.String()
-
-			currencies = append(currencies, &fiatcurrencymgrpb.FiatCurrencyReq{
-				FiatTypeID:      &coin.ID,
-				FeedType:        &feedType,
-				MarketValueHigh: &curr,
-				MarketValueLow:  &curr,
-			})
 		}
 
 		if _, err = CreateFiatCurrencies(ctx, currencies); err != nil {

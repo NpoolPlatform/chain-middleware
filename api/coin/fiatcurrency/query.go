@@ -1,8 +1,9 @@
-//nolint:dupl
 package fiatcurrency
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
@@ -14,40 +15,16 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/google/uuid"
 )
 
 func (s *Server) GetFiatCurrency(ctx context.Context, in *npool.GetFiatCurrencyRequest) (*npool.GetFiatCurrencyResponse, error) {
-	if _, err := uuid.Parse(in.GetID()); err != nil {
-		logger.Sugar().Errorw("GetFiatCurrency", "ID", in.GetID(), "error", err)
-		return &npool.GetFiatCurrencyResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	info, err := currency1.GetFiatCurrency(ctx, in.GetID())
+	info, err := currency1.GetFiatCurrency(ctx, in.FiatCurrencyTypeID)
 	if err != nil {
-		logger.Sugar().Errorw("GetFiatCurrency", "ID", in.GetID(), "error", err)
+		logger.Sugar().Errorw("GetCoinFiatCurrency", "error", err)
 		return &npool.GetFiatCurrencyResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &npool.GetFiatCurrencyResponse{
-		Info: info,
-	}, nil
-}
-
-func (s *Server) GetCoinFiatCurrency(ctx context.Context, in *npool.GetCoinFiatCurrencyRequest) (*npool.GetCoinFiatCurrencyResponse, error) {
-	if _, err := uuid.Parse(in.GetCoinTypeID()); err != nil {
-		logger.Sugar().Errorw("GetCoinFiatCurrency", "CoinTypeID", in.GetCoinTypeID(), "error", err)
-		return &npool.GetCoinFiatCurrencyResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	info, err := currency1.GetCoinFiatCurrency(ctx, in.GetCoinTypeID())
-	if err != nil {
-		logger.Sugar().Errorw("GetCoinFiatCurrency", "CoinTypeID", in.GetCoinTypeID(), "error", err)
-		return &npool.GetCoinFiatCurrencyResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	return &npool.GetCoinFiatCurrencyResponse{
 		Info: info,
 	}, nil
 }
@@ -59,15 +36,15 @@ func ValidateConds(conds *npool.Conds) error {
 			return err
 		}
 	}
-	if conds.CoinTypeID != nil {
-		if _, err := uuid.Parse(conds.GetCoinTypeID().GetValue()); err != nil {
-			logger.Sugar().Errorw("ValudateConds", "CoinTypeID", conds.GetCoinTypeID().GetValue(), "error", err)
+	if conds.FiatCurrencyTypeID != nil {
+		if _, err := uuid.Parse(conds.GetFiatCurrencyTypeID().GetValue()); err != nil {
+			logger.Sugar().Errorw("ValudateConds", "FiatCurrencyTypeID", conds.GetFiatCurrencyTypeID().GetValue(), "error", err)
 			return err
 		}
 	}
-	for _, id := range conds.GetCoinTypeIDs().GetValue() {
+	for _, id := range conds.GetFiatCurrencyTypeIDs().GetValue() {
 		if _, err := uuid.Parse(id); err != nil {
-			logger.Sugar().Errorw("ValudateConds", "CoinTypeIDs", conds.GetCoinTypeIDs().GetValue(), "error", err)
+			logger.Sugar().Errorw("ValudateConds", "FiatCurrencyTypeIDs", conds.GetFiatCurrencyTypeIDs().GetValue(), "error", err)
 			return err
 		}
 	}
@@ -83,13 +60,40 @@ func (s *Server) GetFiatCurrencies(ctx context.Context, in *npool.GetFiatCurrenc
 		return &npool.GetFiatCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, err := currency1.GetFiatCurrencies(ctx, in.GetConds())
+	infos, err := currency1.GetFiatCurrencies(ctx, in.Conds)
 	if err != nil {
-		logger.Sugar().Errorw("GetFiatCurrencies", "error", err)
+		logger.Sugar().Errorw("GetCoinFiatCurrency", "error", err)
 		return &npool.GetFiatCurrenciesResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
 	return &npool.GetFiatCurrenciesResponse{
+		Infos: infos,
+	}, nil
+}
+
+func (s *Server) GetCoinFiatCurrencies(
+	ctx context.Context,
+	in *npool.GetCoinFiatCurrenciesRequest,
+) (
+	*npool.GetCoinFiatCurrenciesResponse,
+	error,
+) {
+	if len(in.GetCoinTypeIDs()) == 0 {
+		logger.Sugar().Errorw("GetFiatCurrencies", "CoinTypeIDs", in.GetCoinTypeIDs())
+		return &npool.GetCoinFiatCurrenciesResponse{}, status.Error(codes.InvalidArgument, "CoinTypeIDs is empty")
+	}
+	if len(in.GetFiatCurrencyTypeIDs()) == 0 {
+		logger.Sugar().Errorw("GetFiatCurrencies", "FiatCurrencyTypeIDs", in.GetFiatCurrencyTypeIDs())
+		return &npool.GetCoinFiatCurrenciesResponse{}, status.Error(codes.InvalidArgument, "CoinTypeIDs is empty")
+	}
+
+	infos, err := currency1.GetCoinFiatCurrencies(ctx, in.GetCoinTypeIDs(), in.GetFiatCurrencyTypeIDs())
+	if err != nil {
+		logger.Sugar().Errorw("GetCoinFiatCurrency", "error", err)
+		return &npool.GetCoinFiatCurrenciesResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetCoinFiatCurrenciesResponse{
 		Infos: infos,
 	}, nil
 }

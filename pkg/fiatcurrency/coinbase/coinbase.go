@@ -2,9 +2,10 @@ package currencyvalue
 
 import (
 	"encoding/json"
-	"github.com/shopspring/decimal"
 	"os"
 	"time"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 

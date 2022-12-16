@@ -2,221 +2,174 @@ package fiatcurrency
 
 import (
 	"context"
-	"fmt"
-	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
-	"time"
+	"strings"
 
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
-
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	commonpb "github.com/NpoolPlatform/message/npool"
+	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
+	currencymwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
+	"github.com/shopspring/decimal"
 
 	"github.com/NpoolPlatform/chain-manager/pkg/db"
 	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
 
-	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
-
-	entcoinbase "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinbase"
 	entfiatcurrency "github.com/NpoolPlatform/chain-manager/pkg/db/ent/fiatcurrency"
+	entfiatcurrencytype "github.com/NpoolPlatform/chain-manager/pkg/db/ent/fiatcurrencytype"
 
 	crud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/fiatcurrency"
 
-	constuuid "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
-
 	"entgo.io/ent/dialect/sql"
+	"github.com/NpoolPlatform/chain-middleware/pkg/coin/currency"
 	"github.com/google/uuid"
 )
 
-func GetCoinFiatCurrency(ctx context.Context, coinTypeID string) (*npool.FiatCurrency, error) {
-	var infos []*npool.FiatCurrency
+func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrency, error) {
+	fiatCurrencies := []*npool.FiatCurrency{}
 
-	coin, err := coin1.GetCoin(ctx, coinTypeID)
-	if err != nil {
-		return nil, err
-	}
-	if coin.StableUSD {
-		now := uint32(time.Now().Unix())
-
-		return &npool.FiatCurrency{
-			ID:                 constuuid.InvalidUUIDStr,
-			FiatCurrencyTypeID: "",
-			FiatCurrencyName:   "",
-			CreatedAt:          now,
-			UpdatedAt:          now,
-			MarketValueHigh:    "1",
-			MarketValueLow:     "1",
-			FeedTypeStr:        currencymgrpb.FeedType_StableUSDHardCode.String(),
-			FeedType:           currencymgrpb.FeedType_StableUSDHardCode,
-			CoinTypeID:         coinTypeID,
-			CoinName:           coin.Name,
-			CoinLogo:           coin.Logo,
-			CoinUnit:           coin.Unit,
-			CoinENV:            coin.ENV,
-		}, nil
-	}
-
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm := cli.
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm := cli.Debug().
 			FiatCurrency.
 			Query().
 			Where(
-				entfiatcurrency.FiatTypeID(uuid.MustParse(coinTypeID)),
+				entfiatcurrency.FiatCurrencyTypeID(uuid.MustParse(fiatTypeID)),
 			).
-			Order(ent.Desc(entfiatcurrency.FieldCreatedAt)).
-			Limit(1)
-
-		return join(stm).
-			Scan(_ctx, &infos)
+			Order(ent.Desc(entfiatcurrency.FieldCreatedAt))
+		return join(stm, nil).
+			Scan(_ctx, &fiatCurrencies)
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(infos) == 0 {
-		return nil, fmt.Errorf("no record")
-	}
-	if len(infos) > 1 {
-		return nil, fmt.Errorf("too many record")
+	if len(fiatCurrencies) == 0 {
+		logger.Sugar().Errorw("fiatCurrencies is empty")
+		return nil, nil
 	}
 
-	infos = expand(infos)
+	fiatCurrencies = expand(fiatCurrencies)
 
-	return infos[0], nil
-}
+	fiatCurrency := fiatCurrencies[0]
 
-func GetFiatCurrency(ctx context.Context, id string) (*npool.FiatCurrency, error) {
-	var infos []*npool.FiatCurrency
-
-	coin, err := coin1.GetCoin(ctx, id)
-	if err != nil {
-		return nil, err
-	}
-	if coin.StableUSD {
-		now := uint32(time.Now().Unix())
-
-		return &npool.FiatCurrency{
-			ID:                 constuuid.InvalidUUIDStr,
-			FiatCurrencyTypeID: "",
-			FiatCurrencyName:   "",
-			CreatedAt:          now,
-			UpdatedAt:          now,
-			MarketValueHigh:    "1",
-			MarketValueLow:     "1",
-			FeedTypeStr:        currencymgrpb.FeedType_StableUSDHardCode.String(),
-			FeedType:           currencymgrpb.FeedType_StableUSDHardCode,
-			CoinTypeID:         "",
-			CoinName:           coin.Name,
-			CoinLogo:           coin.Logo,
-			CoinUnit:           coin.Unit,
-			CoinENV:            coin.ENV,
-		}, nil
-	}
-
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm := cli.
-			FiatCurrency.
-			Query().
-			Where(
-				entfiatcurrency.FiatTypeID(uuid.MustParse(id)),
-			).
-			Order(ent.Desc(entfiatcurrency.FieldCreatedAt)).
-			Limit(1)
-
-		return join(stm).
-			Scan(_ctx, &infos)
-	})
-	if err != nil {
-		return nil, err
-	}
-	if len(infos) == 0 {
-		return nil, fmt.Errorf("no record")
-	}
-	if len(infos) > 1 {
-		return nil, fmt.Errorf("too many record")
-	}
-
-	infos = expand(infos)
-
-	return infos[0], nil
+	return &npool.FiatCurrency{
+		ID:                 fiatCurrency.ID,
+		FiatCurrencyTypeID: fiatCurrency.FiatCurrencyTypeID,
+		FeedTypeStr:        fiatCurrency.FeedTypeStr,
+		FeedType:           fiatCurrency.FeedType,
+		FiatCurrencyName:   fiatCurrency.FiatCurrencyName,
+		MarketValueHigh:    fiatCurrency.MarketValueHigh,
+		MarketValueLow:     fiatCurrency.MarketValueLow,
+		CreatedAt:          fiatCurrency.CreatedAt,
+		UpdatedAt:          fiatCurrency.UpdatedAt,
+	}, nil
 }
 
 func GetFiatCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.FiatCurrency, error) {
-	var infos []*npool.FiatCurrency
+	fiatCurrencies := []*npool.FiatCurrency{}
 
-	ids := []string{}
-	if conds.CoinTypeID == nil {
-		ids = append(ids, conds.GetCoinTypeIDs().GetValue()...)
-	} else {
-		ids = append(ids, conds.GetCoinTypeID().GetValue())
-	}
-
-	coins, err := coin1.GetManyCoins(ctx, ids)
-	if err != nil {
-		return nil, err
-	}
-
-	ids = []string{}
-	for _, coin := range coins {
-		if coin.StableUSD {
-			continue
-		}
-		ids = append(ids, coin.ID)
-	}
-
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		for _, id := range ids {
-			var linfos []*npool.FiatCurrency
-
-			stm, err := crud.SetQueryConds(&fiatcurrencymgrpb.Conds{
-				ID: conds.ID,
-				FiatTypeID: &commonpb.StringVal{
-					Op:    cruder.EQ,
-					Value: id,
-				},
-			}, cli)
-			if err != nil {
-				return err
-			}
-
-			stm.
-				Order(ent.Asc(entfiatcurrency.FieldCreatedAt)).
-				Limit(1)
-
-			if err := join(stm).Scan(_ctx, &linfos); err != nil {
-				return err
-			}
-
-			infos = append(infos, linfos...)
-		}
-		return nil
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm := cli.FiatCurrency.Query()
+		stm.Order(ent.Desc(entfiatcurrency.FieldCreatedAt))
+		return join(stm, conds).
+			Scan(_ctx, &fiatCurrencies)
 	})
 	if err != nil {
 		return nil, err
 	}
+	if len(fiatCurrencies) == 0 {
+		logger.Sugar().Errorw("fiatCurrencies is empty")
+		return nil, nil
+	}
 
-	infos = expand(infos)
+	fiatCurrencies = expand(fiatCurrencies)
 
-	for _, coin := range coins {
-		if !coin.StableUSD {
-			continue
+	return fiatCurrencies, nil
+}
+
+func GetCoinFiatCurrencies(ctx context.Context, coinTypeIDs, fiatTypeIDs []string) ([]*npool.FiatCurrency, error) {
+	fiatCurrencies := []*npool.FiatCurrency{}
+
+	fiatTypeIDs1 := []uuid.UUID{}
+	for _, val := range fiatTypeIDs {
+		id, err := uuid.Parse(val)
+		if err != nil {
+			return nil, err
 		}
+		fiatTypeIDs1 = append(fiatTypeIDs1, id)
+	}
 
-		now := uint32(time.Now().Unix())
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm := cli.Debug().
+			FiatCurrency.
+			Query().
+			Where(
+				entfiatcurrency.FiatCurrencyTypeIDIn(fiatTypeIDs1...),
+			).
+			Order(ent.Desc(entfiatcurrency.FieldCreatedAt))
+		return join(stm, nil).
+			Scan(_ctx, &fiatCurrencies)
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(fiatCurrencies) == 0 {
+		logger.Sugar().Errorw("fiatCurrencies is empty")
+		return nil, nil
+	}
 
-		infos = append(infos, &npool.FiatCurrency{
-			ID:              constuuid.InvalidUUIDStr,
-			CoinTypeID:      coin.ID,
-			CoinName:        coin.Name,
-			CoinLogo:        coin.Logo,
-			CoinUnit:        coin.Unit,
-			CoinENV:         coin.ENV,
-			CreatedAt:       now,
-			UpdatedAt:       now,
-			MarketValueHigh: "1",
-			MarketValueLow:  "1",
-			FeedTypeStr:     currencymgrpb.FeedType_StableUSDHardCode.String(),
-			FeedType:        currencymgrpb.FeedType_StableUSDHardCode,
-		})
+	fiatCurrencies = expand(fiatCurrencies)
+
+	coinCurrencies, err := currency.GetCurrencies(ctx, &currencymwpb.Conds{
+		CoinTypeIDs: &commonpb.StringSliceVal{
+			Op:    cruder.IN,
+			Value: coinTypeIDs,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(coinCurrencies) == 0 {
+		logger.Sugar().Errorw("coinCurrencies is empty")
+		return nil, nil
+	}
+	infos := []*npool.FiatCurrency{}
+
+	for _, coinCurrency := range coinCurrencies {
+		for _, fiatCurrency := range fiatCurrencies {
+			marketValueHigh, err := decimal.NewFromString(fiatCurrency.MarketValueHigh)
+			if err != nil {
+				return nil, err
+			}
+			marketValueHigh1, err := decimal.NewFromString(coinCurrency.MarketValueHigh)
+			if err != nil {
+				return nil, err
+			}
+			marketValueLow, err := decimal.NewFromString(fiatCurrency.MarketValueLow)
+			if err != nil {
+				return nil, err
+			}
+			marketValueLow1, err := decimal.NewFromString(coinCurrency.MarketValueLow)
+			if err != nil {
+				return nil, err
+			}
+			infos = append(infos, &npool.FiatCurrency{
+				ID:                 fiatCurrency.ID,
+				FiatCurrencyTypeID: fiatCurrency.FiatCurrencyTypeID,
+				FeedTypeStr:        fiatCurrency.FeedTypeStr,
+				FeedType:           fiatCurrency.FeedType,
+				FiatCurrencyName:   fiatCurrency.FiatCurrencyName,
+				MarketValueHigh:    marketValueHigh.Mul(marketValueHigh1).String(),
+				MarketValueLow:     marketValueLow.Mul(marketValueLow1).String(),
+				CreatedAt:          fiatCurrency.CreatedAt,
+				UpdatedAt:          fiatCurrency.UpdatedAt,
+				CoinTypeID:         coinCurrency.CoinTypeID,
+				CoinName:           coinCurrency.CoinName,
+				CoinLogo:           coinCurrency.CoinLogo,
+				CoinUnit:           coinCurrency.CoinUnit,
+				CoinENV:            coinCurrency.CoinENV,
+			})
+		}
 	}
 
 	return infos, nil
@@ -227,18 +180,21 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	var total uint32
 
 	ids := []uuid.UUID{}
-	if conds.CoinTypeID == nil {
-		for _, id := range conds.GetCoinTypeIDs().GetValue() {
-			ids = append(ids, uuid.MustParse(id))
+
+	for _, val := range conds.GetFiatCurrencyTypeIDs().GetValue() {
+		id, err := uuid.Parse(val)
+		if err != nil {
+			return nil, 0, err
 		}
+		ids = append(ids, id)
 	}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm, err := crud.SetQueryConds(&fiatcurrencymgrpb.Conds{
-			ID:         conds.ID,
-			FiatTypeID: conds.CoinTypeID,
-			StartAt:    conds.StartAt,
-			EndAt:      conds.EndAt,
+			ID:                 conds.ID,
+			FiatCurrencyTypeID: conds.FiatCurrencyTypeID,
+			StartAt:            conds.StartAt,
+			EndAt:              conds.EndAt,
 		}, cli)
 		if err != nil {
 			return err
@@ -246,7 +202,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 
 		if len(ids) > 0 {
 			stm.Where(
-				entfiatcurrency.FiatTypeIDIn(ids...),
+				entfiatcurrency.FiatCurrencyTypeIDIn(ids...),
 			)
 		}
 
@@ -258,11 +214,9 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 		total = uint32(_total)
 
 		stm.
-			Order(ent.Desc(entfiatcurrency.FieldCreatedAt)).
 			Offset(int(offset)).
 			Limit(int(limit))
-
-		return join(stm).
+		return join(stm, nil).
 			Scan(_ctx, &infos)
 	})
 	if err != nil {
@@ -274,31 +228,72 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	return infos, total, nil
 }
 
-func join(stm *ent.FiatCurrencyQuery) *ent.FiatCurrencySelect {
+func join(stm *ent.FiatCurrencyQuery, conds *npool.Conds) *ent.FiatCurrencySelect {
 	return stm.
-		Select(
-			entfiatcurrency.FieldID,
-			entfiatcurrency.FieldFiatTypeID,
-			entfiatcurrency.FieldFeedType,
-			entfiatcurrency.FieldMarketValueHigh,
-			entfiatcurrency.FieldMarketValueLow,
-			entfiatcurrency.FieldCreatedAt,
-			entfiatcurrency.FieldUpdatedAt,
-		).
 		Modify(func(s *sql.Selector) {
-			t1 := sql.Table(entcoinbase.Table)
+			t1 := sql.Table(entfiatcurrencytype.Table)
+			s.Select(
+				s.C(entfiatcurrency.FieldID),
+				s.C(entfiatcurrency.FieldFiatCurrencyTypeID),
+				s.C(entfiatcurrency.FieldFeedType),
+				s.C(entfiatcurrency.FieldMarketValueHigh),
+				s.C(entfiatcurrency.FieldMarketValueLow),
+				s.C(entfiatcurrency.FieldCreatedAt),
+				s.C(entfiatcurrency.FieldUpdatedAt),
+			)
 			s.
 				LeftJoin(t1).
 				On(
-					s.C(entfiatcurrency.FieldFiatTypeID),
-					t1.C(entcoinbase.FieldID),
+					s.C(entfiatcurrency.FieldFiatCurrencyTypeID),
+					t1.C(entfiatcurrencytype.FieldID),
 				).
 				AppendSelect(
-					sql.As(t1.C(entcoinbase.FieldName), "coin_name"),
-					sql.As(t1.C(entcoinbase.FieldLogo), "coin_logo"),
-					sql.As(t1.C(entcoinbase.FieldUnit), "coin_unit"),
-					sql.As(t1.C(entcoinbase.FieldEnv), "coin_env"),
+					sql.As(t1.C(entfiatcurrencytype.FieldName), "fiat_currency_name"),
 				)
+			if conds != nil {
+				if conds.ID != nil {
+					s.Where(
+						sql.EQ(
+							s.C(entfiatcurrency.FieldID),
+							conds.GetID().GetValue()),
+					)
+				}
+				if conds.FiatCurrencyTypeID != nil {
+					s.Where(
+						sql.EQ(t1.C(entfiatcurrencytype.FieldID),
+							conds.GetFiatCurrencyTypeID().GetValue(),
+						),
+					)
+				}
+
+				if conds.FiatCurrencyTypeIDs != nil {
+					s.Where(
+						sql.In(
+							t1.C(entfiatcurrencytype.FieldID),
+							strings.Join(conds.GetFiatCurrencyTypeIDs().GetValue(), `,`),
+						),
+					)
+				}
+				if conds.StartAt != nil {
+					s.Where(
+						sql.GTE(
+							t1.C(entfiatcurrencytype.FieldCreatedAt),
+							conds.GetStartAt().GetValue(),
+						),
+					)
+				}
+				if conds.EndAt != nil {
+					s.Where(
+						sql.LTE(
+							t1.C(
+								entfiatcurrencytype.FieldCreatedAt),
+							conds.GetEndAt().GetValue(),
+						),
+					)
+				}
+			}
+			s.GroupBy(entfiatcurrency.FieldFiatCurrencyTypeID)
+			s.OrderBy(entfiatcurrency.FieldCreatedAt)
 		})
 }
 
