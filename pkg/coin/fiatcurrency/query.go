@@ -176,16 +176,6 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	var infos []*npool.FiatCurrency
 	var total uint32
 
-	ids := []uuid.UUID{}
-
-	for _, val := range conds.GetFiatCurrencyTypeIDs().GetValue() {
-		id, err := uuid.Parse(val)
-		if err != nil {
-			return nil, 0, err
-		}
-		ids = append(ids, id)
-	}
-
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.FiatCurrency.Query()
 
