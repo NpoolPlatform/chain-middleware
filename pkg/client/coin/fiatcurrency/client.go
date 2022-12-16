@@ -112,7 +112,7 @@ func GetFiatCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.FiatCu
 	return infos.([]*npool.FiatCurrency), nil
 }
 
-func GetCoinFiatCurrencies(ctx context.Context, fiatCurrencyTypeIDs, coinTypeIDs []string) ([]*npool.FiatCurrency, error) {
+func GetCoinFiatCurrencies(ctx context.Context, coinTypeIDs, fiatCurrencyTypeIDs []string) ([]*npool.FiatCurrency, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetCoinFiatCurrencies(ctx, &npool.GetCoinFiatCurrenciesRequest{
 			FiatCurrencyTypeIDs: nil,
