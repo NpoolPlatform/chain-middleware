@@ -48,7 +48,6 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
-			Debug().
 			AppCoin.
 			Query().
 			Where(
