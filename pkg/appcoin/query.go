@@ -204,6 +204,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 			entappcoin.FieldCreatedAt,
 			entappcoin.FieldUpdatedAt,
 			entappcoin.FieldDisplay,
+			entappcoin.FieldDailyRewardAmount,
 		).
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entcoinextra.Table)
