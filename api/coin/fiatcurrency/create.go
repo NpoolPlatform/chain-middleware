@@ -74,15 +74,13 @@ func (s *Server) CreateFiatCurrency(ctx context.Context, in *npool.CreateFiatCur
 		return &npool.CreateFiatCurrencyResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	info, err := fiatcurrency1.CreateFiatCurrency(ctx, in.GetInfo())
+	_, err := fiatcurrency1.CreateFiatCurrency(ctx, in.GetInfo())
 	if err != nil {
 		logger.Sugar().Errorw("CreateFiatCurrency", "error", err)
 		return &npool.CreateFiatCurrencyResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.CreateFiatCurrencyResponse{
-		Info: info,
-	}, nil
+	return &npool.CreateFiatCurrencyResponse{}, nil
 }
 
 func (s *Server) CreateFiatCurrencies(
@@ -96,13 +94,11 @@ func (s *Server) CreateFiatCurrencies(
 		return &npool.CreateFiatCurrenciesResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	infos, err := fiatcurrency1.CreateFiatCurrencies(ctx, in.GetInfos())
+	_, err := fiatcurrency1.CreateFiatCurrencies(ctx, in.GetInfos())
 	if err != nil {
 		logger.Sugar().Errorw("CreateFiatCurrencies", "error", err)
 		return &npool.CreateFiatCurrenciesResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.CreateFiatCurrenciesResponse{
-		Infos: infos,
-	}, nil
+	return &npool.CreateFiatCurrenciesResponse{}, nil
 }
