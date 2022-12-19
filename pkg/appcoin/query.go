@@ -48,7 +48,6 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
-			Debug().
 			AppCoin.
 			Query().
 			Where(
@@ -120,7 +119,6 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 	if err != nil {
 		return nil, 0, err
 	}
-
 	infos = expand(infos)
 
 	return infos, total, nil
@@ -204,6 +202,8 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 			entappcoin.FieldDisabled,
 			entappcoin.FieldCreatedAt,
 			entappcoin.FieldUpdatedAt,
+			entappcoin.FieldDisplay,
+			entappcoin.FieldDailyRewardAmount,
 		).
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entcoinextra.Table)
