@@ -3,8 +3,9 @@ package fiat
 import (
 	"context"
 	"fmt"
-	"github.com/NpoolPlatform/chain-middleware/pkg/coin"
 	"strings"
+
+	"github.com/NpoolPlatform/chain-middleware/pkg/coin"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
