@@ -1,14 +1,14 @@
-package currency
+package fiat
 
 import (
 	"context"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
-	fiatcurrencymgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/fiatcurrency"
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiatcurrency"
+	fiatcurrencymgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/fiat/currency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiat/currency"
 
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
 
 	npoolpb "github.com/NpoolPlatform/message/npool"
 )

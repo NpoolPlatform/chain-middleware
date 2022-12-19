@@ -1,11 +1,11 @@
-package fiatcurrency
+package fiat
 
 import (
 	"context"
 
-	fiatcurrency1 "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency"
+	fiatcurrency1 "github.com/NpoolPlatform/chain-middleware/pkg/fiat"
 
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

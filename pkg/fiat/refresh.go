@@ -1,12 +1,12 @@
-package currency
+package fiat
 
 import (
 	"context"
 
 	typemgrent "github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiatcurrency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiat/currency"
 
-	typecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/fiatcurrencytype"
+	typecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/fiat/currencytype"
 )
 
 func RefreshFiatCurrencies(ctx context.Context) error {

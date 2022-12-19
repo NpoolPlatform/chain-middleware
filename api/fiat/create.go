@@ -1,19 +1,18 @@
 //nolint:dupl
-package fiatcurrency
+package fiat
 
 import (
 	"context"
 	"fmt"
 
-	fiatcurrency1 "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency"
+	fiatcurrency1 "github.com/NpoolPlatform/chain-middleware/pkg/fiat"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiatcurrency"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiat/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/client/fiatcurrencytype"
-
+	"github.com/NpoolPlatform/chain-manager/pkg/client/fiat/currencytype"
 	"github.com/shopspring/decimal"
 
 	"google.golang.org/grpc/codes"
@@ -35,7 +34,7 @@ func ValidateCreate(ctx context.Context, in *fiatcurrencymgrpb.FiatCurrencyReq) 
 		return err
 	}
 
-	_, err := fiatcurrencytype.GetFiatCurrencyType(ctx, in.GetFiatCurrencyTypeID())
+	_, err := currencytype.GetFiatCurrencyType(ctx, in.GetFiatCurrencyTypeID())
 	if err != nil {
 		logger.Sugar().Errorw("CreateFiatCurrency", "FiatTypeID", in.GetFiatCurrencyTypeID(), "error", err)
 		return err

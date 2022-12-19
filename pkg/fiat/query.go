@@ -1,4 +1,4 @@
-package currency
+package fiat
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	commonpb "github.com/NpoolPlatform/message/npool"
 	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 	currencymwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
 	"github.com/shopspring/decimal"
 
 	"github.com/NpoolPlatform/chain-manager/pkg/db"
@@ -224,6 +224,7 @@ func join(stm *ent.FiatCurrencyQuery, conds *npool.Conds) *ent.FiatCurrencySelec
 				).
 				AppendSelect(
 					sql.As(t1.C(entfiatcurrencytype.FieldName), "fiat_currency_name"),
+					sql.As(t1.C(entfiatcurrencytype.FieldLogo), "fiat_currency_logo"),
 				)
 			if conds != nil {
 				if conds.ID != nil {

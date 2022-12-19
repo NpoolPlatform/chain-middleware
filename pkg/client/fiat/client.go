@@ -1,4 +1,4 @@
-package fiatcurrency
+package fiat
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiatcurrency"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiat/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 )

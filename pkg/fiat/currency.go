@@ -1,10 +1,11 @@
-package currency
+package fiat
 
 import (
 	"strings"
 
-	coinbase "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency/coinbase"
-	coingecko "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency/coingecko"
+	coinbase "github.com/NpoolPlatform/chain-middleware/pkg/fiat/coinbase"
+	coingecko "github.com/NpoolPlatform/chain-middleware/pkg/fiat/coingecko"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 
