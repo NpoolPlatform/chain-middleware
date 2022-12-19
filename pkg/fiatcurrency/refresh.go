@@ -1,14 +1,12 @@
-package fiatcurrency
+package currency
 
 import (
 	"context"
 
 	typemgrent "github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiatcurrency"
 
-	fiatcurrency "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency"
-
-	typecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/fiatcurrencytype"
+	typecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/fiatcurrencytype"
 )
 
 func RefreshFiatCurrencies(ctx context.Context) error {
@@ -33,7 +31,7 @@ func RefreshFiatCurrencies(ctx context.Context) error {
 			continue
 		}
 
-		prices, feedType, err := fiatcurrency.CoinUSDPrices(names)
+		prices, feedType, err := CoinUSDPrices(names)
 		if err != nil {
 			return err
 		}

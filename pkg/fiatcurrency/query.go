@@ -1,4 +1,4 @@
-package fiatcurrency
+package currency
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	commonpb "github.com/NpoolPlatform/message/npool"
 	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 	currencymwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
 	"github.com/shopspring/decimal"
 
 	"github.com/NpoolPlatform/chain-manager/pkg/db"

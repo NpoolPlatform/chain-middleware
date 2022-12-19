@@ -5,14 +5,14 @@ import (
 	"context"
 	"fmt"
 
+	fiatcurrency1 "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency"
+
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
-	fiatcurrency1 "github.com/NpoolPlatform/chain-middleware/pkg/coin/fiatcurrency"
+	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiatcurrency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
 
-	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/fiatcurrency"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
-
-	"github.com/NpoolPlatform/chain-manager/pkg/client/coin/fiatcurrencytype"
+	"github.com/NpoolPlatform/chain-manager/pkg/client/fiatcurrencytype"
 
 	"github.com/shopspring/decimal"
 

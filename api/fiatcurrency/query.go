@@ -3,13 +3,13 @@ package fiatcurrency
 import (
 	"context"
 
+	currency1 "github.com/NpoolPlatform/chain-middleware/pkg/fiatcurrency"
+
 	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
-	currency1 "github.com/NpoolPlatform/chain-middleware/pkg/coin/fiatcurrency"
-
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 

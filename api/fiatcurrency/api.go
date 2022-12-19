@@ -1,7 +1,7 @@
 package fiatcurrency
 
 import (
-	"github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiatcurrency"
+	"github.com/NpoolPlatform/message/npool/chain/mw/v1/fiatcurrency"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"

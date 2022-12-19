@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	"github.com/NpoolPlatform/chain-middleware/api/coin/fiatcurrency"
+	"github.com/NpoolPlatform/chain-middleware/api/fiatcurrency"
 
 	chainmw "github.com/NpoolPlatform/message/npool/chain/mw/v1"
 
