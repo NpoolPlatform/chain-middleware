@@ -2,6 +2,8 @@ package fiat
 
 import (
 	"context"
+	"fmt"
+	"github.com/NpoolPlatform/chain-middleware/pkg/coin"
 	"strings"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -21,7 +23,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/chain-middleware/pkg/coin/currency"
 	"github.com/google/uuid"
+
+	coinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 )
+
+const DefaultCoinType = "usdterc20"
 
 func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrency, error) {
 	fiatCurrencies := []*npool.FiatCurrency{}
@@ -47,6 +53,27 @@ func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrenc
 
 	fiatCurrencies = expand(fiatCurrencies)
 
+	coinInfo, err := coin.GetCoinOnly(ctx, &coinpb.Conds{
+		Name: &commonpb.StringVal{
+			Op:    cruder.EQ,
+			Value: DefaultCoinType,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if coinInfo == nil {
+		return nil, fmt.Errorf("coin info not found")
+	}
+	coinCurrency, err := currency.GetCoinCurrency(ctx, coinInfo.ID)
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+
 	fiatCurrency := fiatCurrencies[0]
 
 	return &npool.FiatCurrency{
@@ -60,6 +87,11 @@ func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrenc
 		MarketValueLow:     fiatCurrency.MarketValueLow,
 		CreatedAt:          fiatCurrency.CreatedAt,
 		UpdatedAt:          fiatCurrency.UpdatedAt,
+		CoinTypeID:         coinCurrency.CoinTypeID,
+		CoinName:           coinCurrency.CoinName,
+		CoinLogo:           coinCurrency.CoinLogo,
+		CoinUnit:           coinCurrency.CoinUnit,
+		CoinENV:            coinCurrency.CoinENV,
 	}, nil
 }
 
