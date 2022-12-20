@@ -29,7 +29,7 @@ import (
 	coinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 )
 
-const DefaultCoinType = "usdterc20"
+var DefaultCoinTypes = []string{"usdterc20", "tusdttrc20"}
 
 func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrency, error) {
 	fiatCurrencies := []*npool.FiatCurrency{}
@@ -55,20 +55,20 @@ func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrenc
 
 	fiatCurrencies = expand(fiatCurrencies)
 
-	coinInfo, err := coin.GetCoinOnly(ctx, &coinpb.Conds{
-		Name: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: DefaultCoinType,
+	coinInfos, _, err := coin.GetCoins(ctx, &coinpb.Conds{
+		Names: &commonpb.StringSliceVal{
+			Op:    cruder.IN,
+			Value: DefaultCoinTypes,
 		},
-	})
+	}, 0, 1)
 	if err != nil {
 		return nil, err
 	}
 
-	if coinInfo == nil {
+	if len(coinInfos) == 0 {
 		return nil, fmt.Errorf("coin info not found")
 	}
-	coinCurrency, err := currency.GetCoinCurrency(ctx, coinInfo.ID)
+	coinCurrency, err := currency.GetCoinCurrency(ctx, coinInfos[0].ID)
 	if err != nil {
 		return nil, err
 	}
