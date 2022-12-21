@@ -149,7 +149,7 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.Currency, 
 			}
 
 			stm.
-				Order(ent.Asc(entcurrency.FieldCreatedAt)).
+				Order(ent.Desc(entcurrency.FieldCreatedAt)).
 				Limit(1)
 
 			if err := join(stm).Scan(_ctx, &linfos); err != nil {
