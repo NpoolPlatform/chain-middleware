@@ -2,6 +2,7 @@ package currency
 
 import (
 	"context"
+	"strings"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 
@@ -66,4 +67,30 @@ func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.
 
 func CoinCurrencyPrice(ctx context.Context, coinName, currency string) (decimal.Decimal, currencymgrpb.FeedType, error) {
 	return decimal.Decimal{}, currencymgrpb.FeedType_DefaultFeedType, nil
+}
+
+func USDPrices(fiatCurrencyNames []string) (map[string]decimal.Decimal, currencymgrpb.FeedType, error) {
+	prices := map[string]decimal.Decimal{}
+
+	prices1, err := coingecko.UsdFiatCurrency(fiatCurrencyNames)
+	if err == nil {
+		for name, price := range prices1 {
+			prices[strings.ToUpper(name)] = price
+		}
+		return prices, currencymgrpb.FeedType_CoinGecko, nil
+	}
+
+	logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinGecko", "error", err)
+
+	prices1, err = coinbase.UsdFaitCurrency()
+	if err != nil {
+		logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinBase", "error", err)
+		return nil, currencymgrpb.FeedType_DefaultFeedType, err
+	}
+
+	for name, price := range prices1 {
+		prices[name] = price
+	}
+
+	return prices, currencymgrpb.FeedType_CoinBase, nil
 }

@@ -42,8 +42,9 @@ func coinNameMap(coinName string) (string, bool) {
 }
 
 const (
-	coinbaseAPI = "https://api.coinbase.com/v2/prices/COIN-USD/sell"
-	timeout     = 5
+	coinbaseAPI     = "https://api.coinbase.com/v2/prices/COIN-USD/sell"
+	coinbaseAPIFiat = "https://api.coinbase.com/v2/exchange-rates?currency=USD"
+	timeout         = 5
 )
 
 type apiData struct {
@@ -119,4 +120,47 @@ func CoinBaseUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 	}
 
 	return prices, nil
+}
+
+type fiatAPIData struct {
+	Base  string            `json:"base"`
+	Rates map[string]string `json:"rates"`
+}
+
+type fiatAPIResp struct {
+	Data fiatAPIData `json:"data"`
+}
+
+func UsdFaitCurrency() (map[string]decimal.Decimal, error) {
+	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
+
+	logger.Sugar().Errorw("CoinBaseUSDPrice", "URL", coinbaseAPIFiat)
+
+	cli := resty.New()
+	cli = cli.SetTimeout(timeout * time.Second)
+	if socksProxy != "" {
+		cli = cli.SetProxy(socksProxy)
+	}
+
+	resp, err := cli.R().Get(coinbaseAPIFiat)
+	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
+		return nil, err
+	}
+	r := fiatAPIResp{}
+	err = json.Unmarshal(resp.Body(), &r)
+	if err != nil {
+		logger.Sugar().Errorw("CoinBaseUSDPrice", "error", err)
+		return nil, err
+	}
+
+	respMap := map[string]decimal.Decimal{}
+	for k, v := range r.Data.Rates {
+		c, err := decimal.NewFromString(v)
+		if err != nil {
+			return nil, err
+		}
+		respMap[k] = c
+	}
+	return respMap, nil
 }
