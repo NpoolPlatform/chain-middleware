@@ -3,7 +3,6 @@ package fiat
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/coin"
 
@@ -22,13 +21,15 @@ import (
 	entfiatcurrencytype "github.com/NpoolPlatform/chain-manager/pkg/db/ent/fiatcurrencytype"
 
 	"entgo.io/ent/dialect/sql"
+	fiatcurrencycrud "github.com/NpoolPlatform/chain-manager/pkg/crud/fiat/currency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/coin/currency"
+	fiatcurrencypb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiat/currency"
 	"github.com/google/uuid"
 
 	coinpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 )
 
-const DefaultCoinType = "usdterc20"
+var DefaultCoinTypes = []string{"usdterc20", "tusdttrc20"}
 
 func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrency, error) {
 	fiatCurrencies := []*npool.FiatCurrency{}
@@ -41,7 +42,7 @@ func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrenc
 				entfiatcurrency.FiatCurrencyTypeID(uuid.MustParse(fiatTypeID)),
 			).
 			Order(ent.Desc(entfiatcurrency.FieldCreatedAt))
-		return join(stm, nil).
+		return join(stm).
 			Scan(_ctx, &fiatCurrencies)
 	})
 	if err != nil {
@@ -54,20 +55,20 @@ func GetFiatCurrency(ctx context.Context, fiatTypeID string) (*npool.FiatCurrenc
 
 	fiatCurrencies = expand(fiatCurrencies)
 
-	coinInfo, err := coin.GetCoinOnly(ctx, &coinpb.Conds{
-		Name: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: DefaultCoinType,
+	coinInfos, _, err := coin.GetCoins(ctx, &coinpb.Conds{
+		Names: &commonpb.StringSliceVal{
+			Op:    cruder.IN,
+			Value: DefaultCoinTypes,
 		},
-	})
+	}, 0, 1)
 	if err != nil {
 		return nil, err
 	}
 
-	if coinInfo == nil {
+	if len(coinInfos) == 0 {
 		return nil, fmt.Errorf("coin info not found")
 	}
-	coinCurrency, err := currency.GetCoinCurrency(ctx, coinInfo.ID)
+	coinCurrency, err := currency.GetCoinCurrency(ctx, coinInfos[0].ID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,9 +101,18 @@ func GetFiatCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.FiatCu
 	fiatCurrencies := []*npool.FiatCurrency{}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm := cli.FiatCurrency.Query()
+		stm, err := fiatcurrencycrud.SetQueryConds(&fiatcurrencypb.Conds{
+			ID:                  conds.ID,
+			FiatCurrencyTypeID:  conds.FiatCurrencyTypeID,
+			FiatCurrencyTypeIDs: conds.FiatCurrencyTypeIDs,
+			StartAt:             conds.StartAt,
+			EndAt:               conds.EndAt,
+		}, cli)
+		if err != nil {
+			return err
+		}
 		stm.Order(ent.Desc(entfiatcurrency.FieldCreatedAt))
-		return join(stm, conds).
+		return join(stm).
 			Scan(_ctx, &fiatCurrencies)
 	})
 	if err != nil {
@@ -121,25 +131,27 @@ func GetFiatCurrencies(ctx context.Context, conds *npool.Conds) ([]*npool.FiatCu
 func GetCoinFiatCurrencies(ctx context.Context, coinTypeIDs, fiatTypeIDs []string) ([]*npool.FiatCurrency, error) {
 	fiatCurrencies := []*npool.FiatCurrency{}
 
-	fiatTypeIDs1 := []uuid.UUID{}
-	for _, val := range fiatTypeIDs {
-		id, err := uuid.Parse(val)
-		if err != nil {
-			return nil, err
-		}
-		fiatTypeIDs1 = append(fiatTypeIDs1, id)
-	}
-
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm := cli.Debug().
-			FiatCurrency.
-			Query().
-			Where(
-				entfiatcurrency.FiatCurrencyTypeIDIn(fiatTypeIDs1...),
-			).
-			Order(ent.Desc(entfiatcurrency.FieldCreatedAt))
-		return join(stm, nil).
-			Scan(_ctx, &fiatCurrencies)
+		for _, id := range fiatTypeIDs {
+			var linfos []*npool.FiatCurrency
+			stm, err := fiatcurrencycrud.SetQueryConds(&fiatcurrencypb.Conds{
+				FiatCurrencyTypeID: &commonpb.StringVal{
+					Op:    cruder.EQ,
+					Value: id,
+				},
+			}, cli)
+			if err != nil {
+				return err
+			}
+			stm.
+				Order(ent.Desc(entfiatcurrency.FieldCreatedAt)).
+				Limit(1)
+			if err := join(stm).Scan(_ctx, &linfos); err != nil {
+				return err
+			}
+			fiatCurrencies = append(fiatCurrencies, linfos...)
+		}
+		return nil
 	})
 	if err != nil {
 		return nil, err
@@ -212,8 +224,16 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	var total uint32
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm := cli.FiatCurrency.Query()
-
+		stm, err := fiatcurrencycrud.SetQueryConds(&fiatcurrencypb.Conds{
+			ID:                  conds.ID,
+			FiatCurrencyTypeID:  conds.FiatCurrencyTypeID,
+			FiatCurrencyTypeIDs: conds.FiatCurrencyTypeIDs,
+			StartAt:             conds.StartAt,
+			EndAt:               conds.EndAt,
+		}, cli)
+		if err != nil {
+			return err
+		}
 		_total, err := stm.Count(_ctx)
 		if err != nil {
 			return err
@@ -224,7 +244,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 		stm.
 			Offset(int(offset)).
 			Limit(int(limit))
-		return join(stm, conds).
+		return join(stm).
 			Scan(_ctx, &infos)
 	})
 	if err != nil {
@@ -236,7 +256,7 @@ func GetHistories(ctx context.Context, conds *npool.Conds, offset, limit int32) 
 	return infos, total, nil
 }
 
-func join(stm *ent.FiatCurrencyQuery, conds *npool.Conds) *ent.FiatCurrencySelect {
+func join(stm *ent.FiatCurrencyQuery) *ent.FiatCurrencySelect {
 	return stm.
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entfiatcurrencytype.Table)
@@ -259,50 +279,6 @@ func join(stm *ent.FiatCurrencyQuery, conds *npool.Conds) *ent.FiatCurrencySelec
 					sql.As(t1.C(entfiatcurrencytype.FieldName), "fiat_currency_name"),
 					sql.As(t1.C(entfiatcurrencytype.FieldLogo), "fiat_currency_logo"),
 				)
-			if conds != nil {
-				if conds.ID != nil {
-					s.Where(
-						sql.EQ(
-							s.C(entfiatcurrency.FieldID),
-							conds.GetID().GetValue()),
-					)
-				}
-				if conds.FiatCurrencyTypeID != nil {
-					s.Where(
-						sql.EQ(t1.C(entfiatcurrencytype.FieldID),
-							conds.GetFiatCurrencyTypeID().GetValue(),
-						),
-					)
-				}
-
-				if conds.FiatCurrencyTypeIDs != nil {
-					s.Where(
-						sql.In(
-							t1.C(entfiatcurrencytype.FieldID),
-							strings.Join(conds.GetFiatCurrencyTypeIDs().GetValue(), `,`),
-						),
-					)
-				}
-				if conds.StartAt != nil {
-					s.Where(
-						sql.GTE(
-							t1.C(entfiatcurrencytype.FieldCreatedAt),
-							conds.GetStartAt().GetValue(),
-						),
-					)
-				}
-				if conds.EndAt != nil {
-					s.Where(
-						sql.LTE(
-							t1.C(
-								entfiatcurrencytype.FieldCreatedAt),
-							conds.GetEndAt().GetValue(),
-						),
-					)
-				}
-			}
-			s.GroupBy(entfiatcurrency.FieldFiatCurrencyTypeID)
-			s.OrderBy(entfiatcurrency.FieldCreatedAt)
 		})
 }
 
