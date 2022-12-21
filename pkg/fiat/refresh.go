@@ -7,6 +7,8 @@ import (
 	fiatcurrencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiat/currency"
 
 	typecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/fiat/currencytype"
+
+	"github.com/NpoolPlatform/chain-middleware/pkg/currency"
 )
 
 func RefreshFiatCurrencies(ctx context.Context) error {
@@ -31,7 +33,7 @@ func RefreshFiatCurrencies(ctx context.Context) error {
 			continue
 		}
 
-		prices, feedType, err := CoinUSDPrices(names)
+		prices, feedType, err := currency.USDPrices(names)
 		if err != nil {
 			return err
 		}
