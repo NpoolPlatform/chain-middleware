@@ -2,6 +2,7 @@ package appcoin
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
@@ -172,6 +173,8 @@ func GetCoinOnly(ctx context.Context, conds *npool.Conds) (*npool.Coin, error) {
 
 func expand(infos []*npool.Coin) []*npool.Coin {
 	for _, info := range infos {
+		fmt.Printf("dn: %v, st: %v\n", info.DisplayNamesStr, info.SettleTipsStr)
+		_ = json.Unmarshal([]byte(info.DisplayNamesStr), &info.DisplayNames)
 		if !info.CoinForPay {
 			info.ForPay = info.CoinForPay
 		}
@@ -184,6 +187,7 @@ func expand(infos []*npool.Coin) []*npool.Coin {
 		if info.SettleValue == "" {
 			info.SettleValue = decimal.NewFromInt(0).String()
 		}
+		_ = json.Unmarshal([]byte(info.SettleTipsStr), &info.SettleTips)
 	}
 	return infos
 }
@@ -195,6 +199,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 			entappcoin.FieldAppID,
 			entappcoin.FieldCoinTypeID,
 			entappcoin.FieldName,
+			entappcoin.FieldDisplayNames,
 			entappcoin.FieldLogo,
 			entappcoin.FieldForPay,
 			entappcoin.FieldWithdrawAutoReviewAmount,
@@ -298,6 +303,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					sql.As(t5.C(entappexrate.FieldMarketValue), "market_value"),
 					sql.As(t5.C(entappexrate.FieldSettleValue), "settle_value"),
 					sql.As(t5.C(entappexrate.FieldSettlePercent), "settle_percent"),
+					sql.As(t5.C(entappexrate.FieldSettleTips), "settle_tips"),
 					sql.As(t5.C(entappexrate.FieldSetter), "setter"),
 				)
 		})

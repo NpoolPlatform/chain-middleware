@@ -52,6 +52,8 @@ var ret = &npool.Coin{
 	AppID:                       uuid.NewString(),
 	CoinName:                    name,
 	Name:                        name,
+	DisplayNamesStr:             "[]",
+	DisplayNames:                []string{"tttttttt", "tttt1"},
 	Logo:                        logo,
 	Unit:                        unit,
 	Presale:                     false,
@@ -72,6 +74,8 @@ var ret = &npool.Coin{
 	MarketValue:                 "0.000000000000000000",
 	SettleValue:                 "0.000000000000000000",
 	SettlePercent:               80,
+	SettleTipsStr:               "[]",
+	SettleTips:                  []string{"tttttttttttt", "ttt"},
 	Setter:                      uuid.NewString(),
 	Display:                     true,
 	DailyRewardAmount:           "0.000000000000000000",
@@ -81,11 +85,13 @@ var req = &npool.CoinReq{
 	ID:                       &ret.ID,
 	AppID:                    &ret.AppID,
 	Name:                     &ret.Name,
+	DisplayNames:             ret.DisplayNames,
 	Logo:                     &ret.Logo,
 	ForPay:                   &ret.ForPay,
 	WithdrawAutoReviewAmount: &ret.WithdrawAutoReviewAmount,
 	MarketValue:              &ret.MarketValue,
 	SettlePercent:            &ret.SettlePercent,
+	SettleTips:               ret.SettleTips,
 	Setter:                   &ret.Setter,
 }
 
@@ -102,6 +108,8 @@ func createCoin(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
 		ret.FeeCoinTypeID = info.FeeCoinTypeID
+		ret.DisplayNamesStr = info.DisplayNamesStr
+		ret.SettleTipsStr = info.SettleTipsStr
 		assert.Equal(t, ret, info)
 	}
 }

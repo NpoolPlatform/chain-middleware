@@ -50,6 +50,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 			info,
 			&appcoinmgrpb.AppCoinReq{
 				Name:                     in.Name,
+				DisplayNames:             in.DisplayNames,
 				Logo:                     in.Logo,
 				ForPay:                   in.ForPay,
 				WithdrawAutoReviewAmount: in.WithdrawAutoReviewAmount,
@@ -81,6 +82,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 					CoinTypeID:    in.CoinTypeID,
 					MarketValue:   in.MarketValue,
 					SettlePercent: in.SettlePercent,
+					SettleTips:    in.SettleTips,
 					Setter:        in.Setter,
 				},
 			).Save(_ctx)
@@ -95,6 +97,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 			&appexratemgrpb.ExchangeRateReq{
 				MarketValue:   in.MarketValue,
 				SettlePercent: in.SettlePercent,
+				SettleTips:    in.SettleTips,
 				Setter:        in.Setter,
 			},
 		).Save(_ctx)

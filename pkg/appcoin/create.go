@@ -44,6 +44,7 @@ func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 				AppID:                    in.AppID,
 				CoinTypeID:               in.CoinTypeID,
 				Name:                     in.Name,
+				DisplayNames:             in.DisplayNames,
 				Logo:                     in.Logo,
 				ForPay:                   in.ForPay,
 				ProductPage:              in.ProductPage,
@@ -65,6 +66,7 @@ func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 				CoinTypeID:    in.CoinTypeID,
 				MarketValue:   in.MarketValue,
 				SettlePercent: in.SettlePercent,
+				SettleTips:    in.SettleTips,
 				Setter:        in.Setter,
 			},
 		).Save(_ctx)
