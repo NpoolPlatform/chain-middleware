@@ -116,14 +116,17 @@ func createCoin(t *testing.T) {
 
 func updateCoin(t *testing.T) {
 	amount := "123.700000000000000000"
+	index := uint32(1)
 
 	ret.WithdrawAutoReviewAmount = amount
 	ret.MarketValue = amount
 	ret.SettleValue = "98.960000000000000000"
+	ret.DisplayIndex = index
 
 	req.ID = &ret.ID
 	req.WithdrawAutoReviewAmount = &amount
 	req.MarketValue = &amount
+	req.DisplayIndex = &index
 
 	info, err := UpdateCoin(context.Background(), req)
 	if assert.Nil(t, err) {

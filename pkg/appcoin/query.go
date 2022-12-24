@@ -111,6 +111,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 		total = uint32(_total)
 
 		stm.
+			Order(ent.Asc(entappcoin.FieldDisplayIndex)).
 			Offset(int(offset)).
 			Limit(int(limit))
 
@@ -209,6 +210,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 			entappcoin.FieldUpdatedAt,
 			entappcoin.FieldDisplay,
 			entappcoin.FieldDailyRewardAmount,
+			entappcoin.FieldDisplayIndex,
 		).
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entcoinextra.Table)
