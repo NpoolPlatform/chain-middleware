@@ -267,20 +267,11 @@ func join(stm *ent.CoinBaseQuery) *ent.CoinBaseSelect {
 					sql.As(t2.C(entsetting.FieldLowFeeAmount), "low_fee_amount"),
 					sql.As(t2.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
 					sql.As(t2.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
-				)
 
-			t3 := sql.Table(entbase.Table)
-			s.
-				LeftJoin(t3).
-				On(
-					t3.C(entbase.FieldID),
-					t2.C(entsetting.FieldFeeCoinTypeID),
-				).
-				AppendSelect(
-					sql.As(t3.C(entbase.FieldName), "fee_coin_name"),
-					sql.As(t3.C(entbase.FieldLogo), "fee_coin_logo"),
-					sql.As(t3.C(entbase.FieldUnit), "fee_coin_unit"),
-					sql.As(t3.C(entbase.FieldEnv), "fee_coin_env"),
+					sql.As(s.C(entbase.FieldName), "fee_coin_name"),
+					sql.As(s.C(entbase.FieldLogo), "fee_coin_logo"),
+					sql.As(s.C(entbase.FieldUnit), "fee_coin_unit"),
+					sql.As(s.C(entbase.FieldEnv), "fee_coin_env"),
 				)
 		})
 }
