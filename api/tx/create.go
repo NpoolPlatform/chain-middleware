@@ -85,6 +85,8 @@ func ValidateCreate(ctx context.Context, in *txmgrpb.TxReq) error { //nolint
 	case txmgrpb.TxType_TxPaymentCollect:
 	case txmgrpb.TxType_TxBenefit:
 	case txmgrpb.TxType_TxLimitation:
+	case txmgrpb.TxType_TxPlatformBenefit:
+	case txmgrpb.TxType_TxUserBenefit:
 	default:
 		logger.Sugar().Errorw("CreateTx", "Type", in.GetType(), "error", "Type is invalid")
 		return fmt.Errorf("type is ivnalid")
