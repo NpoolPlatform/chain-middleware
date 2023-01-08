@@ -46,6 +46,34 @@ func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 	return infos[0], nil
 }
 
+func GetManyTxs(ctx context.Context, ids []string) ([]*npool.Tx, error) {
+	var infos []*npool.Tx
+
+	tids := []uuid.UUID{}
+	for _, id := range ids {
+		tids = append(tids, uuid.MustParse(id))
+	}
+
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm := cli.
+			Tran.
+			Query().
+			Where(
+				enttran.IDIn(tids...),
+			)
+
+		return join(stm).
+			Scan(_ctx, &infos)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	infos = expand(infos)
+
+	return infos, nil
+}
+
 func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*npool.Tx, uint32, error) {
 	var infos []*npool.Tx
 	var total uint32

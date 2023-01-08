@@ -16,3 +16,17 @@ func CreateTx(ctx context.Context, in *txmgrpb.TxReq) (*npool.Tx, error) {
 
 	return GetTx(ctx, info.ID)
 }
+
+func CreateTxs(ctx context.Context, in []*txmgrpb.TxReq) ([]*npool.Tx, error) {
+	infos, err := txmgrcli.CreateTxs(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	ids := []string{}
+	for _, info := range infos {
+		ids = append(ids, info.ID)
+	}
+
+	return GetManyTxs(ctx, ids)
+}
