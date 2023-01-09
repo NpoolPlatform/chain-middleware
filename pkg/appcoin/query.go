@@ -211,6 +211,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 			entappcoin.FieldDisplay,
 			entappcoin.FieldDailyRewardAmount,
 			entappcoin.FieldDisplayIndex,
+			entappcoin.FieldMaxAmountPerWithdraw,
 		).
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entcoinextra.Table)

@@ -83,6 +83,13 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 			return nil, err
 		}
 	}
+	if in.MaxAmountPerWithdraw != nil {
+		amount, err := decimal.NewFromString(in.GetMaxAmountPerWithdraw())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("CreateCoin", "MaxAmountPerWithdraw", in.GetMaxAmountPerWithdraw(), "error", err)
+			return nil, fmt.Errorf("MaxAmountPerWithdraw is invalid: %v", err)
+		}
+	}
 
 	if in.Name == nil {
 		in.Name = &info.Name

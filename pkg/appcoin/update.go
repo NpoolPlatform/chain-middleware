@@ -59,6 +59,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 				ProductPage:              in.ProductPage,
 				Display:                  in.Display,
 				DisplayIndex:             in.DisplayIndex,
+				MaxAmountPerWithdraw:     in.MaxAmountPerWithdraw,
 			},
 		).Save(_ctx)
 		if err != nil {

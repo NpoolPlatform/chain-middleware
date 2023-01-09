@@ -79,6 +79,7 @@ var ret = &npool.Coin{
 	Setter:                      uuid.NewString(),
 	Display:                     true,
 	DailyRewardAmount:           "0.000000000000000000",
+	MaxAmountPerWithdraw:        "0.000000000000000000",
 }
 
 var req = &npool.CoinReq{
@@ -93,6 +94,7 @@ var req = &npool.CoinReq{
 	SettlePercent:            &ret.SettlePercent,
 	SettleTips:               ret.SettleTips,
 	Setter:                   &ret.Setter,
+	MaxAmountPerWithdraw:     &ret.MaxAmountPerWithdraw,
 }
 
 func createCoin(t *testing.T) {
