@@ -188,6 +188,9 @@ func expand(infos []*npool.Coin) []*npool.Coin {
 		if info.SettleValue == "" {
 			info.SettleValue = decimal.NewFromInt(0).String()
 		}
+		if info.MaxAmountPerWithdraw == "" {
+			info.MaxAmountPerWithdraw = decimal.NewFromInt(0).String()
+		}
 		_ = json.Unmarshal([]byte(info.SettleTipsStr), &info.SettleTips)
 	}
 	return infos
