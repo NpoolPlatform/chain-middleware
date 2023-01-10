@@ -249,6 +249,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					sql.As(t2.C(entsetting.FieldLowFeeAmount), "low_fee_amount"),
 					sql.As(t2.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
 					sql.As(t2.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
+					sql.As(t2.C(entsetting.FieldLeastTransferAmount), "least_transfer_amount"),
 				)
 
 			t3 := sql.Table(entcoinbase.Table)

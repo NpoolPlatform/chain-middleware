@@ -110,6 +110,14 @@ func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error { //nolint
 			return err
 		}
 	}
+	if in.LeastTransferAmount != nil {
+		if _, err := decimal.NewFromString(in.GetLeastTransferAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin",
+				"LeastTransferAmount", in.GetLeastTransferAmount(),
+				"error", "permission denied")
+			return err
+		}
+	}
 
 	return nil
 }
