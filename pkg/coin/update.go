@@ -89,6 +89,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 			LowFeeAmount:                in.LowFeeAmount,
 			HotWalletAccountAmount:      in.HotWalletAccountAmount,
 			PaymentAccountCollectAmount: in.PaymentAccountCollectAmount,
+			LeastTransferAmount:         in.LeastTransferAmount,
 		}).Save(_ctx)
 		if err != nil {
 			return err

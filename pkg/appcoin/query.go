@@ -188,6 +188,9 @@ func expand(infos []*npool.Coin) []*npool.Coin {
 		if info.SettleValue == "" {
 			info.SettleValue = decimal.NewFromInt(0).String()
 		}
+		if info.MaxAmountPerWithdraw == "" {
+			info.MaxAmountPerWithdraw = decimal.NewFromInt(0).String()
+		}
 		_ = json.Unmarshal([]byte(info.SettleTipsStr), &info.SettleTips)
 	}
 	return infos
@@ -211,6 +214,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 			entappcoin.FieldDisplay,
 			entappcoin.FieldDailyRewardAmount,
 			entappcoin.FieldDisplayIndex,
+			entappcoin.FieldMaxAmountPerWithdraw,
 		).
 		Modify(func(s *sql.Selector) {
 			t1 := sql.Table(entcoinextra.Table)
@@ -248,6 +252,7 @@ func join(stm *ent.AppCoinQuery) *ent.AppCoinSelect { //nolint:funlen
 					sql.As(t2.C(entsetting.FieldLowFeeAmount), "low_fee_amount"),
 					sql.As(t2.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
 					sql.As(t2.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
+					sql.As(t2.C(entsetting.FieldLeastTransferAmount), "least_transfer_amount"),
 				)
 
 			t3 := sql.Table(entcoinbase.Table)

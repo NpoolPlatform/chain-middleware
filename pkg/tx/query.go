@@ -12,10 +12,10 @@ import (
 	"github.com/NpoolPlatform/chain-manager/pkg/db"
 	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
 
+	crud "github.com/NpoolPlatform/chain-manager/pkg/crud/tx"
+
 	entcoinbase "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinbase"
 	enttran "github.com/NpoolPlatform/chain-manager/pkg/db/ent/tran"
-
-	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"
 )
@@ -46,62 +46,42 @@ func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 	return infos[0], nil
 }
 
-func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*npool.Tx, uint32, error) {
+func GetManyTxs(ctx context.Context, ids []string) ([]*npool.Tx, error) {
 	var infos []*npool.Tx
-	var total uint32
 
-	ids := []uuid.UUID{}
-	for _, id := range conds.GetAccountIDs().GetValue() {
-		ids = append(ids, uuid.MustParse(id))
+	tids := []uuid.UUID{}
+	for _, id := range ids {
+		tids = append(tids, uuid.MustParse(id))
 	}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
 			Tran.
-			Query()
+			Query().
+			Where(
+				enttran.IDIn(tids...),
+			)
 
-		if conds.ID != nil {
-			stm.Where(
-				enttran.ID(uuid.MustParse(conds.GetID().GetValue())),
-			)
-		}
-		if conds.CoinTypeID != nil {
-			stm.Where(
-				enttran.CoinTypeID(uuid.MustParse(conds.GetCoinTypeID().GetValue())),
-			)
-		}
-		if conds.AccountID != nil {
-			stm.Where(
-				enttran.Or(
-					enttran.FromAccountID(uuid.MustParse(conds.GetAccountID().GetValue())),
-					enttran.ToAccountID(uuid.MustParse(conds.GetAccountID().GetValue())),
-				),
-			)
-		}
-		if len(ids) > 0 {
-			stm.Where(
-				enttran.Or(
-					enttran.FromAccountIDIn(ids...),
-					enttran.ToAccountIDIn(ids...),
-				),
-			)
-		}
-		if conds.State != nil {
-			switch conds.GetState().GetOp() {
-			case cruder.EQ:
-				stm.Where(
-					enttran.State(txmgrpb.TxState(conds.GetState().GetValue()).String()),
-				)
-			case cruder.NEQ:
-				stm.Where(
-					enttran.StateNEQ(txmgrpb.TxState(conds.GetState().GetValue()).String()),
-				)
-			}
-		}
-		if conds.Type != nil {
-			stm.Where(
-				enttran.Type(txmgrpb.TxType(conds.GetType().GetValue()).String()),
-			)
+		return join(stm).
+			Scan(_ctx, &infos)
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	infos = expand(infos)
+
+	return infos, nil
+}
+
+func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*npool.Tx, uint32, error) {
+	var infos []*npool.Tx
+	var total uint32
+
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm, err := crud.SetQueryConds(conds, cli)
+		if err != nil {
+			return err
 		}
 
 		_total, err := stm.Count(_ctx)

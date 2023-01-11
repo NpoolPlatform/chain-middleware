@@ -80,6 +80,13 @@ func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error { //nolint
 		logger.Sugar().Errorw("UpdateCoin", "Logo", in.GetLogo(), "error", "Logo is invalid")
 		return fmt.Errorf("logo is invalid")
 	}
+	if in.MaxAmountPerWithdraw != nil {
+		amount, err := decimal.NewFromString(in.GetMaxAmountPerWithdraw())
+		if err != nil || amount.Cmp(decimal.NewFromInt(0)) < 0 {
+			logger.Sugar().Errorw("UpdateCoin", "MaxAmountPerWithdraw", in.GetMaxAmountPerWithdraw(), "error", err)
+			return fmt.Errorf("MaxAmountPerWithdraw is invalid: %v", err)
+		}
+	}
 
 	return nil
 }

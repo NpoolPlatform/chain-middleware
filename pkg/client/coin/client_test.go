@@ -53,6 +53,7 @@ var ret = &npool.Coin{
 	FeeCoinName:                 name,
 	FeeCoinUnit:                 unit,
 	FeeCoinENV:                  "main",
+	LeastTransferAmount:         "0.000000000000000000",
 }
 
 var req = &npool.CoinReq{
@@ -86,6 +87,7 @@ func updateCoin(t *testing.T) {
 	ret.LowFeeAmount = amount
 	ret.HotWalletAccountAmount = amount
 	ret.PaymentAccountCollectAmount = amount
+	ret.LeastTransferAmount = amount
 	ret.FeeCoinLogo = logo
 
 	req.ID = &ret.ID
@@ -98,6 +100,7 @@ func updateCoin(t *testing.T) {
 	req.LowFeeAmount = &amount
 	req.HotWalletAccountAmount = &amount
 	req.PaymentAccountCollectAmount = &amount
+	req.LeastTransferAmount = &amount
 
 	_, err := UpdateCoin(context.Background(), req)
 	assert.NotNil(t, err)

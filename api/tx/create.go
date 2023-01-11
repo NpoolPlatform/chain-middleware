@@ -85,6 +85,8 @@ func ValidateCreate(ctx context.Context, in *txmgrpb.TxReq) error { //nolint
 	case txmgrpb.TxType_TxPaymentCollect:
 	case txmgrpb.TxType_TxBenefit:
 	case txmgrpb.TxType_TxLimitation:
+	case txmgrpb.TxType_TxPlatformBenefit:
+	case txmgrpb.TxType_TxUserBenefit:
 	default:
 		logger.Sugar().Errorw("CreateTx", "Type", in.GetType(), "error", "Type is invalid")
 		return fmt.Errorf("type is ivnalid")
@@ -119,5 +121,37 @@ func (s *Server) CreateTx(ctx context.Context, in *npool.CreateTxRequest) (*npoo
 
 	return &npool.CreateTxResponse{
 		Info: info,
+	}, nil
+}
+
+func (s *Server) CreateTxs(ctx context.Context, in *npool.CreateTxsRequest) (*npool.CreateTxsResponse, error) {
+	var err error
+
+	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateTxs")
+	defer span.End()
+
+	defer func() {
+		if err != nil {
+			span.SetStatus(scodes.Error, err.Error())
+			span.RecordError(err)
+		}
+	}()
+
+	for _, info := range in.GetInfos() {
+		if err := ValidateCreate(ctx, info); err != nil {
+			return &npool.CreateTxsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+
+	span = commontracer.TraceInvoker(span, "tx", "tx", "CreateTxs")
+
+	infos, err := tx1.CreateTxs(ctx, in.GetInfos())
+	if err != nil {
+		logger.Sugar().Errorw("CreateTxs", "error", err)
+		return &npool.CreateTxsResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.CreateTxsResponse{
+		Infos: infos,
 	}, nil
 }

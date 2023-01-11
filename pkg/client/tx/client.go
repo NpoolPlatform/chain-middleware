@@ -49,6 +49,22 @@ func CreateTx(ctx context.Context, in *txmgrpb.TxReq) (*npool.Tx, error) {
 	return info.(*npool.Tx), nil
 }
 
+func CreateTxs(ctx context.Context, in []*txmgrpb.TxReq) ([]*npool.Tx, error) {
+	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.CreateTxs(ctx, &npool.CreateTxsRequest{
+			Infos: in,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Infos, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return infos.([]*npool.Tx), nil
+}
+
 func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetTx(ctx, &npool.GetTxRequest{
