@@ -72,7 +72,7 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 	}
 
 	if coins == "" {
-		return nil, fmt.Errorf("invalid coins")
+		return nil, nil
 	}
 
 	logger.Sugar().Errorw("CoinGeckoUSDPrices", "Coins", coins)
