@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
@@ -80,13 +81,13 @@ func ValidateCreate(ctx context.Context, in *txmgrpb.TxReq) error { //nolint
 		}
 	}
 	switch in.GetType() {
-	case txmgrpb.TxType_TxWithdraw:
-	case txmgrpb.TxType_TxFeedGas:
-	case txmgrpb.TxType_TxPaymentCollect:
-	case txmgrpb.TxType_TxBenefit:
-	case txmgrpb.TxType_TxLimitation:
-	case txmgrpb.TxType_TxPlatformBenefit:
-	case txmgrpb.TxType_TxUserBenefit:
+	case basetypes.TxType_TxWithdraw:
+	case basetypes.TxType_TxFeedGas:
+	case basetypes.TxType_TxPaymentCollect:
+	case basetypes.TxType_TxBenefit:
+	case basetypes.TxType_TxLimitation:
+	case basetypes.TxType_TxPlatformBenefit:
+	case basetypes.TxType_TxUserBenefit:
 	default:
 		logger.Sugar().Errorw("CreateTx", "Type", in.GetType(), "error", "Type is invalid")
 		return fmt.Errorf("type is ivnalid")
