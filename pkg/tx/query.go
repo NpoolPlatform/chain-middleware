@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
@@ -144,7 +145,7 @@ func join(stm *ent.TranQuery) *ent.TranSelect {
 func expand(infos []*npool.Tx) []*npool.Tx {
 	for _, info := range infos {
 		info.State = txmgrpb.TxState(txmgrpb.TxState_value[info.StateStr])
-		info.Type = txmgrpb.TxType(txmgrpb.TxType_value[info.TypeStr])
+		info.Type = basetypes.TxType(basetypes.TxType_value[info.TypeStr])
 	}
 	return infos
 }

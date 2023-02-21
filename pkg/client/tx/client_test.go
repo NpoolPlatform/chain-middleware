@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	commonpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
@@ -60,8 +61,8 @@ var ret = &npool.Tx{
 	State:         txmgrpb.TxState_StateCreated,
 	StateStr:      txmgrpb.TxState_StateCreated.String(),
 	Extra:         uuid.NewString(),
-	Type:          txmgrpb.TxType_TxWithdraw,
-	TypeStr:       txmgrpb.TxType_TxWithdraw.String(),
+	Type:          basetypes.TxType_TxWithdraw,
+	TypeStr:       basetypes.TxType_TxWithdraw.String(),
 }
 
 var req = &txmgrpb.TxReq{

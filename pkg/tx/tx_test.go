@@ -11,6 +11,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
 	coinmw "github.com/NpoolPlatform/chain-middleware/pkg/coin"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
@@ -49,8 +50,8 @@ var ret = &npool.Tx{
 	FeeAmount:     "2.010000000000000000",
 	State:         txmgrpb.TxState_StateCreated,
 	StateStr:      txmgrpb.TxState_StateCreated.String(),
-	Type:          txmgrpb.TxType_TxWithdraw,
-	TypeStr:       txmgrpb.TxType_TxWithdraw.String(),
+	Type:          basetypes.TxType_TxWithdraw,
+	TypeStr:       basetypes.TxType_TxWithdraw.String(),
 	Extra:         uuid.NewString(),
 }
 
