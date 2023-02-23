@@ -19,6 +19,7 @@ import (
 	enttran "github.com/NpoolPlatform/chain-manager/pkg/db/ent/tran"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
@@ -146,6 +147,7 @@ func expand(infos []*npool.Tx) []*npool.Tx {
 	for _, info := range infos {
 		info.State = txmgrpb.TxState(txmgrpb.TxState_value[info.StateStr])
 		info.Type = basetypes.TxType(basetypes.TxType_value[info.TypeStr])
+		info.Amount = decimal.RequireFromString(info.Amount).String()
 	}
 	return infos
 }
