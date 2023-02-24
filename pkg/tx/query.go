@@ -148,6 +148,7 @@ func expand(infos []*npool.Tx) []*npool.Tx {
 		info.State = txmgrpb.TxState(txmgrpb.TxState_value[info.StateStr])
 		info.Type = basetypes.TxType(basetypes.TxType_value[info.TypeStr])
 		info.Amount = decimal.RequireFromString(info.Amount).String()
+		info.FeeAmount = decimal.RequireFromString(info.FeeAmount).String()
 	}
 	return infos
 }
