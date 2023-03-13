@@ -33,6 +33,7 @@ var ret = &npool.Coin{
 	CollectFeeAmount:            "0.000000000000000000",
 	HotWalletFeeAmount:          "0.000000000000000000",
 	LowFeeAmount:                "0.000000000000000000",
+	HotLowFeeAmount:             "0.000000000000000000",
 	HotWalletAccountAmount:      "0.000000000000000000",
 	PaymentAccountCollectAmount: "0.000000000000000000",
 	FeeCoinName:                 "bitcoin1",
@@ -70,6 +71,7 @@ func update(t *testing.T) {
 	ret.CollectFeeAmount = amount
 	ret.HotWalletFeeAmount = amount
 	ret.LowFeeAmount = amount
+	ret.HotLowFeeAmount = amount
 	ret.HotWalletAccountAmount = amount
 	ret.PaymentAccountCollectAmount = amount
 	ret.LeastTransferAmount = amount
@@ -83,6 +85,7 @@ func update(t *testing.T) {
 	req.CollectFeeAmount = &amount
 	req.HotWalletFeeAmount = &amount
 	req.LowFeeAmount = &amount
+	req.HotLowFeeAmount = &amount
 	req.HotWalletAccountAmount = &amount
 	req.PaymentAccountCollectAmount = &amount
 	req.LeastTransferAmount = &amount

@@ -87,6 +87,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 			CollectFeeAmount:            in.CollectFeeAmount,
 			HotWalletFeeAmount:          in.HotWalletFeeAmount,
 			LowFeeAmount:                in.LowFeeAmount,
+			HotLowFeeAmount:             in.HotLowFeeAmount,
 			HotWalletAccountAmount:      in.HotWalletAccountAmount,
 			PaymentAccountCollectAmount: in.PaymentAccountCollectAmount,
 			LeastTransferAmount:         in.LeastTransferAmount,
