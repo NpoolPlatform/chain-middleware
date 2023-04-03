@@ -96,6 +96,12 @@ func ValidateUpdate(ctx context.Context, in *npool.CoinReq) error { //nolint
 			return fmt.Errorf("LowFeeAmount is invalid: %v", err)
 		}
 	}
+	if in.HotLowFeeAmount != nil {
+		if _, err := decimal.NewFromString(in.GetHotLowFeeAmount()); err != nil {
+			logger.Sugar().Errorw("UpdateCoin", "HotLowFeeAmount", in.GetHotLowFeeAmount(), "error", "permission denied")
+			return fmt.Errorf("HotLowFeeAmount is invalid: %v", err)
+		}
+	}
 	if in.HotWalletAccountAmount != nil {
 		if _, err := decimal.NewFromString(in.GetHotWalletAccountAmount()); err != nil {
 			logger.Sugar().Errorw("UpdateCoin", "HotWalletAccountAmount", in.GetHotWalletAccountAmount(), "error", "permission denied")

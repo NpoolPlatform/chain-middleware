@@ -65,6 +65,7 @@ var ret = &npool.Coin{
 	CollectFeeAmount:            "0.000000000000000000",
 	HotWalletFeeAmount:          "0.000000000000000000",
 	LowFeeAmount:                "0.000000000000000000",
+	HotLowFeeAmount:             "0.000000000000000000",
 	HotWalletAccountAmount:      "0.000000000000000000",
 	PaymentAccountCollectAmount: "0.000000000000000000",
 	FeeCoinName:                 name,
