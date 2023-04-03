@@ -50,8 +50,8 @@ github.com/DATA-DOG/go-sqlmock v1.5.0 h1:Shsta01QNfFxHCfpW6YH2STWB0MudeXXEWMr20O
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/NpoolPlatform/basal-middleware v0.0.0-20230221094657-688f81366495 h1:nsyv7O18rOkvVIxG1eIww7C3iAj3eLmWxj8fnlrNTlE=
 github.com/NpoolPlatform/basal-middleware v0.0.0-20230221094657-688f81366495/go.mod h1:vJXQnMxhAgu3v7X2YelLqm2k5hvcH5XwSvKR0qyb31E=
-github.com/NpoolPlatform/chain-manager v0.0.0-20230313110321-d076e10eea5d h1:BLpjDdQn1gewusHYhtTxVzb3tkItu4VQ6vdZoY8LqFM=
-github.com/NpoolPlatform/chain-manager v0.0.0-20230313110321-d076e10eea5d/go.mod h1:hIoWz96xXbdBm8mdnHy976VP1gFNvifa1y61LOqeg1o=
+github.com/NpoolPlatform/chain-manager v0.0.0-20230403083739-c1436e6bd67a h1:qAiICM/JbRV6WJkqK9sKmoH3rhFuDrs0+LxBAe80JTc=
+github.com/NpoolPlatform/chain-manager v0.0.0-20230403083739-c1436e6bd67a/go.mod h1:hIoWz96xXbdBm8mdnHy976VP1gFNvifa1y61LOqeg1o=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012 h1:agWdYMDo1nBXR0w/PQz9Kze5IZsROOwSL8WcQFTMT4Q=
 github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012/go.mod h1:/sor3E0i0XR8BaKInJwWC85aXLmbMFRNLdIuw+ed+ig=
 github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb h1:IAQOJ0xQWdJS1BnimNdM6GZMLgTL/FnIa8C8K4xffUA=
