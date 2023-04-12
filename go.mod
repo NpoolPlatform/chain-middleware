@@ -6,7 +6,7 @@ require (
 	bou.ke/monkey v1.0.2
 	entgo.io/ent v0.11.2
 	github.com/NpoolPlatform/basal-middleware v0.0.0-20230221094657-688f81366495
-	github.com/NpoolPlatform/chain-manager v0.0.0-20230403083739-c1436e6bd67a
+	github.com/NpoolPlatform/chain-manager v0.0.0-20230412011504-c5b3f9fac99d
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20221102072657-7fcc5e6f1012
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
 	github.com/NpoolPlatform/message v0.0.0-20230313110131-64d0b6ec62b3
