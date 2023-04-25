@@ -269,6 +269,7 @@ func join(stm *ent.CoinBaseQuery) *ent.CoinBaseSelect {
 					sql.As(t2.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
 					sql.As(t2.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
 					sql.As(t2.C(entsetting.FieldLeastTransferAmount), "least_transfer_amount"),
+					sql.As(t2.C(entsetting.FieldNeedMemo), "need_memo"),
 				)
 
 			t3 := sql.Table(entbase.Table)
