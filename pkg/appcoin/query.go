@@ -174,7 +174,6 @@ func GetCoinOnly(ctx context.Context, conds *npool.Conds) (*npool.Coin, error) {
 
 func expand(infos []*npool.Coin) []*npool.Coin {
 	for _, info := range infos {
-		fmt.Printf("dn: %v, st: %v\n", info.DisplayNamesStr, info.SettleTipsStr)
 		_ = json.Unmarshal([]byte(info.DisplayNamesStr), &info.DisplayNames)
 		if !info.CoinForPay {
 			info.ForPay = info.CoinForPay
