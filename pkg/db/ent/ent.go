@@ -17,8 +17,9 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
-	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencytype"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/setting"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 )
@@ -41,17 +42,18 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		appcoin.Table:          appcoin.ValidColumn,
-		coinbase.Table:         coinbase.ValidColumn,
-		coindescription.Table:  coindescription.ValidColumn,
-		coinextra.Table:        coinextra.ValidColumn,
-		currency.Table:         currency.ValidColumn,
-		currencyhistory.Table:  currencyhistory.ValidColumn,
-		exchangerate.Table:     exchangerate.ValidColumn,
-		fiatcurrency.Table:     fiatcurrency.ValidColumn,
-		fiatcurrencytype.Table: fiatcurrencytype.ValidColumn,
-		setting.Table:          setting.ValidColumn,
-		tran.Table:             tran.ValidColumn,
+		appcoin.Table:             appcoin.ValidColumn,
+		coinbase.Table:            coinbase.ValidColumn,
+		coindescription.Table:     coindescription.ValidColumn,
+		coinextra.Table:           coinextra.ValidColumn,
+		currency.Table:            currency.ValidColumn,
+		currencyhistory.Table:     currencyhistory.ValidColumn,
+		exchangerate.Table:        exchangerate.ValidColumn,
+		fiat.Table:                fiat.ValidColumn,
+		fiatcurrency.Table:        fiatcurrency.ValidColumn,
+		fiatcurrencyhistory.Table: fiatcurrencyhistory.ValidColumn,
+		setting.Table:             setting.ValidColumn,
+		tran.Table:                tran.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

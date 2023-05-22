@@ -7,19 +7,19 @@ import (
 	"github.com/google/uuid"
 )
 
-// FiatCurrencyType holds the schema definition for the FiatCurrencyType entity.
-type FiatCurrencyType struct {
+// Fiat holds the schema definition for the Fiat entity.
+type Fiat struct {
 	ent.Schema
 }
 
-func (FiatCurrencyType) Mixin() []ent.Mixin {
+func (Fiat) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
 	}
 }
 
-// Fields of the FiatCurrencyType.
-func (FiatCurrencyType) Fields() []ent.Field {
+// Fields of the Fiat.
+func (Fiat) Fields() []ent.Field {
 	return []ent.Field{
 		field.
 			UUID("id", uuid.UUID{}).
@@ -36,7 +36,7 @@ func (FiatCurrencyType) Fields() []ent.Field {
 	}
 }
 
-// Edges of the FiatCurrencyType.
-func (FiatCurrencyType) Edges() []ent.Edge {
+// Edges of the Fiat.
+func (Fiat) Edges() []ent.Edge {
 	return nil
 }

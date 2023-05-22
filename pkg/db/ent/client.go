@@ -18,8 +18,9 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
-	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencytype"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/setting"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 
@@ -46,10 +47,12 @@ type Client struct {
 	CurrencyHistory *CurrencyHistoryClient
 	// ExchangeRate is the client for interacting with the ExchangeRate builders.
 	ExchangeRate *ExchangeRateClient
+	// Fiat is the client for interacting with the Fiat builders.
+	Fiat *FiatClient
 	// FiatCurrency is the client for interacting with the FiatCurrency builders.
 	FiatCurrency *FiatCurrencyClient
-	// FiatCurrencyType is the client for interacting with the FiatCurrencyType builders.
-	FiatCurrencyType *FiatCurrencyTypeClient
+	// FiatCurrencyHistory is the client for interacting with the FiatCurrencyHistory builders.
+	FiatCurrencyHistory *FiatCurrencyHistoryClient
 	// Setting is the client for interacting with the Setting builders.
 	Setting *SettingClient
 	// Tran is the client for interacting with the Tran builders.
@@ -74,8 +77,9 @@ func (c *Client) init() {
 	c.Currency = NewCurrencyClient(c.config)
 	c.CurrencyHistory = NewCurrencyHistoryClient(c.config)
 	c.ExchangeRate = NewExchangeRateClient(c.config)
+	c.Fiat = NewFiatClient(c.config)
 	c.FiatCurrency = NewFiatCurrencyClient(c.config)
-	c.FiatCurrencyType = NewFiatCurrencyTypeClient(c.config)
+	c.FiatCurrencyHistory = NewFiatCurrencyHistoryClient(c.config)
 	c.Setting = NewSettingClient(c.config)
 	c.Tran = NewTranClient(c.config)
 }
@@ -109,19 +113,20 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:              ctx,
-		config:           cfg,
-		AppCoin:          NewAppCoinClient(cfg),
-		CoinBase:         NewCoinBaseClient(cfg),
-		CoinDescription:  NewCoinDescriptionClient(cfg),
-		CoinExtra:        NewCoinExtraClient(cfg),
-		Currency:         NewCurrencyClient(cfg),
-		CurrencyHistory:  NewCurrencyHistoryClient(cfg),
-		ExchangeRate:     NewExchangeRateClient(cfg),
-		FiatCurrency:     NewFiatCurrencyClient(cfg),
-		FiatCurrencyType: NewFiatCurrencyTypeClient(cfg),
-		Setting:          NewSettingClient(cfg),
-		Tran:             NewTranClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		AppCoin:             NewAppCoinClient(cfg),
+		CoinBase:            NewCoinBaseClient(cfg),
+		CoinDescription:     NewCoinDescriptionClient(cfg),
+		CoinExtra:           NewCoinExtraClient(cfg),
+		Currency:            NewCurrencyClient(cfg),
+		CurrencyHistory:     NewCurrencyHistoryClient(cfg),
+		ExchangeRate:        NewExchangeRateClient(cfg),
+		Fiat:                NewFiatClient(cfg),
+		FiatCurrency:        NewFiatCurrencyClient(cfg),
+		FiatCurrencyHistory: NewFiatCurrencyHistoryClient(cfg),
+		Setting:             NewSettingClient(cfg),
+		Tran:                NewTranClient(cfg),
 	}, nil
 }
 
@@ -139,19 +144,20 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:              ctx,
-		config:           cfg,
-		AppCoin:          NewAppCoinClient(cfg),
-		CoinBase:         NewCoinBaseClient(cfg),
-		CoinDescription:  NewCoinDescriptionClient(cfg),
-		CoinExtra:        NewCoinExtraClient(cfg),
-		Currency:         NewCurrencyClient(cfg),
-		CurrencyHistory:  NewCurrencyHistoryClient(cfg),
-		ExchangeRate:     NewExchangeRateClient(cfg),
-		FiatCurrency:     NewFiatCurrencyClient(cfg),
-		FiatCurrencyType: NewFiatCurrencyTypeClient(cfg),
-		Setting:          NewSettingClient(cfg),
-		Tran:             NewTranClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		AppCoin:             NewAppCoinClient(cfg),
+		CoinBase:            NewCoinBaseClient(cfg),
+		CoinDescription:     NewCoinDescriptionClient(cfg),
+		CoinExtra:           NewCoinExtraClient(cfg),
+		Currency:            NewCurrencyClient(cfg),
+		CurrencyHistory:     NewCurrencyHistoryClient(cfg),
+		ExchangeRate:        NewExchangeRateClient(cfg),
+		Fiat:                NewFiatClient(cfg),
+		FiatCurrency:        NewFiatCurrencyClient(cfg),
+		FiatCurrencyHistory: NewFiatCurrencyHistoryClient(cfg),
+		Setting:             NewSettingClient(cfg),
+		Tran:                NewTranClient(cfg),
 	}, nil
 }
 
@@ -188,8 +194,9 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Currency.Use(hooks...)
 	c.CurrencyHistory.Use(hooks...)
 	c.ExchangeRate.Use(hooks...)
+	c.Fiat.Use(hooks...)
 	c.FiatCurrency.Use(hooks...)
-	c.FiatCurrencyType.Use(hooks...)
+	c.FiatCurrencyHistory.Use(hooks...)
 	c.Setting.Use(hooks...)
 	c.Tran.Use(hooks...)
 }
@@ -831,6 +838,97 @@ func (c *ExchangeRateClient) Hooks() []Hook {
 	return append(hooks[:len(hooks):len(hooks)], exchangerate.Hooks[:]...)
 }
 
+// FiatClient is a client for the Fiat schema.
+type FiatClient struct {
+	config
+}
+
+// NewFiatClient returns a client for the Fiat from the given config.
+func NewFiatClient(c config) *FiatClient {
+	return &FiatClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `fiat.Hooks(f(g(h())))`.
+func (c *FiatClient) Use(hooks ...Hook) {
+	c.hooks.Fiat = append(c.hooks.Fiat, hooks...)
+}
+
+// Create returns a builder for creating a Fiat entity.
+func (c *FiatClient) Create() *FiatCreate {
+	mutation := newFiatMutation(c.config, OpCreate)
+	return &FiatCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Fiat entities.
+func (c *FiatClient) CreateBulk(builders ...*FiatCreate) *FiatCreateBulk {
+	return &FiatCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Fiat.
+func (c *FiatClient) Update() *FiatUpdate {
+	mutation := newFiatMutation(c.config, OpUpdate)
+	return &FiatUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FiatClient) UpdateOne(f *Fiat) *FiatUpdateOne {
+	mutation := newFiatMutation(c.config, OpUpdateOne, withFiat(f))
+	return &FiatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FiatClient) UpdateOneID(id uuid.UUID) *FiatUpdateOne {
+	mutation := newFiatMutation(c.config, OpUpdateOne, withFiatID(id))
+	return &FiatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Fiat.
+func (c *FiatClient) Delete() *FiatDelete {
+	mutation := newFiatMutation(c.config, OpDelete)
+	return &FiatDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FiatClient) DeleteOne(f *Fiat) *FiatDeleteOne {
+	return c.DeleteOneID(f.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *FiatClient) DeleteOneID(id uuid.UUID) *FiatDeleteOne {
+	builder := c.Delete().Where(fiat.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FiatDeleteOne{builder}
+}
+
+// Query returns a query builder for Fiat.
+func (c *FiatClient) Query() *FiatQuery {
+	return &FiatQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Fiat entity by its id.
+func (c *FiatClient) Get(ctx context.Context, id uuid.UUID) (*Fiat, error) {
+	return c.Query().Where(fiat.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FiatClient) GetX(ctx context.Context, id uuid.UUID) *Fiat {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FiatClient) Hooks() []Hook {
+	hooks := c.hooks.Fiat
+	return append(hooks[:len(hooks):len(hooks)], fiat.Hooks[:]...)
+}
+
 // FiatCurrencyClient is a client for the FiatCurrency schema.
 type FiatCurrencyClient struct {
 	config
@@ -922,84 +1020,84 @@ func (c *FiatCurrencyClient) Hooks() []Hook {
 	return append(hooks[:len(hooks):len(hooks)], fiatcurrency.Hooks[:]...)
 }
 
-// FiatCurrencyTypeClient is a client for the FiatCurrencyType schema.
-type FiatCurrencyTypeClient struct {
+// FiatCurrencyHistoryClient is a client for the FiatCurrencyHistory schema.
+type FiatCurrencyHistoryClient struct {
 	config
 }
 
-// NewFiatCurrencyTypeClient returns a client for the FiatCurrencyType from the given config.
-func NewFiatCurrencyTypeClient(c config) *FiatCurrencyTypeClient {
-	return &FiatCurrencyTypeClient{config: c}
+// NewFiatCurrencyHistoryClient returns a client for the FiatCurrencyHistory from the given config.
+func NewFiatCurrencyHistoryClient(c config) *FiatCurrencyHistoryClient {
+	return &FiatCurrencyHistoryClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `fiatcurrencytype.Hooks(f(g(h())))`.
-func (c *FiatCurrencyTypeClient) Use(hooks ...Hook) {
-	c.hooks.FiatCurrencyType = append(c.hooks.FiatCurrencyType, hooks...)
+// A call to `Use(f, g, h)` equals to `fiatcurrencyhistory.Hooks(f(g(h())))`.
+func (c *FiatCurrencyHistoryClient) Use(hooks ...Hook) {
+	c.hooks.FiatCurrencyHistory = append(c.hooks.FiatCurrencyHistory, hooks...)
 }
 
-// Create returns a builder for creating a FiatCurrencyType entity.
-func (c *FiatCurrencyTypeClient) Create() *FiatCurrencyTypeCreate {
-	mutation := newFiatCurrencyTypeMutation(c.config, OpCreate)
-	return &FiatCurrencyTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a FiatCurrencyHistory entity.
+func (c *FiatCurrencyHistoryClient) Create() *FiatCurrencyHistoryCreate {
+	mutation := newFiatCurrencyHistoryMutation(c.config, OpCreate)
+	return &FiatCurrencyHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of FiatCurrencyType entities.
-func (c *FiatCurrencyTypeClient) CreateBulk(builders ...*FiatCurrencyTypeCreate) *FiatCurrencyTypeCreateBulk {
-	return &FiatCurrencyTypeCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of FiatCurrencyHistory entities.
+func (c *FiatCurrencyHistoryClient) CreateBulk(builders ...*FiatCurrencyHistoryCreate) *FiatCurrencyHistoryCreateBulk {
+	return &FiatCurrencyHistoryCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for FiatCurrencyType.
-func (c *FiatCurrencyTypeClient) Update() *FiatCurrencyTypeUpdate {
-	mutation := newFiatCurrencyTypeMutation(c.config, OpUpdate)
-	return &FiatCurrencyTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for FiatCurrencyHistory.
+func (c *FiatCurrencyHistoryClient) Update() *FiatCurrencyHistoryUpdate {
+	mutation := newFiatCurrencyHistoryMutation(c.config, OpUpdate)
+	return &FiatCurrencyHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *FiatCurrencyTypeClient) UpdateOne(fct *FiatCurrencyType) *FiatCurrencyTypeUpdateOne {
-	mutation := newFiatCurrencyTypeMutation(c.config, OpUpdateOne, withFiatCurrencyType(fct))
-	return &FiatCurrencyTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *FiatCurrencyHistoryClient) UpdateOne(fch *FiatCurrencyHistory) *FiatCurrencyHistoryUpdateOne {
+	mutation := newFiatCurrencyHistoryMutation(c.config, OpUpdateOne, withFiatCurrencyHistory(fch))
+	return &FiatCurrencyHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *FiatCurrencyTypeClient) UpdateOneID(id uuid.UUID) *FiatCurrencyTypeUpdateOne {
-	mutation := newFiatCurrencyTypeMutation(c.config, OpUpdateOne, withFiatCurrencyTypeID(id))
-	return &FiatCurrencyTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *FiatCurrencyHistoryClient) UpdateOneID(id uuid.UUID) *FiatCurrencyHistoryUpdateOne {
+	mutation := newFiatCurrencyHistoryMutation(c.config, OpUpdateOne, withFiatCurrencyHistoryID(id))
+	return &FiatCurrencyHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for FiatCurrencyType.
-func (c *FiatCurrencyTypeClient) Delete() *FiatCurrencyTypeDelete {
-	mutation := newFiatCurrencyTypeMutation(c.config, OpDelete)
-	return &FiatCurrencyTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for FiatCurrencyHistory.
+func (c *FiatCurrencyHistoryClient) Delete() *FiatCurrencyHistoryDelete {
+	mutation := newFiatCurrencyHistoryMutation(c.config, OpDelete)
+	return &FiatCurrencyHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *FiatCurrencyTypeClient) DeleteOne(fct *FiatCurrencyType) *FiatCurrencyTypeDeleteOne {
-	return c.DeleteOneID(fct.ID)
+func (c *FiatCurrencyHistoryClient) DeleteOne(fch *FiatCurrencyHistory) *FiatCurrencyHistoryDeleteOne {
+	return c.DeleteOneID(fch.ID)
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *FiatCurrencyTypeClient) DeleteOneID(id uuid.UUID) *FiatCurrencyTypeDeleteOne {
-	builder := c.Delete().Where(fiatcurrencytype.ID(id))
+func (c *FiatCurrencyHistoryClient) DeleteOneID(id uuid.UUID) *FiatCurrencyHistoryDeleteOne {
+	builder := c.Delete().Where(fiatcurrencyhistory.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &FiatCurrencyTypeDeleteOne{builder}
+	return &FiatCurrencyHistoryDeleteOne{builder}
 }
 
-// Query returns a query builder for FiatCurrencyType.
-func (c *FiatCurrencyTypeClient) Query() *FiatCurrencyTypeQuery {
-	return &FiatCurrencyTypeQuery{
+// Query returns a query builder for FiatCurrencyHistory.
+func (c *FiatCurrencyHistoryClient) Query() *FiatCurrencyHistoryQuery {
+	return &FiatCurrencyHistoryQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a FiatCurrencyType entity by its id.
-func (c *FiatCurrencyTypeClient) Get(ctx context.Context, id uuid.UUID) (*FiatCurrencyType, error) {
-	return c.Query().Where(fiatcurrencytype.ID(id)).Only(ctx)
+// Get returns a FiatCurrencyHistory entity by its id.
+func (c *FiatCurrencyHistoryClient) Get(ctx context.Context, id uuid.UUID) (*FiatCurrencyHistory, error) {
+	return c.Query().Where(fiatcurrencyhistory.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *FiatCurrencyTypeClient) GetX(ctx context.Context, id uuid.UUID) *FiatCurrencyType {
+func (c *FiatCurrencyHistoryClient) GetX(ctx context.Context, id uuid.UUID) *FiatCurrencyHistory {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1008,9 +1106,9 @@ func (c *FiatCurrencyTypeClient) GetX(ctx context.Context, id uuid.UUID) *FiatCu
 }
 
 // Hooks returns the client hooks.
-func (c *FiatCurrencyTypeClient) Hooks() []Hook {
-	hooks := c.hooks.FiatCurrencyType
-	return append(hooks[:len(hooks):len(hooks)], fiatcurrencytype.Hooks[:]...)
+func (c *FiatCurrencyHistoryClient) Hooks() []Hook {
+	hooks := c.hooks.FiatCurrencyHistory
+	return append(hooks[:len(hooks):len(hooks)], fiatcurrencyhistory.Hooks[:]...)
 }
 
 // SettingClient is a client for the Setting schema.

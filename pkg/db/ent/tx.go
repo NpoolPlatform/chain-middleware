@@ -28,10 +28,12 @@ type Tx struct {
 	CurrencyHistory *CurrencyHistoryClient
 	// ExchangeRate is the client for interacting with the ExchangeRate builders.
 	ExchangeRate *ExchangeRateClient
+	// Fiat is the client for interacting with the Fiat builders.
+	Fiat *FiatClient
 	// FiatCurrency is the client for interacting with the FiatCurrency builders.
 	FiatCurrency *FiatCurrencyClient
-	// FiatCurrencyType is the client for interacting with the FiatCurrencyType builders.
-	FiatCurrencyType *FiatCurrencyTypeClient
+	// FiatCurrencyHistory is the client for interacting with the FiatCurrencyHistory builders.
+	FiatCurrencyHistory *FiatCurrencyHistoryClient
 	// Setting is the client for interacting with the Setting builders.
 	Setting *SettingClient
 	// Tran is the client for interacting with the Tran builders.
@@ -178,8 +180,9 @@ func (tx *Tx) init() {
 	tx.Currency = NewCurrencyClient(tx.config)
 	tx.CurrencyHistory = NewCurrencyHistoryClient(tx.config)
 	tx.ExchangeRate = NewExchangeRateClient(tx.config)
+	tx.Fiat = NewFiatClient(tx.config)
 	tx.FiatCurrency = NewFiatCurrencyClient(tx.config)
-	tx.FiatCurrencyType = NewFiatCurrencyTypeClient(tx.config)
+	tx.FiatCurrencyHistory = NewFiatCurrencyHistoryClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)
 	tx.Tran = NewTranClient(tx.config)
 }

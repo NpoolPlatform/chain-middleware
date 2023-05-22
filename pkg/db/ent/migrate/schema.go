@@ -168,13 +168,28 @@ var (
 		Columns:    ExchangeRatesColumns,
 		PrimaryKey: []*schema.Column{ExchangeRatesColumns[0]},
 	}
+	// FiatsColumns holds the columns for the "fiats" table.
+	FiatsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "logo", Type: field.TypeString, Nullable: true, Default: ""},
+	}
+	// FiatsTable holds the schema information for the "fiats" table.
+	FiatsTable = &schema.Table{
+		Name:       "fiats",
+		Columns:    FiatsColumns,
+		PrimaryKey: []*schema.Column{FiatsColumns[0]},
+	}
 	// FiatCurrenciesColumns holds the columns for the "fiat_currencies" table.
 	FiatCurrenciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
-		{Name: "fiat_currency_type_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
 		{Name: "market_value_low", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
 		{Name: "market_value_high", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
@@ -185,20 +200,22 @@ var (
 		Columns:    FiatCurrenciesColumns,
 		PrimaryKey: []*schema.Column{FiatCurrenciesColumns[0]},
 	}
-	// FiatCurrencyTypesColumns holds the columns for the "fiat_currency_types" table.
-	FiatCurrencyTypesColumns = []*schema.Column{
+	// FiatCurrencyHistoriesColumns holds the columns for the "fiat_currency_histories" table.
+	FiatCurrencyHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
-		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
-		{Name: "logo", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
+		{Name: "market_value_low", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
+		{Name: "market_value_high", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
 	}
-	// FiatCurrencyTypesTable holds the schema information for the "fiat_currency_types" table.
-	FiatCurrencyTypesTable = &schema.Table{
-		Name:       "fiat_currency_types",
-		Columns:    FiatCurrencyTypesColumns,
-		PrimaryKey: []*schema.Column{FiatCurrencyTypesColumns[0]},
+	// FiatCurrencyHistoriesTable holds the schema information for the "fiat_currency_histories" table.
+	FiatCurrencyHistoriesTable = &schema.Table{
+		Name:       "fiat_currency_histories",
+		Columns:    FiatCurrencyHistoriesColumns,
+		PrimaryKey: []*schema.Column{FiatCurrencyHistoriesColumns[0]},
 	}
 	// SettingsColumns holds the columns for the "settings" table.
 	SettingsColumns = []*schema.Column{
@@ -256,8 +273,9 @@ var (
 		CurrenciesTable,
 		CurrencyHistoriesTable,
 		ExchangeRatesTable,
+		FiatsTable,
 		FiatCurrenciesTable,
-		FiatCurrencyTypesTable,
+		FiatCurrencyHistoriesTable,
 		SettingsTable,
 		TransTable,
 	}

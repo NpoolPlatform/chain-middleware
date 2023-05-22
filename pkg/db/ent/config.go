@@ -28,17 +28,18 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
-	AppCoin          []ent.Hook
-	CoinBase         []ent.Hook
-	CoinDescription  []ent.Hook
-	CoinExtra        []ent.Hook
-	Currency         []ent.Hook
-	CurrencyHistory  []ent.Hook
-	ExchangeRate     []ent.Hook
-	FiatCurrency     []ent.Hook
-	FiatCurrencyType []ent.Hook
-	Setting          []ent.Hook
-	Tran             []ent.Hook
+	AppCoin             []ent.Hook
+	CoinBase            []ent.Hook
+	CoinDescription     []ent.Hook
+	CoinExtra           []ent.Hook
+	Currency            []ent.Hook
+	CurrencyHistory     []ent.Hook
+	ExchangeRate        []ent.Hook
+	Fiat                []ent.Hook
+	FiatCurrency        []ent.Hook
+	FiatCurrencyHistory []ent.Hook
+	Setting             []ent.Hook
+	Tran                []ent.Hook
 }
 
 // Options applies the options on the config object.

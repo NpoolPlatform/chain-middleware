@@ -85,23 +85,23 @@ func (fcu *FiatCurrencyUpdate) AddDeletedAt(u int32) *FiatCurrencyUpdate {
 	return fcu
 }
 
-// SetFiatCurrencyTypeID sets the "fiat_currency_type_id" field.
-func (fcu *FiatCurrencyUpdate) SetFiatCurrencyTypeID(u uuid.UUID) *FiatCurrencyUpdate {
-	fcu.mutation.SetFiatCurrencyTypeID(u)
+// SetFiatID sets the "fiat_id" field.
+func (fcu *FiatCurrencyUpdate) SetFiatID(u uuid.UUID) *FiatCurrencyUpdate {
+	fcu.mutation.SetFiatID(u)
 	return fcu
 }
 
-// SetNillableFiatCurrencyTypeID sets the "fiat_currency_type_id" field if the given value is not nil.
-func (fcu *FiatCurrencyUpdate) SetNillableFiatCurrencyTypeID(u *uuid.UUID) *FiatCurrencyUpdate {
+// SetNillableFiatID sets the "fiat_id" field if the given value is not nil.
+func (fcu *FiatCurrencyUpdate) SetNillableFiatID(u *uuid.UUID) *FiatCurrencyUpdate {
 	if u != nil {
-		fcu.SetFiatCurrencyTypeID(*u)
+		fcu.SetFiatID(*u)
 	}
 	return fcu
 }
 
-// ClearFiatCurrencyTypeID clears the value of the "fiat_currency_type_id" field.
-func (fcu *FiatCurrencyUpdate) ClearFiatCurrencyTypeID() *FiatCurrencyUpdate {
-	fcu.mutation.ClearFiatCurrencyTypeID()
+// ClearFiatID clears the value of the "fiat_id" field.
+func (fcu *FiatCurrencyUpdate) ClearFiatID() *FiatCurrencyUpdate {
+	fcu.mutation.ClearFiatID()
 	return fcu
 }
 
@@ -305,17 +305,17 @@ func (fcu *FiatCurrencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: fiatcurrency.FieldDeletedAt,
 		})
 	}
-	if value, ok := fcu.mutation.FiatCurrencyTypeID(); ok {
+	if value, ok := fcu.mutation.FiatID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUUID,
 			Value:  value,
-			Column: fiatcurrency.FieldFiatCurrencyTypeID,
+			Column: fiatcurrency.FieldFiatID,
 		})
 	}
-	if fcu.mutation.FiatCurrencyTypeIDCleared() {
+	if fcu.mutation.FiatIDCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeUUID,
-			Column: fiatcurrency.FieldFiatCurrencyTypeID,
+			Column: fiatcurrency.FieldFiatID,
 		})
 	}
 	if value, ok := fcu.mutation.FeedType(); ok {
@@ -433,23 +433,23 @@ func (fcuo *FiatCurrencyUpdateOne) AddDeletedAt(u int32) *FiatCurrencyUpdateOne 
 	return fcuo
 }
 
-// SetFiatCurrencyTypeID sets the "fiat_currency_type_id" field.
-func (fcuo *FiatCurrencyUpdateOne) SetFiatCurrencyTypeID(u uuid.UUID) *FiatCurrencyUpdateOne {
-	fcuo.mutation.SetFiatCurrencyTypeID(u)
+// SetFiatID sets the "fiat_id" field.
+func (fcuo *FiatCurrencyUpdateOne) SetFiatID(u uuid.UUID) *FiatCurrencyUpdateOne {
+	fcuo.mutation.SetFiatID(u)
 	return fcuo
 }
 
-// SetNillableFiatCurrencyTypeID sets the "fiat_currency_type_id" field if the given value is not nil.
-func (fcuo *FiatCurrencyUpdateOne) SetNillableFiatCurrencyTypeID(u *uuid.UUID) *FiatCurrencyUpdateOne {
+// SetNillableFiatID sets the "fiat_id" field if the given value is not nil.
+func (fcuo *FiatCurrencyUpdateOne) SetNillableFiatID(u *uuid.UUID) *FiatCurrencyUpdateOne {
 	if u != nil {
-		fcuo.SetFiatCurrencyTypeID(*u)
+		fcuo.SetFiatID(*u)
 	}
 	return fcuo
 }
 
-// ClearFiatCurrencyTypeID clears the value of the "fiat_currency_type_id" field.
-func (fcuo *FiatCurrencyUpdateOne) ClearFiatCurrencyTypeID() *FiatCurrencyUpdateOne {
-	fcuo.mutation.ClearFiatCurrencyTypeID()
+// ClearFiatID clears the value of the "fiat_id" field.
+func (fcuo *FiatCurrencyUpdateOne) ClearFiatID() *FiatCurrencyUpdateOne {
+	fcuo.mutation.ClearFiatID()
 	return fcuo
 }
 
@@ -683,17 +683,17 @@ func (fcuo *FiatCurrencyUpdateOne) sqlSave(ctx context.Context) (_node *FiatCurr
 			Column: fiatcurrency.FieldDeletedAt,
 		})
 	}
-	if value, ok := fcuo.mutation.FiatCurrencyTypeID(); ok {
+	if value, ok := fcuo.mutation.FiatID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUUID,
 			Value:  value,
-			Column: fiatcurrency.FieldFiatCurrencyTypeID,
+			Column: fiatcurrency.FieldFiatID,
 		})
 	}
-	if fcuo.mutation.FiatCurrencyTypeIDCleared() {
+	if fcuo.mutation.FiatIDCleared() {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeUUID,
-			Column: fiatcurrency.FieldFiatCurrencyTypeID,
+			Column: fiatcurrency.FieldFiatID,
 		})
 	}
 	if value, ok := fcuo.mutation.FeedType(); ok {

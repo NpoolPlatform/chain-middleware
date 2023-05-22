@@ -318,6 +318,30 @@ func (f ExchangeRateMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mu
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ExchangeRateMutation", m)
 }
 
+// The FiatQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type FiatQueryRuleFunc func(context.Context, *ent.FiatQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f FiatQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.FiatQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.FiatQuery", q)
+}
+
+// The FiatMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type FiatMutationRuleFunc func(context.Context, *ent.FiatMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f FiatMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.FiatMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.FiatMutation", m)
+}
+
 // The FiatCurrencyQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type FiatCurrencyQueryRuleFunc func(context.Context, *ent.FiatCurrencyQuery) error
@@ -342,28 +366,28 @@ func (f FiatCurrencyMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mu
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.FiatCurrencyMutation", m)
 }
 
-// The FiatCurrencyTypeQueryRuleFunc type is an adapter to allow the use of ordinary
+// The FiatCurrencyHistoryQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
-type FiatCurrencyTypeQueryRuleFunc func(context.Context, *ent.FiatCurrencyTypeQuery) error
+type FiatCurrencyHistoryQueryRuleFunc func(context.Context, *ent.FiatCurrencyHistoryQuery) error
 
 // EvalQuery return f(ctx, q).
-func (f FiatCurrencyTypeQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.FiatCurrencyTypeQuery); ok {
+func (f FiatCurrencyHistoryQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.FiatCurrencyHistoryQuery); ok {
 		return f(ctx, q)
 	}
-	return Denyf("ent/privacy: unexpected query type %T, expect *ent.FiatCurrencyTypeQuery", q)
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.FiatCurrencyHistoryQuery", q)
 }
 
-// The FiatCurrencyTypeMutationRuleFunc type is an adapter to allow the use of ordinary
+// The FiatCurrencyHistoryMutationRuleFunc type is an adapter to allow the use of ordinary
 // functions as a mutation rule.
-type FiatCurrencyTypeMutationRuleFunc func(context.Context, *ent.FiatCurrencyTypeMutation) error
+type FiatCurrencyHistoryMutationRuleFunc func(context.Context, *ent.FiatCurrencyHistoryMutation) error
 
 // EvalMutation calls f(ctx, m).
-func (f FiatCurrencyTypeMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
-	if m, ok := m.(*ent.FiatCurrencyTypeMutation); ok {
+func (f FiatCurrencyHistoryMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.FiatCurrencyHistoryMutation); ok {
 		return f(ctx, m)
 	}
-	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.FiatCurrencyTypeMutation", m)
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.FiatCurrencyHistoryMutation", m)
 }
 
 // The SettingQueryRuleFunc type is an adapter to allow the use of ordinary
@@ -463,9 +487,11 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.ExchangeRateQuery:
 		return q.Filter(), nil
+	case *ent.FiatQuery:
+		return q.Filter(), nil
 	case *ent.FiatCurrencyQuery:
 		return q.Filter(), nil
-	case *ent.FiatCurrencyTypeQuery:
+	case *ent.FiatCurrencyHistoryQuery:
 		return q.Filter(), nil
 	case *ent.SettingQuery:
 		return q.Filter(), nil
@@ -492,9 +518,11 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 		return m.Filter(), nil
 	case *ent.ExchangeRateMutation:
 		return m.Filter(), nil
+	case *ent.FiatMutation:
+		return m.Filter(), nil
 	case *ent.FiatCurrencyMutation:
 		return m.Filter(), nil
-	case *ent.FiatCurrencyTypeMutation:
+	case *ent.FiatCurrencyHistoryMutation:
 		return m.Filter(), nil
 	case *ent.SettingMutation:
 		return m.Filter(), nil

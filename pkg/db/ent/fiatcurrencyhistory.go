@@ -7,13 +7,13 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyhistory"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
-// FiatCurrency is the model entity for the FiatCurrency schema.
-type FiatCurrency struct {
+// FiatCurrencyHistory is the model entity for the FiatCurrencyHistory schema.
+type FiatCurrencyHistory struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uuid.UUID `json:"id,omitempty"`
@@ -34,138 +34,138 @@ type FiatCurrency struct {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*FiatCurrency) scanValues(columns []string) ([]interface{}, error) {
+func (*FiatCurrencyHistory) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case fiatcurrency.FieldMarketValueLow, fiatcurrency.FieldMarketValueHigh:
+		case fiatcurrencyhistory.FieldMarketValueLow, fiatcurrencyhistory.FieldMarketValueHigh:
 			values[i] = new(decimal.Decimal)
-		case fiatcurrency.FieldCreatedAt, fiatcurrency.FieldUpdatedAt, fiatcurrency.FieldDeletedAt:
+		case fiatcurrencyhistory.FieldCreatedAt, fiatcurrencyhistory.FieldUpdatedAt, fiatcurrencyhistory.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
-		case fiatcurrency.FieldFeedType:
+		case fiatcurrencyhistory.FieldFeedType:
 			values[i] = new(sql.NullString)
-		case fiatcurrency.FieldID, fiatcurrency.FieldFiatID:
+		case fiatcurrencyhistory.FieldID, fiatcurrencyhistory.FieldFiatID:
 			values[i] = new(uuid.UUID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type FiatCurrency", columns[i])
+			return nil, fmt.Errorf("unexpected column %q for type FiatCurrencyHistory", columns[i])
 		}
 	}
 	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the FiatCurrency fields.
-func (fc *FiatCurrency) assignValues(columns []string, values []interface{}) error {
+// to the FiatCurrencyHistory fields.
+func (fch *FiatCurrencyHistory) assignValues(columns []string, values []interface{}) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case fiatcurrency.FieldID:
+		case fiatcurrencyhistory.FieldID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				fc.ID = *value
+				fch.ID = *value
 			}
-		case fiatcurrency.FieldCreatedAt:
+		case fiatcurrencyhistory.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				fc.CreatedAt = uint32(value.Int64)
+				fch.CreatedAt = uint32(value.Int64)
 			}
-		case fiatcurrency.FieldUpdatedAt:
+		case fiatcurrencyhistory.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				fc.UpdatedAt = uint32(value.Int64)
+				fch.UpdatedAt = uint32(value.Int64)
 			}
-		case fiatcurrency.FieldDeletedAt:
+		case fiatcurrencyhistory.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				fc.DeletedAt = uint32(value.Int64)
+				fch.DeletedAt = uint32(value.Int64)
 			}
-		case fiatcurrency.FieldFiatID:
+		case fiatcurrencyhistory.FieldFiatID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field fiat_id", values[i])
 			} else if value != nil {
-				fc.FiatID = *value
+				fch.FiatID = *value
 			}
-		case fiatcurrency.FieldFeedType:
+		case fiatcurrencyhistory.FieldFeedType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field feed_type", values[i])
 			} else if value.Valid {
-				fc.FeedType = value.String
+				fch.FeedType = value.String
 			}
-		case fiatcurrency.FieldMarketValueLow:
+		case fiatcurrencyhistory.FieldMarketValueLow:
 			if value, ok := values[i].(*decimal.Decimal); !ok {
 				return fmt.Errorf("unexpected type %T for field market_value_low", values[i])
 			} else if value != nil {
-				fc.MarketValueLow = *value
+				fch.MarketValueLow = *value
 			}
-		case fiatcurrency.FieldMarketValueHigh:
+		case fiatcurrencyhistory.FieldMarketValueHigh:
 			if value, ok := values[i].(*decimal.Decimal); !ok {
 				return fmt.Errorf("unexpected type %T for field market_value_high", values[i])
 			} else if value != nil {
-				fc.MarketValueHigh = *value
+				fch.MarketValueHigh = *value
 			}
 		}
 	}
 	return nil
 }
 
-// Update returns a builder for updating this FiatCurrency.
-// Note that you need to call FiatCurrency.Unwrap() before calling this method if this FiatCurrency
+// Update returns a builder for updating this FiatCurrencyHistory.
+// Note that you need to call FiatCurrencyHistory.Unwrap() before calling this method if this FiatCurrencyHistory
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (fc *FiatCurrency) Update() *FiatCurrencyUpdateOne {
-	return (&FiatCurrencyClient{config: fc.config}).UpdateOne(fc)
+func (fch *FiatCurrencyHistory) Update() *FiatCurrencyHistoryUpdateOne {
+	return (&FiatCurrencyHistoryClient{config: fch.config}).UpdateOne(fch)
 }
 
-// Unwrap unwraps the FiatCurrency entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the FiatCurrencyHistory entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (fc *FiatCurrency) Unwrap() *FiatCurrency {
-	_tx, ok := fc.config.driver.(*txDriver)
+func (fch *FiatCurrencyHistory) Unwrap() *FiatCurrencyHistory {
+	_tx, ok := fch.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: FiatCurrency is not a transactional entity")
+		panic("ent: FiatCurrencyHistory is not a transactional entity")
 	}
-	fc.config.driver = _tx.drv
-	return fc
+	fch.config.driver = _tx.drv
+	return fch
 }
 
 // String implements the fmt.Stringer.
-func (fc *FiatCurrency) String() string {
+func (fch *FiatCurrencyHistory) String() string {
 	var builder strings.Builder
-	builder.WriteString("FiatCurrency(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", fc.ID))
+	builder.WriteString("FiatCurrencyHistory(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", fch.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(fmt.Sprintf("%v", fc.CreatedAt))
+	builder.WriteString(fmt.Sprintf("%v", fch.CreatedAt))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(fmt.Sprintf("%v", fc.UpdatedAt))
+	builder.WriteString(fmt.Sprintf("%v", fch.UpdatedAt))
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
-	builder.WriteString(fmt.Sprintf("%v", fc.DeletedAt))
+	builder.WriteString(fmt.Sprintf("%v", fch.DeletedAt))
 	builder.WriteString(", ")
 	builder.WriteString("fiat_id=")
-	builder.WriteString(fmt.Sprintf("%v", fc.FiatID))
+	builder.WriteString(fmt.Sprintf("%v", fch.FiatID))
 	builder.WriteString(", ")
 	builder.WriteString("feed_type=")
-	builder.WriteString(fc.FeedType)
+	builder.WriteString(fch.FeedType)
 	builder.WriteString(", ")
 	builder.WriteString("market_value_low=")
-	builder.WriteString(fmt.Sprintf("%v", fc.MarketValueLow))
+	builder.WriteString(fmt.Sprintf("%v", fch.MarketValueLow))
 	builder.WriteString(", ")
 	builder.WriteString("market_value_high=")
-	builder.WriteString(fmt.Sprintf("%v", fc.MarketValueHigh))
+	builder.WriteString(fmt.Sprintf("%v", fch.MarketValueHigh))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// FiatCurrencies is a parsable slice of FiatCurrency.
-type FiatCurrencies []*FiatCurrency
+// FiatCurrencyHistories is a parsable slice of FiatCurrencyHistory.
+type FiatCurrencyHistories []*FiatCurrencyHistory
 
-func (fc FiatCurrencies) config(cfg config) {
-	for _i := range fc {
-		fc[_i].config = cfg
+func (fch FiatCurrencyHistories) config(cfg config) {
+	for _i := range fch {
+		fch[_i].config = cfg
 	}
 }

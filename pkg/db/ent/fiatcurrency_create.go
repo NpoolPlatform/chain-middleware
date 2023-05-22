@@ -66,16 +66,16 @@ func (fcc *FiatCurrencyCreate) SetNillableDeletedAt(u *uint32) *FiatCurrencyCrea
 	return fcc
 }
 
-// SetFiatCurrencyTypeID sets the "fiat_currency_type_id" field.
-func (fcc *FiatCurrencyCreate) SetFiatCurrencyTypeID(u uuid.UUID) *FiatCurrencyCreate {
-	fcc.mutation.SetFiatCurrencyTypeID(u)
+// SetFiatID sets the "fiat_id" field.
+func (fcc *FiatCurrencyCreate) SetFiatID(u uuid.UUID) *FiatCurrencyCreate {
+	fcc.mutation.SetFiatID(u)
 	return fcc
 }
 
-// SetNillableFiatCurrencyTypeID sets the "fiat_currency_type_id" field if the given value is not nil.
-func (fcc *FiatCurrencyCreate) SetNillableFiatCurrencyTypeID(u *uuid.UUID) *FiatCurrencyCreate {
+// SetNillableFiatID sets the "fiat_id" field if the given value is not nil.
+func (fcc *FiatCurrencyCreate) SetNillableFiatID(u *uuid.UUID) *FiatCurrencyCreate {
 	if u != nil {
-		fcc.SetFiatCurrencyTypeID(*u)
+		fcc.SetFiatID(*u)
 	}
 	return fcc
 }
@@ -236,12 +236,12 @@ func (fcc *FiatCurrencyCreate) defaults() error {
 		v := fiatcurrency.DefaultDeletedAt()
 		fcc.mutation.SetDeletedAt(v)
 	}
-	if _, ok := fcc.mutation.FiatCurrencyTypeID(); !ok {
-		if fiatcurrency.DefaultFiatCurrencyTypeID == nil {
-			return fmt.Errorf("ent: uninitialized fiatcurrency.DefaultFiatCurrencyTypeID (forgotten import ent/runtime?)")
+	if _, ok := fcc.mutation.FiatID(); !ok {
+		if fiatcurrency.DefaultFiatID == nil {
+			return fmt.Errorf("ent: uninitialized fiatcurrency.DefaultFiatID (forgotten import ent/runtime?)")
 		}
-		v := fiatcurrency.DefaultFiatCurrencyTypeID()
-		fcc.mutation.SetFiatCurrencyTypeID(v)
+		v := fiatcurrency.DefaultFiatID()
+		fcc.mutation.SetFiatID(v)
 	}
 	if _, ok := fcc.mutation.FeedType(); !ok {
 		v := fiatcurrency.DefaultFeedType
@@ -337,13 +337,13 @@ func (fcc *FiatCurrencyCreate) createSpec() (*FiatCurrency, *sqlgraph.CreateSpec
 		})
 		_node.DeletedAt = value
 	}
-	if value, ok := fcc.mutation.FiatCurrencyTypeID(); ok {
+	if value, ok := fcc.mutation.FiatID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeUUID,
 			Value:  value,
-			Column: fiatcurrency.FieldFiatCurrencyTypeID,
+			Column: fiatcurrency.FieldFiatID,
 		})
-		_node.FiatCurrencyTypeID = value
+		_node.FiatID = value
 	}
 	if value, ok := fcc.mutation.FeedType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -477,21 +477,21 @@ func (u *FiatCurrencyUpsert) AddDeletedAt(v uint32) *FiatCurrencyUpsert {
 	return u
 }
 
-// SetFiatCurrencyTypeID sets the "fiat_currency_type_id" field.
-func (u *FiatCurrencyUpsert) SetFiatCurrencyTypeID(v uuid.UUID) *FiatCurrencyUpsert {
-	u.Set(fiatcurrency.FieldFiatCurrencyTypeID, v)
+// SetFiatID sets the "fiat_id" field.
+func (u *FiatCurrencyUpsert) SetFiatID(v uuid.UUID) *FiatCurrencyUpsert {
+	u.Set(fiatcurrency.FieldFiatID, v)
 	return u
 }
 
-// UpdateFiatCurrencyTypeID sets the "fiat_currency_type_id" field to the value that was provided on create.
-func (u *FiatCurrencyUpsert) UpdateFiatCurrencyTypeID() *FiatCurrencyUpsert {
-	u.SetExcluded(fiatcurrency.FieldFiatCurrencyTypeID)
+// UpdateFiatID sets the "fiat_id" field to the value that was provided on create.
+func (u *FiatCurrencyUpsert) UpdateFiatID() *FiatCurrencyUpsert {
+	u.SetExcluded(fiatcurrency.FieldFiatID)
 	return u
 }
 
-// ClearFiatCurrencyTypeID clears the value of the "fiat_currency_type_id" field.
-func (u *FiatCurrencyUpsert) ClearFiatCurrencyTypeID() *FiatCurrencyUpsert {
-	u.SetNull(fiatcurrency.FieldFiatCurrencyTypeID)
+// ClearFiatID clears the value of the "fiat_id" field.
+func (u *FiatCurrencyUpsert) ClearFiatID() *FiatCurrencyUpsert {
+	u.SetNull(fiatcurrency.FieldFiatID)
 	return u
 }
 
@@ -662,24 +662,24 @@ func (u *FiatCurrencyUpsertOne) UpdateDeletedAt() *FiatCurrencyUpsertOne {
 	})
 }
 
-// SetFiatCurrencyTypeID sets the "fiat_currency_type_id" field.
-func (u *FiatCurrencyUpsertOne) SetFiatCurrencyTypeID(v uuid.UUID) *FiatCurrencyUpsertOne {
+// SetFiatID sets the "fiat_id" field.
+func (u *FiatCurrencyUpsertOne) SetFiatID(v uuid.UUID) *FiatCurrencyUpsertOne {
 	return u.Update(func(s *FiatCurrencyUpsert) {
-		s.SetFiatCurrencyTypeID(v)
+		s.SetFiatID(v)
 	})
 }
 
-// UpdateFiatCurrencyTypeID sets the "fiat_currency_type_id" field to the value that was provided on create.
-func (u *FiatCurrencyUpsertOne) UpdateFiatCurrencyTypeID() *FiatCurrencyUpsertOne {
+// UpdateFiatID sets the "fiat_id" field to the value that was provided on create.
+func (u *FiatCurrencyUpsertOne) UpdateFiatID() *FiatCurrencyUpsertOne {
 	return u.Update(func(s *FiatCurrencyUpsert) {
-		s.UpdateFiatCurrencyTypeID()
+		s.UpdateFiatID()
 	})
 }
 
-// ClearFiatCurrencyTypeID clears the value of the "fiat_currency_type_id" field.
-func (u *FiatCurrencyUpsertOne) ClearFiatCurrencyTypeID() *FiatCurrencyUpsertOne {
+// ClearFiatID clears the value of the "fiat_id" field.
+func (u *FiatCurrencyUpsertOne) ClearFiatID() *FiatCurrencyUpsertOne {
 	return u.Update(func(s *FiatCurrencyUpsert) {
-		s.ClearFiatCurrencyTypeID()
+		s.ClearFiatID()
 	})
 }
 
@@ -1025,24 +1025,24 @@ func (u *FiatCurrencyUpsertBulk) UpdateDeletedAt() *FiatCurrencyUpsertBulk {
 	})
 }
 
-// SetFiatCurrencyTypeID sets the "fiat_currency_type_id" field.
-func (u *FiatCurrencyUpsertBulk) SetFiatCurrencyTypeID(v uuid.UUID) *FiatCurrencyUpsertBulk {
+// SetFiatID sets the "fiat_id" field.
+func (u *FiatCurrencyUpsertBulk) SetFiatID(v uuid.UUID) *FiatCurrencyUpsertBulk {
 	return u.Update(func(s *FiatCurrencyUpsert) {
-		s.SetFiatCurrencyTypeID(v)
+		s.SetFiatID(v)
 	})
 }
 
-// UpdateFiatCurrencyTypeID sets the "fiat_currency_type_id" field to the value that was provided on create.
-func (u *FiatCurrencyUpsertBulk) UpdateFiatCurrencyTypeID() *FiatCurrencyUpsertBulk {
+// UpdateFiatID sets the "fiat_id" field to the value that was provided on create.
+func (u *FiatCurrencyUpsertBulk) UpdateFiatID() *FiatCurrencyUpsertBulk {
 	return u.Update(func(s *FiatCurrencyUpsert) {
-		s.UpdateFiatCurrencyTypeID()
+		s.UpdateFiatID()
 	})
 }
 
-// ClearFiatCurrencyTypeID clears the value of the "fiat_currency_type_id" field.
-func (u *FiatCurrencyUpsertBulk) ClearFiatCurrencyTypeID() *FiatCurrencyUpsertBulk {
+// ClearFiatID clears the value of the "fiat_id" field.
+func (u *FiatCurrencyUpsertBulk) ClearFiatID() *FiatCurrencyUpsertBulk {
 	return u.Update(func(s *FiatCurrencyUpsert) {
-		s.ClearFiatCurrencyTypeID()
+		s.ClearFiatID()
 	})
 }
 

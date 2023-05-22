@@ -12,19 +12,19 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 )
 
-// FiatCurrency holds the schema definition for the FiatCurrency entity.
-type FiatCurrency struct {
+// FiatCurrencyHistory holds the schema definition for the FiatCurrencyHistory entity.
+type FiatCurrencyHistory struct {
 	ent.Schema
 }
 
-func (FiatCurrency) Mixin() []ent.Mixin {
+func (FiatCurrencyHistory) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
 	}
 }
 
-// Fields of the FiatCurrency.
-func (FiatCurrency) Fields() []ent.Field {
+// Fields of the FiatCurrencyHistory.
+func (FiatCurrencyHistory) Fields() []ent.Field {
 	return []ent.Field{
 		field.
 			UUID("id", uuid.UUID{}).
@@ -55,7 +55,7 @@ func (FiatCurrency) Fields() []ent.Field {
 	}
 }
 
-// Edges of the FiatCurrency.
-func (FiatCurrency) Edges() []ent.Edge {
+// Edges of the FiatCurrencyHistory.
+func (FiatCurrencyHistory) Edges() []ent.Edge {
 	return nil
 }
