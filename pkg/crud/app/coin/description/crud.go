@@ -3,8 +3,8 @@ package description
 import (
 	"fmt"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	entcoindescription "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coindescription"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	entcoindescription "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 

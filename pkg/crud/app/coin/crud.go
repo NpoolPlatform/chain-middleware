@@ -3,8 +3,8 @@ package appcoin
 import (
 	"fmt"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	entappcoin "github.com/NpoolPlatform/chain-manager/pkg/db/ent/appcoin"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	entappcoin "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/appcoin"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"

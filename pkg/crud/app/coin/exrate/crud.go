@@ -3,8 +3,8 @@ package exrate
 import (
 	"fmt"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	entexrate "github.com/NpoolPlatform/chain-manager/pkg/db/ent/exchangerate"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	entexrate "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"

@@ -3,8 +3,8 @@ package tx
 import (
 	"fmt"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	enttran "github.com/NpoolPlatform/chain-manager/pkg/db/ent/tran"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	enttran "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 

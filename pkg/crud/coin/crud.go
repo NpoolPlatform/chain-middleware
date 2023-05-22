@@ -3,8 +3,8 @@ package coinbase
 import (
 	"fmt"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	entcoinbase "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinbase"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	entcoinbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"

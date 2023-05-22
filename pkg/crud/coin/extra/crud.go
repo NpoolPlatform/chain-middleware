@@ -3,8 +3,8 @@ package coinextra
 import (
 	"fmt"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-	entcoinextra "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinextra"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	entcoinextra "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"
