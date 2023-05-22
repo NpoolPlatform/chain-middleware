@@ -15,6 +15,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencytype"
@@ -45,6 +46,7 @@ func columnChecker(table string) func(string) error {
 		coindescription.Table:  coindescription.ValidColumn,
 		coinextra.Table:        coinextra.ValidColumn,
 		currency.Table:         currency.ValidColumn,
+		currencyhistory.Table:  currencyhistory.ValidColumn,
 		exchangerate.Table:     exchangerate.ValidColumn,
 		fiatcurrency.Table:     fiatcurrency.ValidColumn,
 		fiatcurrencytype.Table: fiatcurrencytype.ValidColumn,

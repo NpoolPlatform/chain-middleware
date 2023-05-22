@@ -16,6 +16,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencytype"
@@ -41,6 +42,8 @@ type Client struct {
 	CoinExtra *CoinExtraClient
 	// Currency is the client for interacting with the Currency builders.
 	Currency *CurrencyClient
+	// CurrencyHistory is the client for interacting with the CurrencyHistory builders.
+	CurrencyHistory *CurrencyHistoryClient
 	// ExchangeRate is the client for interacting with the ExchangeRate builders.
 	ExchangeRate *ExchangeRateClient
 	// FiatCurrency is the client for interacting with the FiatCurrency builders.
@@ -69,6 +72,7 @@ func (c *Client) init() {
 	c.CoinDescription = NewCoinDescriptionClient(c.config)
 	c.CoinExtra = NewCoinExtraClient(c.config)
 	c.Currency = NewCurrencyClient(c.config)
+	c.CurrencyHistory = NewCurrencyHistoryClient(c.config)
 	c.ExchangeRate = NewExchangeRateClient(c.config)
 	c.FiatCurrency = NewFiatCurrencyClient(c.config)
 	c.FiatCurrencyType = NewFiatCurrencyTypeClient(c.config)
@@ -112,6 +116,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CoinDescription:  NewCoinDescriptionClient(cfg),
 		CoinExtra:        NewCoinExtraClient(cfg),
 		Currency:         NewCurrencyClient(cfg),
+		CurrencyHistory:  NewCurrencyHistoryClient(cfg),
 		ExchangeRate:     NewExchangeRateClient(cfg),
 		FiatCurrency:     NewFiatCurrencyClient(cfg),
 		FiatCurrencyType: NewFiatCurrencyTypeClient(cfg),
@@ -141,6 +146,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CoinDescription:  NewCoinDescriptionClient(cfg),
 		CoinExtra:        NewCoinExtraClient(cfg),
 		Currency:         NewCurrencyClient(cfg),
+		CurrencyHistory:  NewCurrencyHistoryClient(cfg),
 		ExchangeRate:     NewExchangeRateClient(cfg),
 		FiatCurrency:     NewFiatCurrencyClient(cfg),
 		FiatCurrencyType: NewFiatCurrencyTypeClient(cfg),
@@ -180,6 +186,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.CoinDescription.Use(hooks...)
 	c.CoinExtra.Use(hooks...)
 	c.Currency.Use(hooks...)
+	c.CurrencyHistory.Use(hooks...)
 	c.ExchangeRate.Use(hooks...)
 	c.FiatCurrency.Use(hooks...)
 	c.FiatCurrencyType.Use(hooks...)
@@ -640,6 +647,97 @@ func (c *CurrencyClient) GetX(ctx context.Context, id uuid.UUID) *Currency {
 func (c *CurrencyClient) Hooks() []Hook {
 	hooks := c.hooks.Currency
 	return append(hooks[:len(hooks):len(hooks)], currency.Hooks[:]...)
+}
+
+// CurrencyHistoryClient is a client for the CurrencyHistory schema.
+type CurrencyHistoryClient struct {
+	config
+}
+
+// NewCurrencyHistoryClient returns a client for the CurrencyHistory from the given config.
+func NewCurrencyHistoryClient(c config) *CurrencyHistoryClient {
+	return &CurrencyHistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `currencyhistory.Hooks(f(g(h())))`.
+func (c *CurrencyHistoryClient) Use(hooks ...Hook) {
+	c.hooks.CurrencyHistory = append(c.hooks.CurrencyHistory, hooks...)
+}
+
+// Create returns a builder for creating a CurrencyHistory entity.
+func (c *CurrencyHistoryClient) Create() *CurrencyHistoryCreate {
+	mutation := newCurrencyHistoryMutation(c.config, OpCreate)
+	return &CurrencyHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CurrencyHistory entities.
+func (c *CurrencyHistoryClient) CreateBulk(builders ...*CurrencyHistoryCreate) *CurrencyHistoryCreateBulk {
+	return &CurrencyHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CurrencyHistory.
+func (c *CurrencyHistoryClient) Update() *CurrencyHistoryUpdate {
+	mutation := newCurrencyHistoryMutation(c.config, OpUpdate)
+	return &CurrencyHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CurrencyHistoryClient) UpdateOne(ch *CurrencyHistory) *CurrencyHistoryUpdateOne {
+	mutation := newCurrencyHistoryMutation(c.config, OpUpdateOne, withCurrencyHistory(ch))
+	return &CurrencyHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CurrencyHistoryClient) UpdateOneID(id uuid.UUID) *CurrencyHistoryUpdateOne {
+	mutation := newCurrencyHistoryMutation(c.config, OpUpdateOne, withCurrencyHistoryID(id))
+	return &CurrencyHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CurrencyHistory.
+func (c *CurrencyHistoryClient) Delete() *CurrencyHistoryDelete {
+	mutation := newCurrencyHistoryMutation(c.config, OpDelete)
+	return &CurrencyHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CurrencyHistoryClient) DeleteOne(ch *CurrencyHistory) *CurrencyHistoryDeleteOne {
+	return c.DeleteOneID(ch.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *CurrencyHistoryClient) DeleteOneID(id uuid.UUID) *CurrencyHistoryDeleteOne {
+	builder := c.Delete().Where(currencyhistory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CurrencyHistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for CurrencyHistory.
+func (c *CurrencyHistoryClient) Query() *CurrencyHistoryQuery {
+	return &CurrencyHistoryQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CurrencyHistory entity by its id.
+func (c *CurrencyHistoryClient) Get(ctx context.Context, id uuid.UUID) (*CurrencyHistory, error) {
+	return c.Query().Where(currencyhistory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CurrencyHistoryClient) GetX(ctx context.Context, id uuid.UUID) *CurrencyHistory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CurrencyHistoryClient) Hooks() []Hook {
+	hooks := c.hooks.CurrencyHistory
+	return append(hooks[:len(hooks):len(hooks)], currencyhistory.Hooks[:]...)
 }
 
 // ExchangeRateClient is a client for the ExchangeRate schema.

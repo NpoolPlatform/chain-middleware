@@ -33,6 +33,7 @@ type hooks struct {
 	CoinDescription  []ent.Hook
 	CoinExtra        []ent.Hook
 	Currency         []ent.Hook
+	CurrencyHistory  []ent.Hook
 	ExchangeRate     []ent.Hook
 	FiatCurrency     []ent.Hook
 	FiatCurrencyType []ent.Hook

@@ -21,6 +21,9 @@ type CoinExtra func(*sql.Selector)
 // Currency is the predicate function for currency builders.
 type Currency func(*sql.Selector)
 
+// CurrencyHistory is the predicate function for currencyhistory builders.
+type CurrencyHistory func(*sql.Selector)
+
 // ExchangeRate is the predicate function for exchangerate builders.
 type ExchangeRate func(*sql.Selector)
 

@@ -119,6 +119,35 @@ var (
 			},
 		},
 	}
+	// CurrencyHistoriesColumns holds the columns for the "currency_histories" table.
+	CurrencyHistoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
+		{Name: "market_value_high", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
+		{Name: "market_value_low", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
+	}
+	// CurrencyHistoriesTable holds the schema information for the "currency_histories" table.
+	CurrencyHistoriesTable = &schema.Table{
+		Name:       "currency_histories",
+		Columns:    CurrencyHistoriesColumns,
+		PrimaryKey: []*schema.Column{CurrencyHistoriesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "currencyhistory_coin_type_id_id",
+				Unique:  false,
+				Columns: []*schema.Column{CurrencyHistoriesColumns[4], CurrencyHistoriesColumns[0]},
+			},
+			{
+				Name:    "currencyhistory_coin_type_id",
+				Unique:  false,
+				Columns: []*schema.Column{CurrencyHistoriesColumns[4]},
+			},
+		},
+	}
 	// ExchangeRatesColumns holds the columns for the "exchange_rates" table.
 	ExchangeRatesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -225,6 +254,7 @@ var (
 		CoinDescriptionsTable,
 		CoinExtrasTable,
 		CurrenciesTable,
+		CurrencyHistoriesTable,
 		ExchangeRatesTable,
 		FiatCurrenciesTable,
 		FiatCurrencyTypesTable,
