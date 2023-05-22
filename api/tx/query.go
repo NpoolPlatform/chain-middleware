@@ -7,14 +7,9 @@ import (
 	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
-	constant1 "github.com/NpoolPlatform/chain-middleware/pkg/const"
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
+	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 
 	tx1 "github.com/NpoolPlatform/chain-middleware/pkg/tx"
-
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -33,22 +28,10 @@ func (s *Server) GetTx(
 ) {
 	var err error
 
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetTx")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
 	if _, err := uuid.Parse(in.GetID()); err != nil {
 		logger.Sugar().Errorw("GetTx", "ID", in.GetID(), "error", err)
 		return &npool.GetTxResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 
 	info, err := tx1.GetTx(ctx, in.GetID())
 	if err != nil {
@@ -69,16 +52,6 @@ func (s *Server) GetTxs(
 	error,
 ) {
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetTxs")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
 
 	conds := in.GetConds()
 	if conds == nil {
@@ -110,11 +83,9 @@ func (s *Server) GetTxs(
 		}
 	}
 
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
-
 	limit := in.GetLimit()
 	if limit == 0 {
-		limit = constant1.DefaultRowLimit
+		limit = constant.DefaultRowLimit
 	}
 
 	infos, total, err := tx1.GetTxs(ctx, conds, in.GetOffset(), limit)

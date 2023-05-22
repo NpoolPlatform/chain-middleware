@@ -4,10 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
-
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
 
 	basemgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/coin/base"
 
@@ -17,8 +14,6 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -136,22 +131,6 @@ func (s *Server) UpdateCoin(
 	error,
 ) {
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "UpdateCoin")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	if err := ValidateUpdate(ctx, in.GetInfo()); err != nil {
-		return &npool.UpdateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "UpdateCoin")
 
 	info, err := coin1.UpdateCoin(ctx, in.GetInfo())
 	if err != nil {

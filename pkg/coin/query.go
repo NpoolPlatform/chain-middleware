@@ -8,12 +8,6 @@ import (
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
-
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
-
 	"entgo.io/ent/dialect/sql"
 
 	basecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/base"
@@ -32,18 +26,6 @@ import (
 func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 	infos := []*npool.Coin{}
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoin")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
@@ -70,18 +52,6 @@ func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 }
 
 func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (infos []*npool.Coin, total uint32, err error) {
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoins")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
-
 	ids := []uuid.UUID{}
 	for _, id := range conds.GetIDs().GetValue() {
 		ids = append(ids, uuid.MustParse(id))
@@ -129,18 +99,6 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (inf
 }
 
 func GetManyCoins(ctx context.Context, coinTypeIDs []string) (infos []*npool.Coin, err error) {
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetManyCoins")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
-
 	ids := []uuid.UUID{}
 	for _, id := range coinTypeIDs {
 		ids = append(ids, uuid.MustParse(id))
@@ -171,17 +129,6 @@ func GetManyCoins(ctx context.Context, coinTypeIDs []string) (infos []*npool.Coi
 
 func GetCoinOnly(ctx context.Context, conds *npool.Conds) (info *npool.Coin, err error) {
 	infos := []*npool.Coin{}
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoins")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 
 	ids := []uuid.UUID{}
 	for _, id := range conds.GetIDs().GetValue() {

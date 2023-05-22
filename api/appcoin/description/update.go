@@ -4,16 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 	descmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/appcoin/description"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin/description"
 
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
-
 	description1 "github.com/NpoolPlatform/chain-middleware/pkg/appcoin/description"
 
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -47,21 +42,9 @@ func (s *Server) UpdateCoinDescription(
 ) {
 	var err error
 
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "UpdateCoinDescription")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
 	if err := ValidateUpdate(in.GetInfo()); err != nil {
 		return &npool.UpdateCoinDescriptionResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "UpdateCoinDescription")
 
 	info, err := description1.UpdateCoinDescription(ctx, in.GetInfo())
 	if err != nil {

@@ -7,10 +7,7 @@ import (
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	npool2 "github.com/NpoolPlatform/message/npool"
 
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
-
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
 
 	coinbasemgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/coin/base"
 
@@ -18,8 +15,6 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -125,22 +120,10 @@ func ValidateCreate(ctx context.Context, in *npool.CoinReq) (*npool.CoinReq, err
 func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*npool.CreateCoinResponse, error) {
 	var err error
 
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateCoin")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
 	input, err := ValidateCreate(ctx, in.GetInfo())
 	if err != nil {
 		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	span = commontracer.TraceInvoker(span, "appcoin", "appcoin", "CreateCoin")
 
 	info1, err := appcoin1.CreateCoin(ctx, input)
 	if err != nil {

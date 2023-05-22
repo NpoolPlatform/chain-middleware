@@ -6,14 +6,9 @@ import (
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 
-	constant1 "github.com/NpoolPlatform/chain-middleware/pkg/const"
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
+	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 
 	appcoin1 "github.com/NpoolPlatform/chain-middleware/pkg/appcoin"
-
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,22 +27,10 @@ func (s *Server) GetCoin(
 ) {
 	var err error
 
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoin")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
 	if _, err := uuid.Parse(in.GetID()); err != nil {
 		logger.Sugar().Errorw("GetCoin", "ID", in.GetID(), "error", err)
 		return &npool.GetCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 
 	info, err := appcoin1.GetCoin(ctx, in.GetID())
 	if err != nil {
@@ -68,16 +51,6 @@ func (s *Server) GetCoins(
 	error,
 ) {
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoins")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
 
 	conds := in.GetConds()
 	if conds == nil {
@@ -109,11 +82,9 @@ func (s *Server) GetCoins(
 		}
 	}
 
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
-
 	limit := in.GetLimit()
 	if limit == 0 {
-		limit = constant1.DefaultRowLimit
+		limit = constant.DefaultRowLimit
 	}
 
 	infos, total, err := appcoin1.GetCoins(ctx, conds, in.GetOffset(), limit)
@@ -136,16 +107,6 @@ func (s *Server) GetCoinOnly(
 	error,
 ) {
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoinOnly")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
 
 	conds := in.GetConds()
 	if conds == nil {
@@ -170,8 +131,6 @@ func (s *Server) GetCoinOnly(
 			return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
 		}
 	}
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 
 	info, err := appcoin1.GetCoinOnly(ctx, conds)
 	if err != nil {

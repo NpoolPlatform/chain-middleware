@@ -7,12 +7,6 @@ import (
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
-
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
-
 	"entgo.io/ent/dialect/sql"
 	"github.com/shopspring/decimal"
 
@@ -34,18 +28,6 @@ import (
 func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 	var infos []*npool.Coin
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoin")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm := cli.
@@ -76,18 +58,6 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 	var infos []*npool.Coin
 	var err error
 	var total uint32
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoins")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoins")
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm, err := crud.SetQueryConds(&appcoinmgrpb.Conds{
@@ -129,18 +99,6 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 func GetCoinOnly(ctx context.Context, conds *npool.Conds) (*npool.Coin, error) {
 	var infos []*npool.Coin
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoinOnly")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoins")
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		stm, err := crud.SetQueryConds(&appcoinmgrpb.Conds{

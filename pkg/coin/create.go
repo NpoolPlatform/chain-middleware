@@ -5,12 +5,6 @@ import (
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
-
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
-
 	basecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/base"
 	extracrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/extra"
 	settingcrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/setting"
@@ -25,18 +19,6 @@ import (
 func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 	var id string
 	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "CreateCoin")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "CreateJoin")
 
 	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
 		info, err := basecrud.CreateSet(
