@@ -76,6 +76,7 @@ func UpdateSet(u *ent.CoinBaseUpdateOne, req *Req) *ent.CoinBaseUpdateOne {
 
 type Conds struct {
 	ID       *cruder.Cond
+	IDs      *cruder.Cond
 	Name     *cruder.Cond
 	ENV      *cruder.Cond
 	Presale  *cruder.Cond
@@ -93,6 +94,18 @@ func SetQueryConds(q *ent.CoinBaseQuery, conds *Conds) (*ent.CoinBaseQuery, erro
 		switch conds.ID.Op {
 		case cruder.EQ:
 			q.Where(entcoinbase.ID(id))
+		default:
+			return nil, fmt.Errorf("invalid coinbase field")
+		}
+	}
+	if conds.IDs != nil {
+		ids, ok := conds.IDs.Val.([]uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid ids")
+		}
+		switch conds.IDs.Op {
+		case cruder.IN:
+			q.Where(entcoinbase.IDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid coinbase field")
 		}
