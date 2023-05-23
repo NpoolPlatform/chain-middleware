@@ -7,8 +7,8 @@ import (
 	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
-	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
 	currency "github.com/NpoolPlatform/chain-middleware/pkg/currency"
+	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 )
 
 func RefreshCurrencies(ctx context.Context) error {
