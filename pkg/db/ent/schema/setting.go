@@ -99,6 +99,10 @@ func (Setting) Fields() []ent.Field {
 			Bool("need_memo").
 			Optional().
 			Default(false),
+		field.
+			Bool("refresh_currency").
+			Optional().
+			Default(false),
 	}
 }
 

@@ -234,6 +234,20 @@ func (sc *SettingCreate) SetNillableNeedMemo(b *bool) *SettingCreate {
 	return sc
 }
 
+// SetRefreshCurrency sets the "refresh_currency" field.
+func (sc *SettingCreate) SetRefreshCurrency(b bool) *SettingCreate {
+	sc.mutation.SetRefreshCurrency(b)
+	return sc
+}
+
+// SetNillableRefreshCurrency sets the "refresh_currency" field if the given value is not nil.
+func (sc *SettingCreate) SetNillableRefreshCurrency(b *bool) *SettingCreate {
+	if b != nil {
+		sc.SetRefreshCurrency(*b)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *SettingCreate) SetID(u uuid.UUID) *SettingCreate {
 	sc.mutation.SetID(u)
@@ -401,6 +415,10 @@ func (sc *SettingCreate) defaults() error {
 	if _, ok := sc.mutation.NeedMemo(); !ok {
 		v := setting.DefaultNeedMemo
 		sc.mutation.SetNeedMemo(v)
+	}
+	if _, ok := sc.mutation.RefreshCurrency(); !ok {
+		v := setting.DefaultRefreshCurrency
+		sc.mutation.SetRefreshCurrency(v)
 	}
 	if _, ok := sc.mutation.ID(); !ok {
 		if setting.DefaultID == nil {
@@ -579,6 +597,14 @@ func (sc *SettingCreate) createSpec() (*Setting, *sqlgraph.CreateSpec) {
 			Column: setting.FieldNeedMemo,
 		})
 		_node.NeedMemo = value
+	}
+	if value, ok := sc.mutation.RefreshCurrency(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: setting.FieldRefreshCurrency,
+		})
+		_node.RefreshCurrency = value
 	}
 	return _node, _spec
 }
@@ -901,6 +927,24 @@ func (u *SettingUpsert) UpdateNeedMemo() *SettingUpsert {
 // ClearNeedMemo clears the value of the "need_memo" field.
 func (u *SettingUpsert) ClearNeedMemo() *SettingUpsert {
 	u.SetNull(setting.FieldNeedMemo)
+	return u
+}
+
+// SetRefreshCurrency sets the "refresh_currency" field.
+func (u *SettingUpsert) SetRefreshCurrency(v bool) *SettingUpsert {
+	u.Set(setting.FieldRefreshCurrency, v)
+	return u
+}
+
+// UpdateRefreshCurrency sets the "refresh_currency" field to the value that was provided on create.
+func (u *SettingUpsert) UpdateRefreshCurrency() *SettingUpsert {
+	u.SetExcluded(setting.FieldRefreshCurrency)
+	return u
+}
+
+// ClearRefreshCurrency clears the value of the "refresh_currency" field.
+func (u *SettingUpsert) ClearRefreshCurrency() *SettingUpsert {
+	u.SetNull(setting.FieldRefreshCurrency)
 	return u
 }
 
@@ -1266,6 +1310,27 @@ func (u *SettingUpsertOne) UpdateNeedMemo() *SettingUpsertOne {
 func (u *SettingUpsertOne) ClearNeedMemo() *SettingUpsertOne {
 	return u.Update(func(s *SettingUpsert) {
 		s.ClearNeedMemo()
+	})
+}
+
+// SetRefreshCurrency sets the "refresh_currency" field.
+func (u *SettingUpsertOne) SetRefreshCurrency(v bool) *SettingUpsertOne {
+	return u.Update(func(s *SettingUpsert) {
+		s.SetRefreshCurrency(v)
+	})
+}
+
+// UpdateRefreshCurrency sets the "refresh_currency" field to the value that was provided on create.
+func (u *SettingUpsertOne) UpdateRefreshCurrency() *SettingUpsertOne {
+	return u.Update(func(s *SettingUpsert) {
+		s.UpdateRefreshCurrency()
+	})
+}
+
+// ClearRefreshCurrency clears the value of the "refresh_currency" field.
+func (u *SettingUpsertOne) ClearRefreshCurrency() *SettingUpsertOne {
+	return u.Update(func(s *SettingUpsert) {
+		s.ClearRefreshCurrency()
 	})
 }
 
@@ -1797,6 +1862,27 @@ func (u *SettingUpsertBulk) UpdateNeedMemo() *SettingUpsertBulk {
 func (u *SettingUpsertBulk) ClearNeedMemo() *SettingUpsertBulk {
 	return u.Update(func(s *SettingUpsert) {
 		s.ClearNeedMemo()
+	})
+}
+
+// SetRefreshCurrency sets the "refresh_currency" field.
+func (u *SettingUpsertBulk) SetRefreshCurrency(v bool) *SettingUpsertBulk {
+	return u.Update(func(s *SettingUpsert) {
+		s.SetRefreshCurrency(v)
+	})
+}
+
+// UpdateRefreshCurrency sets the "refresh_currency" field to the value that was provided on create.
+func (u *SettingUpsertBulk) UpdateRefreshCurrency() *SettingUpsertBulk {
+	return u.Update(func(s *SettingUpsert) {
+		s.UpdateRefreshCurrency()
+	})
+}
+
+// ClearRefreshCurrency clears the value of the "refresh_currency" field.
+func (u *SettingUpsertBulk) ClearRefreshCurrency() *SettingUpsertBulk {
+	return u.Update(func(s *SettingUpsert) {
+		s.ClearRefreshCurrency()
 	})
 }
 

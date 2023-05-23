@@ -4,233 +4,201 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-
+	"entgo.io/ent/dialect/sql"
+	coincrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
-	"entgo.io/ent/dialect/sql"
-
-	basecrud "github.com/NpoolPlatform/chain-manager/pkg/crud/coin/base"
-	basemgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/base"
-
-	"github.com/NpoolPlatform/chain-manager/pkg/db"
-	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
-
-	entbase "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinbase"
-	entextra "github.com/NpoolPlatform/chain-manager/pkg/db/ent/coinextra"
-	entsetting "github.com/NpoolPlatform/chain-manager/pkg/db/ent/setting"
-
-	"github.com/google/uuid"
+	entbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
+	entextra "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
+	entsetting "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/setting"
 )
 
-func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
-	infos := []*npool.Coin{}
-	var err error
+type queryHandler struct {
+	*Handler
+	stm   *ent.CoinBaseSelect
+	infos []*npool.Coin
+	total uint32
+}
 
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm := cli.
-			CoinBase.
+func (h *queryHandler) selectCoin(stm *ent.CoinBaseQuery) {
+	h.stm = stm.Select(
+		entbase.FieldID,
+		entbase.FieldName,
+		entbase.FieldLogo,
+		entbase.FieldPresale,
+		entbase.FieldForPay,
+		entbase.FieldUnit,
+		entbase.FieldEnv,
+		entbase.FieldReservedAmount,
+		entbase.FieldDisabled,
+		entbase.FieldCreatedAt,
+		entbase.FieldUpdatedAt,
+	)
+}
+
+func (h *queryHandler) queryCoin(cli *ent.Client) error {
+	if h.ID == nil {
+		return fmt.Errorf("invalid id")
+	}
+
+	h.selectCoin(
+		cli.CoinBase.
 			Query().
 			Where(
-				entbase.ID(uuid.MustParse(id)),
-			)
+				entbase.ID(*h.ID),
+			),
+	)
+	return nil
+}
 
-		return join(stm).
-			Scan(_ctx, &infos)
+func (h *queryHandler) queryCoins(ctx context.Context, cli *ent.Client) error {
+	stm, err := coincrud.SetQueryConds(cli.CoinBase.Query(), h.Conds)
+	if err != nil {
+		return err
+	}
+	total, err := stm.Count(ctx)
+	if err != nil {
+		return err
+	}
+	h.total = uint32(total)
+	h.selectCoin(stm)
+	return nil
+}
+
+func (h *queryHandler) queryJoinExtra(s *sql.Selector) {
+	t := sql.Table(entextra.Table)
+	s.
+		LeftJoin(t).
+		On(
+			s.C(entbase.FieldID),
+			t.C(entextra.FieldCoinTypeID),
+		).
+		AppendSelect(
+			sql.As(t.C(entextra.FieldHomePage), "home_page"),
+			sql.As(t.C(entextra.FieldSpecs), "specs"),
+			sql.As(t.C(entextra.FieldStableUsd), "stable_usd"),
+		)
+}
+
+func (h *queryHandler) queryJoinSetting(s *sql.Selector) {
+	t1 := sql.Table(entsetting.Table)
+	s.
+		LeftJoin(t1).
+		On(
+			s.C(entbase.FieldID),
+			t1.C(entsetting.FieldCoinTypeID),
+		).
+		AppendSelect(
+			sql.As(t1.C(entsetting.FieldFeeCoinTypeID), "fee_coin_type_id"),
+			sql.As(t1.C(entsetting.FieldWithdrawFeeByStableUsd), "withdraw_fee_by_stable_usd"),
+			sql.As(t1.C(entsetting.FieldWithdrawFeeAmount), "withdraw_fee_amount"),
+			sql.As(t1.C(entsetting.FieldCollectFeeAmount), "collect_fee_amount"),
+			sql.As(t1.C(entsetting.FieldHotWalletFeeAmount), "hot_wallet_fee_amount"),
+			sql.As(t1.C(entsetting.FieldLowFeeAmount), "low_fee_amount"),
+			sql.As(t1.C(entsetting.FieldHotLowFeeAmount), "hot_low_fee_amount"),
+			sql.As(t1.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
+			sql.As(t1.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
+			sql.As(t1.C(entsetting.FieldLeastTransferAmount), "least_transfer_amount"),
+			sql.As(t1.C(entsetting.FieldNeedMemo), "need_memo"),
+			sql.As(t1.C(entsetting.FieldRefreshCurrency), "refresh_currency"),
+		)
+
+	t2 := sql.Table(entbase.Table)
+	s.
+		LeftJoin(t2).
+		On(
+			t2.C(entbase.FieldID),
+			t1.C(entsetting.FieldFeeCoinTypeID),
+		).
+		AppendSelect(
+			sql.As(t2.C(entbase.FieldName), "fee_coin_name"),
+			sql.As(t2.C(entbase.FieldLogo), "fee_coin_logo"),
+			sql.As(t2.C(entbase.FieldUnit), "fee_coin_unit"),
+			sql.As(t2.C(entbase.FieldEnv), "fee_coin_env"),
+		)
+}
+
+func (h *queryHandler) queryJoin() {
+	h.stm.Modify(func(s *sql.Selector) {
+		h.queryJoinExtra(s)
+		h.queryJoinSetting(s)
+	})
+}
+
+func (h *queryHandler) scan(ctx context.Context) error {
+	return h.stm.Scan(ctx, &h.infos)
+}
+
+func (h *Handler) GetCoin(ctx context.Context) (*npool.Coin, error) {
+	handler := &queryHandler{
+		Handler: h,
+	}
+
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		if err := handler.queryCoin(cli); err != nil {
+			return err
+		}
+		handler.queryJoin()
+		handler.stm.Offset(0).Limit(2)
+		return handler.scan(_ctx)
 	})
 	if err != nil {
 		return nil, err
 	}
-	if len(infos) == 0 {
-		return nil, fmt.Errorf("no record")
+	if len(handler.infos) == 0 {
+		return nil, nil
 	}
-	if len(infos) > 1 {
+	if len(handler.infos) > 1 {
 		return nil, fmt.Errorf("too many record")
 	}
 
-	return infos[0], nil
+	return handler.infos[0], nil
 }
 
-func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) (infos []*npool.Coin, total uint32, err error) {
-	ids := []uuid.UUID{}
-	for _, id := range conds.GetIDs().GetValue() {
-		ids = append(ids, uuid.MustParse(id))
+func (h *Handler) GetCoins(ctx context.Context) ([]*npool.Coin, uint32, error) {
+	handler := &queryHandler{
+		Handler: h,
 	}
 
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm, err := basecrud.SetQueryConds(&basemgrpb.Conds{
-			ID:      conds.ID,
-			Presale: conds.Presale,
-			ENV:     conds.ENV,
-			ForPay:  conds.ForPay,
-			Name:    conds.Name,
-			Names:   conds.Names,
-		}, cli)
-		if err != nil {
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		if err := handler.queryCoins(_ctx, cli); err != nil {
 			return err
 		}
-
-		if len(ids) > 0 {
-			stm = stm.
-				Where(
-					entbase.IDIn(ids...),
-				)
-		}
-
-		_total, err := stm.Count(_ctx)
-		if err != nil {
-			return err
-		}
-
-		total = uint32(_total)
-
-		stm = stm.
-			Offset(int(offset)).
-			Limit(int(limit))
-
-		return join(stm).
-			Scan(_ctx, &infos)
+		handler.queryJoin()
+		handler.stm.
+			Offset(int(h.Offset)).
+			Limit(int(h.Limit))
+		return handler.scan(_ctx)
 	})
 	if err != nil {
 		return nil, 0, err
 	}
 
-	return infos, total, nil
+	return handler.infos, handler.total, nil
 }
 
-func GetManyCoins(ctx context.Context, coinTypeIDs []string) (infos []*npool.Coin, err error) {
-	ids := []uuid.UUID{}
-	for _, id := range coinTypeIDs {
-		ids = append(ids, uuid.MustParse(id))
+func (h *Handler) GetCoinOnly(ctx context.Context) (info *npool.Coin, err error) {
+	handler := &queryHandler{
+		Handler: h,
 	}
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm, err := basecrud.SetQueryConds(&basemgrpb.Conds{}, cli)
-		if err != nil {
+		if err := handler.queryCoins(_ctx, cli); err != nil {
 			return err
 		}
-
-		if len(ids) > 0 {
-			stm = stm.
-				Where(
-					entbase.IDIn(ids...),
-				)
-		}
-
-		return join(stm).
-			Scan(_ctx, &infos)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return infos, nil
-}
-
-func GetCoinOnly(ctx context.Context, conds *npool.Conds) (info *npool.Coin, err error) {
-	infos := []*npool.Coin{}
-
-	ids := []uuid.UUID{}
-	for _, id := range conds.GetIDs().GetValue() {
-		ids = append(ids, uuid.MustParse(id))
-	}
-
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		stm, err := basecrud.SetQueryConds(&basemgrpb.Conds{
-			ID:      conds.ID,
-			Presale: conds.Presale,
-			ENV:     conds.ENV,
-			ForPay:  conds.ForPay,
-			Name:    conds.Name,
-		}, cli)
-		if err != nil {
-			return err
-		}
-
-		if len(ids) > 0 {
-			stm = stm.
-				Where(
-					entbase.IDIn(ids...),
-				)
-		}
-
-		return join(stm).
-			Scan(_ctx, &infos)
+		handler.queryJoin()
+		handler.stm.Offset(0).Limit(2)
+		return handler.scan(_ctx)
 	})
 
-	if len(infos) == 0 {
+	if len(handler.infos) == 0 {
 		return nil, nil
 	}
-	if len(infos) > 1 {
-		logger.Sugar().Errorw("err", "too many records")
+	if len(handler.infos) > 1 {
 		return nil, fmt.Errorf("too many records")
 	}
 
-	return infos[0], nil
-}
-
-func join(stm *ent.CoinBaseQuery) *ent.CoinBaseSelect {
-	return stm.
-		Select(
-			entbase.FieldID,
-			entbase.FieldName,
-			entbase.FieldLogo,
-			entbase.FieldPresale,
-			entbase.FieldForPay,
-			entbase.FieldUnit,
-			entbase.FieldEnv,
-			entbase.FieldReservedAmount,
-			entbase.FieldDisabled,
-			entbase.FieldCreatedAt,
-			entbase.FieldUpdatedAt,
-		).
-		Modify(func(s *sql.Selector) {
-			t1 := sql.Table(entextra.Table)
-			s.
-				LeftJoin(t1).
-				On(
-					s.C(entbase.FieldID),
-					t1.C(entextra.FieldCoinTypeID),
-				).
-				AppendSelect(
-					sql.As(t1.C(entextra.FieldHomePage), "home_page"),
-					sql.As(t1.C(entextra.FieldSpecs), "specs"),
-					sql.As(t1.C(entextra.FieldStableUsd), "stable_usd"),
-				)
-
-			t2 := sql.Table(entsetting.Table)
-			s.
-				LeftJoin(t2).
-				On(
-					s.C(entbase.FieldID),
-					t2.C(entsetting.FieldCoinTypeID),
-				).
-				AppendSelect(
-					sql.As(t2.C(entsetting.FieldFeeCoinTypeID), "fee_coin_type_id"),
-					sql.As(t2.C(entsetting.FieldWithdrawFeeByStableUsd), "withdraw_fee_by_stable_usd"),
-					sql.As(t2.C(entsetting.FieldWithdrawFeeAmount), "withdraw_fee_amount"),
-					sql.As(t2.C(entsetting.FieldCollectFeeAmount), "collect_fee_amount"),
-					sql.As(t2.C(entsetting.FieldHotWalletFeeAmount), "hot_wallet_fee_amount"),
-					sql.As(t2.C(entsetting.FieldLowFeeAmount), "low_fee_amount"),
-					sql.As(t2.C(entsetting.FieldHotLowFeeAmount), "hot_low_fee_amount"),
-					sql.As(t2.C(entsetting.FieldHotWalletAccountAmount), "hot_wallet_account_amount"),
-					sql.As(t2.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
-					sql.As(t2.C(entsetting.FieldLeastTransferAmount), "least_transfer_amount"),
-					sql.As(t2.C(entsetting.FieldNeedMemo), "need_memo"),
-				)
-
-			t3 := sql.Table(entbase.Table)
-			s.
-				LeftJoin(t3).
-				On(
-					t3.C(entbase.FieldID),
-					t2.C(entsetting.FieldFeeCoinTypeID),
-				).
-				AppendSelect(
-					sql.As(t3.C(entbase.FieldName), "fee_coin_name"),
-					sql.As(t3.C(entbase.FieldLogo), "fee_coin_logo"),
-					sql.As(t3.C(entbase.FieldUnit), "fee_coin_unit"),
-					sql.As(t3.C(entbase.FieldEnv), "fee_coin_env"),
-				)
-		})
+	return handler.infos[0], nil
 }

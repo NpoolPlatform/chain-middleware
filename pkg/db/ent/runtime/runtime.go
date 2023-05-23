@@ -645,6 +645,10 @@ func init() {
 	settingDescNeedMemo := settingFields[12].Descriptor()
 	// setting.DefaultNeedMemo holds the default value on creation for the need_memo field.
 	setting.DefaultNeedMemo = settingDescNeedMemo.Default.(bool)
+	// settingDescRefreshCurrency is the schema descriptor for refresh_currency field.
+	settingDescRefreshCurrency := settingFields[13].Descriptor()
+	// setting.DefaultRefreshCurrency holds the default value on creation for the refresh_currency field.
+	setting.DefaultRefreshCurrency = settingDescRefreshCurrency.Default.(bool)
 	// settingDescID is the schema descriptor for id field.
 	settingDescID := settingFields[0].Descriptor()
 	// setting.DefaultID holds the default value on creation for the id field.

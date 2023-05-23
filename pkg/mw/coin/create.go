@@ -16,29 +16,29 @@ import (
 	"github.com/NpoolPlatform/chain-manager/pkg/db/ent"
 )
 
-func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
-	var id string
-	var err error
+func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
+	id := uuid.New()
+	if h.ID == nil {
+		h.ID = &id
+	}
 
-	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+	err := db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
 		info, err := basecrud.CreateSet(
 			tx.CoinBase.Create(),
 			&basemgrpb.CoinBaseReq{
-				ID:             in.ID,
-				Name:           in.Name,
-				Logo:           in.Logo,
-				Presale:        in.Presale,
-				Unit:           in.Unit,
-				ENV:            in.ENV,
-				ReservedAmount: in.ReservedAmount,
-				ForPay:         in.ForPay,
+				ID:             h.ID,
+				Name:           h.Name,
+				Logo:           h.Logo,
+				Presale:        h.Presale,
+				Unit:           h.Unit,
+				ENV:            h.ENV,
+				ReservedAmount: h.ReservedAmount,
+				ForPay:         h.ForPay,
 			},
 		).Save(_ctx)
 		if err != nil {
 			return err
 		}
-
-		id = info.ID.String()
 
 		_, err = extracrud.CreateSet(
 			tx.CoinExtra.Create(),

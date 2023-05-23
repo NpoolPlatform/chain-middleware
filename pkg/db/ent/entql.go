@@ -266,6 +266,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			setting.FieldPaymentAccountCollectAmount: {Type: field.TypeOther, Column: setting.FieldPaymentAccountCollectAmount},
 			setting.FieldLeastTransferAmount:         {Type: field.TypeOther, Column: setting.FieldLeastTransferAmount},
 			setting.FieldNeedMemo:                    {Type: field.TypeBool, Column: setting.FieldNeedMemo},
+			setting.FieldRefreshCurrency:             {Type: field.TypeBool, Column: setting.FieldRefreshCurrency},
 		},
 	}
 	graph.Nodes[11] = &sqlgraph.Node{
@@ -1240,6 +1241,11 @@ func (f *SettingFilter) WhereLeastTransferAmount(p entql.OtherP) {
 // WhereNeedMemo applies the entql bool predicate on the need_memo field.
 func (f *SettingFilter) WhereNeedMemo(p entql.BoolP) {
 	f.Where(p.Field(setting.FieldNeedMemo))
+}
+
+// WhereRefreshCurrency applies the entql bool predicate on the refresh_currency field.
+func (f *SettingFilter) WhereRefreshCurrency(p entql.BoolP) {
+	f.Where(p.Field(setting.FieldRefreshCurrency))
 }
 
 // addPredicate implements the predicateAdder interface.

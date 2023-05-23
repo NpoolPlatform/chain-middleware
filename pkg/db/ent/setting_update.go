@@ -325,6 +325,26 @@ func (su *SettingUpdate) ClearNeedMemo() *SettingUpdate {
 	return su
 }
 
+// SetRefreshCurrency sets the "refresh_currency" field.
+func (su *SettingUpdate) SetRefreshCurrency(b bool) *SettingUpdate {
+	su.mutation.SetRefreshCurrency(b)
+	return su
+}
+
+// SetNillableRefreshCurrency sets the "refresh_currency" field if the given value is not nil.
+func (su *SettingUpdate) SetNillableRefreshCurrency(b *bool) *SettingUpdate {
+	if b != nil {
+		su.SetRefreshCurrency(*b)
+	}
+	return su
+}
+
+// ClearRefreshCurrency clears the value of the "refresh_currency" field.
+func (su *SettingUpdate) ClearRefreshCurrency() *SettingUpdate {
+	su.mutation.ClearRefreshCurrency()
+	return su
+}
+
 // Mutation returns the SettingMutation object of the builder.
 func (su *SettingUpdate) Mutation() *SettingMutation {
 	return su.mutation
@@ -619,6 +639,19 @@ func (su *SettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Column: setting.FieldNeedMemo,
+		})
+	}
+	if value, ok := su.mutation.RefreshCurrency(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: setting.FieldRefreshCurrency,
+		})
+	}
+	if su.mutation.RefreshCurrencyCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Column: setting.FieldRefreshCurrency,
 		})
 	}
 	_spec.Modifiers = su.modifiers
@@ -934,6 +967,26 @@ func (suo *SettingUpdateOne) SetNillableNeedMemo(b *bool) *SettingUpdateOne {
 // ClearNeedMemo clears the value of the "need_memo" field.
 func (suo *SettingUpdateOne) ClearNeedMemo() *SettingUpdateOne {
 	suo.mutation.ClearNeedMemo()
+	return suo
+}
+
+// SetRefreshCurrency sets the "refresh_currency" field.
+func (suo *SettingUpdateOne) SetRefreshCurrency(b bool) *SettingUpdateOne {
+	suo.mutation.SetRefreshCurrency(b)
+	return suo
+}
+
+// SetNillableRefreshCurrency sets the "refresh_currency" field if the given value is not nil.
+func (suo *SettingUpdateOne) SetNillableRefreshCurrency(b *bool) *SettingUpdateOne {
+	if b != nil {
+		suo.SetRefreshCurrency(*b)
+	}
+	return suo
+}
+
+// ClearRefreshCurrency clears the value of the "refresh_currency" field.
+func (suo *SettingUpdateOne) ClearRefreshCurrency() *SettingUpdateOne {
+	suo.mutation.ClearRefreshCurrency()
 	return suo
 }
 
@@ -1261,6 +1314,19 @@ func (suo *SettingUpdateOne) sqlSave(ctx context.Context) (_node *Setting, err e
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Column: setting.FieldNeedMemo,
+		})
+	}
+	if value, ok := suo.mutation.RefreshCurrency(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: setting.FieldRefreshCurrency,
+		})
+	}
+	if suo.mutation.RefreshCurrencyCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Column: setting.FieldRefreshCurrency,
 		})
 	}
 	_spec.Modifiers = suo.modifiers

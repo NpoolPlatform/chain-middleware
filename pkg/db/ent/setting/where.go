@@ -185,6 +185,13 @@ func NeedMemo(v bool) predicate.Setting {
 	})
 }
 
+// RefreshCurrency applies equality check predicate on the "refresh_currency" field. It's identical to RefreshCurrencyEQ.
+func RefreshCurrency(v bool) predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRefreshCurrency), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v uint32) predicate.Setting {
 	return predicate.Setting(func(s *sql.Selector) {
@@ -1210,6 +1217,34 @@ func NeedMemoIsNil() predicate.Setting {
 func NeedMemoNotNil() predicate.Setting {
 	return predicate.Setting(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldNeedMemo)))
+	})
+}
+
+// RefreshCurrencyEQ applies the EQ predicate on the "refresh_currency" field.
+func RefreshCurrencyEQ(v bool) predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRefreshCurrency), v))
+	})
+}
+
+// RefreshCurrencyNEQ applies the NEQ predicate on the "refresh_currency" field.
+func RefreshCurrencyNEQ(v bool) predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldRefreshCurrency), v))
+	})
+}
+
+// RefreshCurrencyIsNil applies the IsNil predicate on the "refresh_currency" field.
+func RefreshCurrencyIsNil() predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldRefreshCurrency)))
+	})
+}
+
+// RefreshCurrencyNotNil applies the NotNil predicate on the "refresh_currency" field.
+func RefreshCurrencyNotNil() predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldRefreshCurrency)))
 	})
 }
 
