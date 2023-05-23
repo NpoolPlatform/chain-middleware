@@ -15,7 +15,7 @@ import (
 type Req struct {
 	ID              *uuid.UUID
 	CoinTypeID      *uuid.UUID
-	FeedType        *basetypes.CoinCurrencyFeedType
+	FeedType        *basetypes.CurrencyFeedType
 	MarketValueHigh *decimal.Decimal
 	MarketValueLow  *decimal.Decimal
 }
@@ -51,8 +51,9 @@ func UpdateSet(u *ent.CurrencyUpdateOne, req *Req) *ent.CurrencyUpdateOne {
 }
 
 type Conds struct {
-	ID         *cruder.Cond
-	CoinTypeID *cruder.Cond
+	ID          *cruder.Cond
+	CoinTypeID  *cruder.Cond
+	CoinTypeIDs *cruder.Cond
 }
 
 func SetQueryConds(q *ent.CurrencyQuery, conds *Conds) (*ent.CurrencyQuery, error) {
@@ -76,6 +77,18 @@ func SetQueryConds(q *ent.CurrencyQuery, conds *Conds) (*ent.CurrencyQuery, erro
 		switch conds.CoinTypeID.Op {
 		case cruder.EQ:
 			q.Where(entcurrency.CoinTypeID(id))
+		default:
+			return nil, fmt.Errorf("invalid currency field")
+		}
+	}
+	if conds.CoinTypeIDs != nil {
+		ids, ok := conds.CoinTypeIDs.Val.([]uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid cointypeids")
+		}
+		switch conds.CoinTypeIDs.Op {
+		case cruder.EQ:
+			q.Where(entcurrency.CoinTypeIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid currency field")
 		}
