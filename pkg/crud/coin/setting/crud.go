@@ -25,6 +25,7 @@ type Req struct {
 	PaymentAccountCollectAmount *decimal.Decimal
 	LeastTransferAmount         *decimal.Decimal
 	NeedMemo                    *bool
+	RefreshCurrency             *bool
 }
 
 func CreateSet(c *ent.SettingCreate, req *Req) *ent.SettingCreate {
@@ -67,6 +68,9 @@ func CreateSet(c *ent.SettingCreate, req *Req) *ent.SettingCreate {
 	if req.NeedMemo != nil {
 		c.SetNeedMemo(*req.NeedMemo)
 	}
+	if req.RefreshCurrency != nil {
+		c.SetRefreshCurrency(*req.RefreshCurrency)
+	}
 	return c
 }
 
@@ -103,6 +107,9 @@ func UpdateSet(u *ent.SettingUpdateOne, req *Req) *ent.SettingUpdateOne {
 	}
 	if req.NeedMemo != nil {
 		u.SetNeedMemo(*req.NeedMemo)
+	}
+	if req.RefreshCurrency != nil {
+		u.SetRefreshCurrency(*req.RefreshCurrency)
 	}
 
 	return u
