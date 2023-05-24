@@ -9,7 +9,7 @@ require (
 	github.com/NpoolPlatform/chain-manager v0.0.0-20230425040012-0846c1644138
 	github.com/NpoolPlatform/go-service-framework v0.0.0-20230509081417-267df92cab6d
 	github.com/NpoolPlatform/libent-cruder v0.0.0-20221109023947-366125b690fb
-	github.com/NpoolPlatform/message v0.0.0-20230524060225-2982a7d2a8bb
+	github.com/NpoolPlatform/message v0.0.0-20230524074542-38c3887e6090
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/google/uuid v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
