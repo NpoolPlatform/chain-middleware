@@ -63,20 +63,19 @@ func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithFeedType(feedType *string) func(context.Context, *Handler) error {
+func WithFeedType(feedType *basetypes.CurrencyFeedType) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if feedType == nil {
 			return nil
 		}
-		_feedType := basetypes.CurrencyFeedType(basetypes.CurrencyFeedType_value[*feedType])
-		switch _feedType {
+		switch *feedType {
 		case basetypes.CurrencyFeedType_CoinGecko:
 		case basetypes.CurrencyFeedType_CoinBase:
 		case basetypes.CurrencyFeedType_StableUSDHardCode:
 		default:
 			return fmt.Errorf("invalid feedtype")
 		}
-		h.FeedType = &_feedType
+		h.FeedType = feedType
 		return nil
 	}
 }
