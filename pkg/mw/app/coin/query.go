@@ -219,7 +219,7 @@ func (h *queryHandler) formalize() {
 	}
 }
 
-func (h *Handler) GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
+func (h *Handler) GetCoin(ctx context.Context) (*npool.Coin, error) {
 	handler := &queryHandler{
 		Handler: h,
 	}
