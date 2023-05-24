@@ -1,0 +1,151 @@
+package description
+
+import (
+	"context"
+	"fmt"
+
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin/description"
+
+	"github.com/NpoolPlatform/chain-middleware/pkg/db"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+
+	descriptioncrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/app/coin/description"
+	entcoinbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
+	entdescription "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
+
+	"entgo.io/ent/dialect/sql"
+)
+
+type queryHandler struct {
+	*Handler
+	stm   *ent.CoinDescriptionSelect
+	infos []*npool.CoinDescription
+	total uint32
+}
+
+func (h *queryHandler) selectCoinDescription(stm *ent.CoinDescriptionQuery) {
+	h.stm.Select(
+		entdescription.FieldID,
+		entdescription.FieldAppID,
+		entdescription.FieldCoinTypeID,
+		entdescription.FieldUsedFor,
+		entdescription.FieldTitle,
+		entdescription.FieldMessage,
+		entdescription.FieldCreatedAt,
+		entdescription.FieldUpdatedAt,
+	)
+}
+
+func (h *queryHandler) queryCoinDescription(cli *ent.Client) error {
+	h.selectCoinDescription(
+		cli.CoinDescription.
+			Query().
+			Where(
+				entdescription.ID(*h.ID),
+			),
+	)
+	return nil
+}
+
+func (h *queryHandler) queryCoinDescriptions(ctx context.Context, cli *ent.Client) error {
+	stm, err := descriptioncrud.SetQueryConds(cli.CoinDescription.Query(), h.Conds)
+	if err != nil {
+		return err
+	}
+
+	total, err := stm.Count(ctx)
+	if err != nil {
+		return err
+	}
+	h.total = uint32(total)
+
+	h.selectCoinDescription(stm)
+	return nil
+}
+
+func (h *queryHandler) queryJoinCoin(s *sql.Selector) {
+	t := sql.Table(entcoinbase.Table)
+	s.
+		LeftJoin(t).
+		On(
+			s.C(entdescription.FieldCoinTypeID),
+			t.C(entcoinbase.FieldID),
+		).
+		AppendSelect(
+			sql.As(t.C(entcoinbase.FieldName), "coin_name"),
+			sql.As(t.C(entcoinbase.FieldLogo), "coin_logo"),
+			sql.As(t.C(entcoinbase.FieldUnit), "coin_unit"),
+			sql.As(t.C(entcoinbase.FieldEnv), "coin_env"),
+		)
+}
+
+func (h *queryHandler) queryJoin() {
+	h.stm.Modify(func(s *sql.Selector) {
+		h.queryJoinCoin(s)
+	})
+}
+
+func (h *queryHandler) scan(ctx context.Context) error {
+	return h.stm.Scan(ctx, &h.infos)
+}
+
+func (h *queryHandler) formalize() {
+	for _, info := range h.infos {
+		info.UsedFor = basetypes.UsedFor(basetypes.UsedFor_value[info.UsedForStr])
+	}
+}
+
+func (h *Handler) GetCoinDescription(ctx context.Context) (*npool.CoinDescription, error) {
+	if h.ID == nil {
+		return nil, fmt.Errorf("invalid id")
+	}
+
+	handler := &queryHandler{
+		Handler: h,
+	}
+
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		if err := handler.queryCoinDescription(cli); err != nil {
+			return err
+		}
+		handler.queryJoin()
+		handler.stm.Offset(0).Limit(2)
+		return handler.scan(_ctx)
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(handler.infos) == 0 {
+		return nil, nil
+	}
+	if len(handler.infos) > 1 {
+		return nil, fmt.Errorf("too many record")
+	}
+
+	handler.formalize()
+	return handler.infos[0], nil
+}
+
+func (h *Handler) GetCoinDescriptions(ctx context.Context) ([]*npool.CoinDescription, uint32, error) {
+	handler := &queryHandler{
+		Handler: h,
+	}
+
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		if err := handler.queryCoinDescriptions(ctx, cli); err != nil {
+			return err
+		}
+		handler.queryJoin()
+		handler.stm.
+			Offset(int(h.Offset)).
+			Limit(int(h.Limit))
+		return handler.scan(_ctx)
+	})
+	if err != nil {
+		return nil, 0, err
+	}
+
+	handler.formalize()
+	return handler.infos, handler.total, nil
+}
