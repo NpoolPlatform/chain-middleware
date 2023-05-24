@@ -15,10 +15,12 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/setting"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
@@ -47,10 +49,12 @@ func columnChecker(table string) func(string) error {
 		coindescription.Table:     coindescription.ValidColumn,
 		coinextra.Table:           coinextra.ValidColumn,
 		currency.Table:            currency.ValidColumn,
+		currencyfeed.Table:        currencyfeed.ValidColumn,
 		currencyhistory.Table:     currencyhistory.ValidColumn,
 		exchangerate.Table:        exchangerate.ValidColumn,
 		fiat.Table:                fiat.ValidColumn,
 		fiatcurrency.Table:        fiatcurrency.ValidColumn,
+		fiatcurrencyfeed.Table:    fiatcurrencyfeed.ValidColumn,
 		fiatcurrencyhistory.Table: fiatcurrencyhistory.ValidColumn,
 		setting.Table:             setting.ValidColumn,
 		tran.Table:                tran.ValidColumn,

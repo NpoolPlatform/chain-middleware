@@ -16,10 +16,12 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/setting"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
@@ -43,6 +45,8 @@ type Client struct {
 	CoinExtra *CoinExtraClient
 	// Currency is the client for interacting with the Currency builders.
 	Currency *CurrencyClient
+	// CurrencyFeed is the client for interacting with the CurrencyFeed builders.
+	CurrencyFeed *CurrencyFeedClient
 	// CurrencyHistory is the client for interacting with the CurrencyHistory builders.
 	CurrencyHistory *CurrencyHistoryClient
 	// ExchangeRate is the client for interacting with the ExchangeRate builders.
@@ -51,6 +55,8 @@ type Client struct {
 	Fiat *FiatClient
 	// FiatCurrency is the client for interacting with the FiatCurrency builders.
 	FiatCurrency *FiatCurrencyClient
+	// FiatCurrencyFeed is the client for interacting with the FiatCurrencyFeed builders.
+	FiatCurrencyFeed *FiatCurrencyFeedClient
 	// FiatCurrencyHistory is the client for interacting with the FiatCurrencyHistory builders.
 	FiatCurrencyHistory *FiatCurrencyHistoryClient
 	// Setting is the client for interacting with the Setting builders.
@@ -75,10 +81,12 @@ func (c *Client) init() {
 	c.CoinDescription = NewCoinDescriptionClient(c.config)
 	c.CoinExtra = NewCoinExtraClient(c.config)
 	c.Currency = NewCurrencyClient(c.config)
+	c.CurrencyFeed = NewCurrencyFeedClient(c.config)
 	c.CurrencyHistory = NewCurrencyHistoryClient(c.config)
 	c.ExchangeRate = NewExchangeRateClient(c.config)
 	c.Fiat = NewFiatClient(c.config)
 	c.FiatCurrency = NewFiatCurrencyClient(c.config)
+	c.FiatCurrencyFeed = NewFiatCurrencyFeedClient(c.config)
 	c.FiatCurrencyHistory = NewFiatCurrencyHistoryClient(c.config)
 	c.Setting = NewSettingClient(c.config)
 	c.Tran = NewTranClient(c.config)
@@ -120,10 +128,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CoinDescription:     NewCoinDescriptionClient(cfg),
 		CoinExtra:           NewCoinExtraClient(cfg),
 		Currency:            NewCurrencyClient(cfg),
+		CurrencyFeed:        NewCurrencyFeedClient(cfg),
 		CurrencyHistory:     NewCurrencyHistoryClient(cfg),
 		ExchangeRate:        NewExchangeRateClient(cfg),
 		Fiat:                NewFiatClient(cfg),
 		FiatCurrency:        NewFiatCurrencyClient(cfg),
+		FiatCurrencyFeed:    NewFiatCurrencyFeedClient(cfg),
 		FiatCurrencyHistory: NewFiatCurrencyHistoryClient(cfg),
 		Setting:             NewSettingClient(cfg),
 		Tran:                NewTranClient(cfg),
@@ -151,10 +161,12 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CoinDescription:     NewCoinDescriptionClient(cfg),
 		CoinExtra:           NewCoinExtraClient(cfg),
 		Currency:            NewCurrencyClient(cfg),
+		CurrencyFeed:        NewCurrencyFeedClient(cfg),
 		CurrencyHistory:     NewCurrencyHistoryClient(cfg),
 		ExchangeRate:        NewExchangeRateClient(cfg),
 		Fiat:                NewFiatClient(cfg),
 		FiatCurrency:        NewFiatCurrencyClient(cfg),
+		FiatCurrencyFeed:    NewFiatCurrencyFeedClient(cfg),
 		FiatCurrencyHistory: NewFiatCurrencyHistoryClient(cfg),
 		Setting:             NewSettingClient(cfg),
 		Tran:                NewTranClient(cfg),
@@ -192,10 +204,12 @@ func (c *Client) Use(hooks ...Hook) {
 	c.CoinDescription.Use(hooks...)
 	c.CoinExtra.Use(hooks...)
 	c.Currency.Use(hooks...)
+	c.CurrencyFeed.Use(hooks...)
 	c.CurrencyHistory.Use(hooks...)
 	c.ExchangeRate.Use(hooks...)
 	c.Fiat.Use(hooks...)
 	c.FiatCurrency.Use(hooks...)
+	c.FiatCurrencyFeed.Use(hooks...)
 	c.FiatCurrencyHistory.Use(hooks...)
 	c.Setting.Use(hooks...)
 	c.Tran.Use(hooks...)
@@ -656,6 +670,97 @@ func (c *CurrencyClient) Hooks() []Hook {
 	return append(hooks[:len(hooks):len(hooks)], currency.Hooks[:]...)
 }
 
+// CurrencyFeedClient is a client for the CurrencyFeed schema.
+type CurrencyFeedClient struct {
+	config
+}
+
+// NewCurrencyFeedClient returns a client for the CurrencyFeed from the given config.
+func NewCurrencyFeedClient(c config) *CurrencyFeedClient {
+	return &CurrencyFeedClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `currencyfeed.Hooks(f(g(h())))`.
+func (c *CurrencyFeedClient) Use(hooks ...Hook) {
+	c.hooks.CurrencyFeed = append(c.hooks.CurrencyFeed, hooks...)
+}
+
+// Create returns a builder for creating a CurrencyFeed entity.
+func (c *CurrencyFeedClient) Create() *CurrencyFeedCreate {
+	mutation := newCurrencyFeedMutation(c.config, OpCreate)
+	return &CurrencyFeedCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CurrencyFeed entities.
+func (c *CurrencyFeedClient) CreateBulk(builders ...*CurrencyFeedCreate) *CurrencyFeedCreateBulk {
+	return &CurrencyFeedCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CurrencyFeed.
+func (c *CurrencyFeedClient) Update() *CurrencyFeedUpdate {
+	mutation := newCurrencyFeedMutation(c.config, OpUpdate)
+	return &CurrencyFeedUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CurrencyFeedClient) UpdateOne(cf *CurrencyFeed) *CurrencyFeedUpdateOne {
+	mutation := newCurrencyFeedMutation(c.config, OpUpdateOne, withCurrencyFeed(cf))
+	return &CurrencyFeedUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CurrencyFeedClient) UpdateOneID(id uuid.UUID) *CurrencyFeedUpdateOne {
+	mutation := newCurrencyFeedMutation(c.config, OpUpdateOne, withCurrencyFeedID(id))
+	return &CurrencyFeedUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CurrencyFeed.
+func (c *CurrencyFeedClient) Delete() *CurrencyFeedDelete {
+	mutation := newCurrencyFeedMutation(c.config, OpDelete)
+	return &CurrencyFeedDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CurrencyFeedClient) DeleteOne(cf *CurrencyFeed) *CurrencyFeedDeleteOne {
+	return c.DeleteOneID(cf.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *CurrencyFeedClient) DeleteOneID(id uuid.UUID) *CurrencyFeedDeleteOne {
+	builder := c.Delete().Where(currencyfeed.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CurrencyFeedDeleteOne{builder}
+}
+
+// Query returns a query builder for CurrencyFeed.
+func (c *CurrencyFeedClient) Query() *CurrencyFeedQuery {
+	return &CurrencyFeedQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CurrencyFeed entity by its id.
+func (c *CurrencyFeedClient) Get(ctx context.Context, id uuid.UUID) (*CurrencyFeed, error) {
+	return c.Query().Where(currencyfeed.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CurrencyFeedClient) GetX(ctx context.Context, id uuid.UUID) *CurrencyFeed {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CurrencyFeedClient) Hooks() []Hook {
+	hooks := c.hooks.CurrencyFeed
+	return append(hooks[:len(hooks):len(hooks)], currencyfeed.Hooks[:]...)
+}
+
 // CurrencyHistoryClient is a client for the CurrencyHistory schema.
 type CurrencyHistoryClient struct {
 	config
@@ -1018,6 +1123,97 @@ func (c *FiatCurrencyClient) GetX(ctx context.Context, id uuid.UUID) *FiatCurren
 func (c *FiatCurrencyClient) Hooks() []Hook {
 	hooks := c.hooks.FiatCurrency
 	return append(hooks[:len(hooks):len(hooks)], fiatcurrency.Hooks[:]...)
+}
+
+// FiatCurrencyFeedClient is a client for the FiatCurrencyFeed schema.
+type FiatCurrencyFeedClient struct {
+	config
+}
+
+// NewFiatCurrencyFeedClient returns a client for the FiatCurrencyFeed from the given config.
+func NewFiatCurrencyFeedClient(c config) *FiatCurrencyFeedClient {
+	return &FiatCurrencyFeedClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `fiatcurrencyfeed.Hooks(f(g(h())))`.
+func (c *FiatCurrencyFeedClient) Use(hooks ...Hook) {
+	c.hooks.FiatCurrencyFeed = append(c.hooks.FiatCurrencyFeed, hooks...)
+}
+
+// Create returns a builder for creating a FiatCurrencyFeed entity.
+func (c *FiatCurrencyFeedClient) Create() *FiatCurrencyFeedCreate {
+	mutation := newFiatCurrencyFeedMutation(c.config, OpCreate)
+	return &FiatCurrencyFeedCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of FiatCurrencyFeed entities.
+func (c *FiatCurrencyFeedClient) CreateBulk(builders ...*FiatCurrencyFeedCreate) *FiatCurrencyFeedCreateBulk {
+	return &FiatCurrencyFeedCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for FiatCurrencyFeed.
+func (c *FiatCurrencyFeedClient) Update() *FiatCurrencyFeedUpdate {
+	mutation := newFiatCurrencyFeedMutation(c.config, OpUpdate)
+	return &FiatCurrencyFeedUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FiatCurrencyFeedClient) UpdateOne(fcf *FiatCurrencyFeed) *FiatCurrencyFeedUpdateOne {
+	mutation := newFiatCurrencyFeedMutation(c.config, OpUpdateOne, withFiatCurrencyFeed(fcf))
+	return &FiatCurrencyFeedUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FiatCurrencyFeedClient) UpdateOneID(id uuid.UUID) *FiatCurrencyFeedUpdateOne {
+	mutation := newFiatCurrencyFeedMutation(c.config, OpUpdateOne, withFiatCurrencyFeedID(id))
+	return &FiatCurrencyFeedUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for FiatCurrencyFeed.
+func (c *FiatCurrencyFeedClient) Delete() *FiatCurrencyFeedDelete {
+	mutation := newFiatCurrencyFeedMutation(c.config, OpDelete)
+	return &FiatCurrencyFeedDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FiatCurrencyFeedClient) DeleteOne(fcf *FiatCurrencyFeed) *FiatCurrencyFeedDeleteOne {
+	return c.DeleteOneID(fcf.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *FiatCurrencyFeedClient) DeleteOneID(id uuid.UUID) *FiatCurrencyFeedDeleteOne {
+	builder := c.Delete().Where(fiatcurrencyfeed.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FiatCurrencyFeedDeleteOne{builder}
+}
+
+// Query returns a query builder for FiatCurrencyFeed.
+func (c *FiatCurrencyFeedClient) Query() *FiatCurrencyFeedQuery {
+	return &FiatCurrencyFeedQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a FiatCurrencyFeed entity by its id.
+func (c *FiatCurrencyFeedClient) Get(ctx context.Context, id uuid.UUID) (*FiatCurrencyFeed, error) {
+	return c.Query().Where(fiatcurrencyfeed.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FiatCurrencyFeedClient) GetX(ctx context.Context, id uuid.UUID) *FiatCurrencyFeed {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FiatCurrencyFeedClient) Hooks() []Hook {
+	hooks := c.hooks.FiatCurrencyFeed
+	return append(hooks[:len(hooks):len(hooks)], fiatcurrencyfeed.Hooks[:]...)
 }
 
 // FiatCurrencyHistoryClient is a client for the FiatCurrencyHistory schema.

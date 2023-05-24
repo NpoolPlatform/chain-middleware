@@ -21,6 +21,9 @@ type CoinExtra func(*sql.Selector)
 // Currency is the predicate function for currency builders.
 type Currency func(*sql.Selector)
 
+// CurrencyFeed is the predicate function for currencyfeed builders.
+type CurrencyFeed func(*sql.Selector)
+
 // CurrencyHistory is the predicate function for currencyhistory builders.
 type CurrencyHistory func(*sql.Selector)
 
@@ -32,6 +35,9 @@ type Fiat func(*sql.Selector)
 
 // FiatCurrency is the predicate function for fiatcurrency builders.
 type FiatCurrency func(*sql.Selector)
+
+// FiatCurrencyFeed is the predicate function for fiatcurrencyfeed builders.
+type FiatCurrencyFeed func(*sql.Selector)
 
 // FiatCurrencyHistory is the predicate function for fiatcurrencyhistory builders.
 type FiatCurrencyHistory func(*sql.Selector)

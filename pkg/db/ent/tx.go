@@ -24,6 +24,8 @@ type Tx struct {
 	CoinExtra *CoinExtraClient
 	// Currency is the client for interacting with the Currency builders.
 	Currency *CurrencyClient
+	// CurrencyFeed is the client for interacting with the CurrencyFeed builders.
+	CurrencyFeed *CurrencyFeedClient
 	// CurrencyHistory is the client for interacting with the CurrencyHistory builders.
 	CurrencyHistory *CurrencyHistoryClient
 	// ExchangeRate is the client for interacting with the ExchangeRate builders.
@@ -32,6 +34,8 @@ type Tx struct {
 	Fiat *FiatClient
 	// FiatCurrency is the client for interacting with the FiatCurrency builders.
 	FiatCurrency *FiatCurrencyClient
+	// FiatCurrencyFeed is the client for interacting with the FiatCurrencyFeed builders.
+	FiatCurrencyFeed *FiatCurrencyFeedClient
 	// FiatCurrencyHistory is the client for interacting with the FiatCurrencyHistory builders.
 	FiatCurrencyHistory *FiatCurrencyHistoryClient
 	// Setting is the client for interacting with the Setting builders.
@@ -178,10 +182,12 @@ func (tx *Tx) init() {
 	tx.CoinDescription = NewCoinDescriptionClient(tx.config)
 	tx.CoinExtra = NewCoinExtraClient(tx.config)
 	tx.Currency = NewCurrencyClient(tx.config)
+	tx.CurrencyFeed = NewCurrencyFeedClient(tx.config)
 	tx.CurrencyHistory = NewCurrencyHistoryClient(tx.config)
 	tx.ExchangeRate = NewExchangeRateClient(tx.config)
 	tx.Fiat = NewFiatClient(tx.config)
 	tx.FiatCurrency = NewFiatCurrencyClient(tx.config)
+	tx.FiatCurrencyFeed = NewFiatCurrencyFeedClient(tx.config)
 	tx.FiatCurrencyHistory = NewFiatCurrencyHistoryClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)
 	tx.Tran = NewTranClient(tx.config)

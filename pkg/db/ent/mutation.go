@@ -13,10 +13,12 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/setting"
@@ -41,10 +43,12 @@ const (
 	TypeCoinDescription     = "CoinDescription"
 	TypeCoinExtra           = "CoinExtra"
 	TypeCurrency            = "Currency"
+	TypeCurrencyFeed        = "CurrencyFeed"
 	TypeCurrencyHistory     = "CurrencyHistory"
 	TypeExchangeRate        = "ExchangeRate"
 	TypeFiat                = "Fiat"
 	TypeFiatCurrency        = "FiatCurrency"
+	TypeFiatCurrencyFeed    = "FiatCurrencyFeed"
 	TypeFiatCurrencyHistory = "FiatCurrencyHistory"
 	TypeSetting             = "Setting"
 	TypeTran                = "Tran"
@@ -5216,6 +5220,828 @@ func (m *CurrencyMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Currency edge %s", name)
 }
 
+// CurrencyFeedMutation represents an operation that mutates the CurrencyFeed nodes in the graph.
+type CurrencyFeedMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *uuid.UUID
+	created_at     *uint32
+	addcreated_at  *int32
+	updated_at     *uint32
+	addupdated_at  *int32
+	deleted_at     *uint32
+	adddeleted_at  *int32
+	coin_type_id   *uuid.UUID
+	feed_type      *string
+	feed_coin_name *string
+	disabled       *bool
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*CurrencyFeed, error)
+	predicates     []predicate.CurrencyFeed
+}
+
+var _ ent.Mutation = (*CurrencyFeedMutation)(nil)
+
+// currencyfeedOption allows management of the mutation configuration using functional options.
+type currencyfeedOption func(*CurrencyFeedMutation)
+
+// newCurrencyFeedMutation creates new mutation for the CurrencyFeed entity.
+func newCurrencyFeedMutation(c config, op Op, opts ...currencyfeedOption) *CurrencyFeedMutation {
+	m := &CurrencyFeedMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCurrencyFeed,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCurrencyFeedID sets the ID field of the mutation.
+func withCurrencyFeedID(id uuid.UUID) currencyfeedOption {
+	return func(m *CurrencyFeedMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CurrencyFeed
+		)
+		m.oldValue = func(ctx context.Context) (*CurrencyFeed, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CurrencyFeed.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCurrencyFeed sets the old CurrencyFeed of the mutation.
+func withCurrencyFeed(node *CurrencyFeed) currencyfeedOption {
+	return func(m *CurrencyFeedMutation) {
+		m.oldValue = func(context.Context) (*CurrencyFeed, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CurrencyFeedMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CurrencyFeedMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of CurrencyFeed entities.
+func (m *CurrencyFeedMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CurrencyFeedMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CurrencyFeedMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().CurrencyFeed.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *CurrencyFeedMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *CurrencyFeedMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the CurrencyFeed entity.
+// If the CurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CurrencyFeedMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (m *CurrencyFeedMutation) AddCreatedAt(u int32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
+	} else {
+		m.addcreated_at = &u
+	}
+}
+
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *CurrencyFeedMutation) AddedCreatedAt() (r int32, exists bool) {
+	v := m.addcreated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *CurrencyFeedMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *CurrencyFeedMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *CurrencyFeedMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the CurrencyFeed entity.
+// If the CurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CurrencyFeedMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *CurrencyFeedMutation) AddUpdatedAt(u int32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
+	} else {
+		m.addupdated_at = &u
+	}
+}
+
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *CurrencyFeedMutation) AddedUpdatedAt() (r int32, exists bool) {
+	v := m.addupdated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *CurrencyFeedMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *CurrencyFeedMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *CurrencyFeedMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the CurrencyFeed entity.
+// If the CurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CurrencyFeedMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *CurrencyFeedMutation) AddDeletedAt(u int32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
+	}
+}
+
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *CurrencyFeedMutation) AddedDeletedAt() (r int32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *CurrencyFeedMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
+}
+
+// SetCoinTypeID sets the "coin_type_id" field.
+func (m *CurrencyFeedMutation) SetCoinTypeID(u uuid.UUID) {
+	m.coin_type_id = &u
+}
+
+// CoinTypeID returns the value of the "coin_type_id" field in the mutation.
+func (m *CurrencyFeedMutation) CoinTypeID() (r uuid.UUID, exists bool) {
+	v := m.coin_type_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCoinTypeID returns the old "coin_type_id" field's value of the CurrencyFeed entity.
+// If the CurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CurrencyFeedMutation) OldCoinTypeID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCoinTypeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCoinTypeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCoinTypeID: %w", err)
+	}
+	return oldValue.CoinTypeID, nil
+}
+
+// ClearCoinTypeID clears the value of the "coin_type_id" field.
+func (m *CurrencyFeedMutation) ClearCoinTypeID() {
+	m.coin_type_id = nil
+	m.clearedFields[currencyfeed.FieldCoinTypeID] = struct{}{}
+}
+
+// CoinTypeIDCleared returns if the "coin_type_id" field was cleared in this mutation.
+func (m *CurrencyFeedMutation) CoinTypeIDCleared() bool {
+	_, ok := m.clearedFields[currencyfeed.FieldCoinTypeID]
+	return ok
+}
+
+// ResetCoinTypeID resets all changes to the "coin_type_id" field.
+func (m *CurrencyFeedMutation) ResetCoinTypeID() {
+	m.coin_type_id = nil
+	delete(m.clearedFields, currencyfeed.FieldCoinTypeID)
+}
+
+// SetFeedType sets the "feed_type" field.
+func (m *CurrencyFeedMutation) SetFeedType(s string) {
+	m.feed_type = &s
+}
+
+// FeedType returns the value of the "feed_type" field in the mutation.
+func (m *CurrencyFeedMutation) FeedType() (r string, exists bool) {
+	v := m.feed_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFeedType returns the old "feed_type" field's value of the CurrencyFeed entity.
+// If the CurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CurrencyFeedMutation) OldFeedType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFeedType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFeedType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFeedType: %w", err)
+	}
+	return oldValue.FeedType, nil
+}
+
+// ClearFeedType clears the value of the "feed_type" field.
+func (m *CurrencyFeedMutation) ClearFeedType() {
+	m.feed_type = nil
+	m.clearedFields[currencyfeed.FieldFeedType] = struct{}{}
+}
+
+// FeedTypeCleared returns if the "feed_type" field was cleared in this mutation.
+func (m *CurrencyFeedMutation) FeedTypeCleared() bool {
+	_, ok := m.clearedFields[currencyfeed.FieldFeedType]
+	return ok
+}
+
+// ResetFeedType resets all changes to the "feed_type" field.
+func (m *CurrencyFeedMutation) ResetFeedType() {
+	m.feed_type = nil
+	delete(m.clearedFields, currencyfeed.FieldFeedType)
+}
+
+// SetFeedCoinName sets the "feed_coin_name" field.
+func (m *CurrencyFeedMutation) SetFeedCoinName(s string) {
+	m.feed_coin_name = &s
+}
+
+// FeedCoinName returns the value of the "feed_coin_name" field in the mutation.
+func (m *CurrencyFeedMutation) FeedCoinName() (r string, exists bool) {
+	v := m.feed_coin_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFeedCoinName returns the old "feed_coin_name" field's value of the CurrencyFeed entity.
+// If the CurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CurrencyFeedMutation) OldFeedCoinName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFeedCoinName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFeedCoinName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFeedCoinName: %w", err)
+	}
+	return oldValue.FeedCoinName, nil
+}
+
+// ClearFeedCoinName clears the value of the "feed_coin_name" field.
+func (m *CurrencyFeedMutation) ClearFeedCoinName() {
+	m.feed_coin_name = nil
+	m.clearedFields[currencyfeed.FieldFeedCoinName] = struct{}{}
+}
+
+// FeedCoinNameCleared returns if the "feed_coin_name" field was cleared in this mutation.
+func (m *CurrencyFeedMutation) FeedCoinNameCleared() bool {
+	_, ok := m.clearedFields[currencyfeed.FieldFeedCoinName]
+	return ok
+}
+
+// ResetFeedCoinName resets all changes to the "feed_coin_name" field.
+func (m *CurrencyFeedMutation) ResetFeedCoinName() {
+	m.feed_coin_name = nil
+	delete(m.clearedFields, currencyfeed.FieldFeedCoinName)
+}
+
+// SetDisabled sets the "disabled" field.
+func (m *CurrencyFeedMutation) SetDisabled(b bool) {
+	m.disabled = &b
+}
+
+// Disabled returns the value of the "disabled" field in the mutation.
+func (m *CurrencyFeedMutation) Disabled() (r bool, exists bool) {
+	v := m.disabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisabled returns the old "disabled" field's value of the CurrencyFeed entity.
+// If the CurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CurrencyFeedMutation) OldDisabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisabled: %w", err)
+	}
+	return oldValue.Disabled, nil
+}
+
+// ClearDisabled clears the value of the "disabled" field.
+func (m *CurrencyFeedMutation) ClearDisabled() {
+	m.disabled = nil
+	m.clearedFields[currencyfeed.FieldDisabled] = struct{}{}
+}
+
+// DisabledCleared returns if the "disabled" field was cleared in this mutation.
+func (m *CurrencyFeedMutation) DisabledCleared() bool {
+	_, ok := m.clearedFields[currencyfeed.FieldDisabled]
+	return ok
+}
+
+// ResetDisabled resets all changes to the "disabled" field.
+func (m *CurrencyFeedMutation) ResetDisabled() {
+	m.disabled = nil
+	delete(m.clearedFields, currencyfeed.FieldDisabled)
+}
+
+// Where appends a list predicates to the CurrencyFeedMutation builder.
+func (m *CurrencyFeedMutation) Where(ps ...predicate.CurrencyFeed) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CurrencyFeedMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (CurrencyFeed).
+func (m *CurrencyFeedMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CurrencyFeedMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, currencyfeed.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, currencyfeed.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, currencyfeed.FieldDeletedAt)
+	}
+	if m.coin_type_id != nil {
+		fields = append(fields, currencyfeed.FieldCoinTypeID)
+	}
+	if m.feed_type != nil {
+		fields = append(fields, currencyfeed.FieldFeedType)
+	}
+	if m.feed_coin_name != nil {
+		fields = append(fields, currencyfeed.FieldFeedCoinName)
+	}
+	if m.disabled != nil {
+		fields = append(fields, currencyfeed.FieldDisabled)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CurrencyFeedMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case currencyfeed.FieldCreatedAt:
+		return m.CreatedAt()
+	case currencyfeed.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case currencyfeed.FieldDeletedAt:
+		return m.DeletedAt()
+	case currencyfeed.FieldCoinTypeID:
+		return m.CoinTypeID()
+	case currencyfeed.FieldFeedType:
+		return m.FeedType()
+	case currencyfeed.FieldFeedCoinName:
+		return m.FeedCoinName()
+	case currencyfeed.FieldDisabled:
+		return m.Disabled()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CurrencyFeedMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case currencyfeed.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case currencyfeed.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case currencyfeed.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case currencyfeed.FieldCoinTypeID:
+		return m.OldCoinTypeID(ctx)
+	case currencyfeed.FieldFeedType:
+		return m.OldFeedType(ctx)
+	case currencyfeed.FieldFeedCoinName:
+		return m.OldFeedCoinName(ctx)
+	case currencyfeed.FieldDisabled:
+		return m.OldDisabled(ctx)
+	}
+	return nil, fmt.Errorf("unknown CurrencyFeed field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CurrencyFeedMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case currencyfeed.FieldCreatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case currencyfeed.FieldUpdatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case currencyfeed.FieldDeletedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case currencyfeed.FieldCoinTypeID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCoinTypeID(v)
+		return nil
+	case currencyfeed.FieldFeedType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFeedType(v)
+		return nil
+	case currencyfeed.FieldFeedCoinName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFeedCoinName(v)
+		return nil
+	case currencyfeed.FieldDisabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisabled(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CurrencyFeed field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CurrencyFeedMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_at != nil {
+		fields = append(fields, currencyfeed.FieldCreatedAt)
+	}
+	if m.addupdated_at != nil {
+		fields = append(fields, currencyfeed.FieldUpdatedAt)
+	}
+	if m.adddeleted_at != nil {
+		fields = append(fields, currencyfeed.FieldDeletedAt)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CurrencyFeedMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case currencyfeed.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case currencyfeed.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case currencyfeed.FieldDeletedAt:
+		return m.AddedDeletedAt()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CurrencyFeedMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case currencyfeed.FieldCreatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedAt(v)
+		return nil
+	case currencyfeed.FieldUpdatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedAt(v)
+		return nil
+	case currencyfeed.FieldDeletedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown CurrencyFeed numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CurrencyFeedMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(currencyfeed.FieldCoinTypeID) {
+		fields = append(fields, currencyfeed.FieldCoinTypeID)
+	}
+	if m.FieldCleared(currencyfeed.FieldFeedType) {
+		fields = append(fields, currencyfeed.FieldFeedType)
+	}
+	if m.FieldCleared(currencyfeed.FieldFeedCoinName) {
+		fields = append(fields, currencyfeed.FieldFeedCoinName)
+	}
+	if m.FieldCleared(currencyfeed.FieldDisabled) {
+		fields = append(fields, currencyfeed.FieldDisabled)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CurrencyFeedMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CurrencyFeedMutation) ClearField(name string) error {
+	switch name {
+	case currencyfeed.FieldCoinTypeID:
+		m.ClearCoinTypeID()
+		return nil
+	case currencyfeed.FieldFeedType:
+		m.ClearFeedType()
+		return nil
+	case currencyfeed.FieldFeedCoinName:
+		m.ClearFeedCoinName()
+		return nil
+	case currencyfeed.FieldDisabled:
+		m.ClearDisabled()
+		return nil
+	}
+	return fmt.Errorf("unknown CurrencyFeed nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CurrencyFeedMutation) ResetField(name string) error {
+	switch name {
+	case currencyfeed.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case currencyfeed.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case currencyfeed.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case currencyfeed.FieldCoinTypeID:
+		m.ResetCoinTypeID()
+		return nil
+	case currencyfeed.FieldFeedType:
+		m.ResetFeedType()
+		return nil
+	case currencyfeed.FieldFeedCoinName:
+		m.ResetFeedCoinName()
+		return nil
+	case currencyfeed.FieldDisabled:
+		m.ResetDisabled()
+		return nil
+	}
+	return fmt.Errorf("unknown CurrencyFeed field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CurrencyFeedMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CurrencyFeedMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CurrencyFeedMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CurrencyFeedMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CurrencyFeedMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CurrencyFeedMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CurrencyFeedMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown CurrencyFeed unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CurrencyFeedMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown CurrencyFeed edge %s", name)
+}
+
 // CurrencyHistoryMutation represents an operation that mutates the CurrencyHistory nodes in the graph.
 type CurrencyHistoryMutation struct {
 	config
@@ -8609,6 +9435,828 @@ func (m *FiatCurrencyMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *FiatCurrencyMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown FiatCurrency edge %s", name)
+}
+
+// FiatCurrencyFeedMutation represents an operation that mutates the FiatCurrencyFeed nodes in the graph.
+type FiatCurrencyFeedMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *uuid.UUID
+	created_at     *uint32
+	addcreated_at  *int32
+	updated_at     *uint32
+	addupdated_at  *int32
+	deleted_at     *uint32
+	adddeleted_at  *int32
+	fiat_id        *uuid.UUID
+	feed_type      *string
+	feed_fiat_name *string
+	disabled       *bool
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*FiatCurrencyFeed, error)
+	predicates     []predicate.FiatCurrencyFeed
+}
+
+var _ ent.Mutation = (*FiatCurrencyFeedMutation)(nil)
+
+// fiatcurrencyfeedOption allows management of the mutation configuration using functional options.
+type fiatcurrencyfeedOption func(*FiatCurrencyFeedMutation)
+
+// newFiatCurrencyFeedMutation creates new mutation for the FiatCurrencyFeed entity.
+func newFiatCurrencyFeedMutation(c config, op Op, opts ...fiatcurrencyfeedOption) *FiatCurrencyFeedMutation {
+	m := &FiatCurrencyFeedMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeFiatCurrencyFeed,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withFiatCurrencyFeedID sets the ID field of the mutation.
+func withFiatCurrencyFeedID(id uuid.UUID) fiatcurrencyfeedOption {
+	return func(m *FiatCurrencyFeedMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *FiatCurrencyFeed
+		)
+		m.oldValue = func(ctx context.Context) (*FiatCurrencyFeed, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().FiatCurrencyFeed.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withFiatCurrencyFeed sets the old FiatCurrencyFeed of the mutation.
+func withFiatCurrencyFeed(node *FiatCurrencyFeed) fiatcurrencyfeedOption {
+	return func(m *FiatCurrencyFeedMutation) {
+		m.oldValue = func(context.Context) (*FiatCurrencyFeed, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m FiatCurrencyFeedMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m FiatCurrencyFeedMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of FiatCurrencyFeed entities.
+func (m *FiatCurrencyFeedMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *FiatCurrencyFeedMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *FiatCurrencyFeedMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().FiatCurrencyFeed.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *FiatCurrencyFeedMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *FiatCurrencyFeedMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the FiatCurrencyFeed entity.
+// If the FiatCurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatCurrencyFeedMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (m *FiatCurrencyFeedMutation) AddCreatedAt(u int32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
+	} else {
+		m.addcreated_at = &u
+	}
+}
+
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *FiatCurrencyFeedMutation) AddedCreatedAt() (r int32, exists bool) {
+	v := m.addcreated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *FiatCurrencyFeedMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *FiatCurrencyFeedMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *FiatCurrencyFeedMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the FiatCurrencyFeed entity.
+// If the FiatCurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatCurrencyFeedMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *FiatCurrencyFeedMutation) AddUpdatedAt(u int32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
+	} else {
+		m.addupdated_at = &u
+	}
+}
+
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *FiatCurrencyFeedMutation) AddedUpdatedAt() (r int32, exists bool) {
+	v := m.addupdated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *FiatCurrencyFeedMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *FiatCurrencyFeedMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *FiatCurrencyFeedMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the FiatCurrencyFeed entity.
+// If the FiatCurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatCurrencyFeedMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *FiatCurrencyFeedMutation) AddDeletedAt(u int32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
+	}
+}
+
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *FiatCurrencyFeedMutation) AddedDeletedAt() (r int32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *FiatCurrencyFeedMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
+}
+
+// SetFiatID sets the "fiat_id" field.
+func (m *FiatCurrencyFeedMutation) SetFiatID(u uuid.UUID) {
+	m.fiat_id = &u
+}
+
+// FiatID returns the value of the "fiat_id" field in the mutation.
+func (m *FiatCurrencyFeedMutation) FiatID() (r uuid.UUID, exists bool) {
+	v := m.fiat_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFiatID returns the old "fiat_id" field's value of the FiatCurrencyFeed entity.
+// If the FiatCurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatCurrencyFeedMutation) OldFiatID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFiatID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFiatID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFiatID: %w", err)
+	}
+	return oldValue.FiatID, nil
+}
+
+// ClearFiatID clears the value of the "fiat_id" field.
+func (m *FiatCurrencyFeedMutation) ClearFiatID() {
+	m.fiat_id = nil
+	m.clearedFields[fiatcurrencyfeed.FieldFiatID] = struct{}{}
+}
+
+// FiatIDCleared returns if the "fiat_id" field was cleared in this mutation.
+func (m *FiatCurrencyFeedMutation) FiatIDCleared() bool {
+	_, ok := m.clearedFields[fiatcurrencyfeed.FieldFiatID]
+	return ok
+}
+
+// ResetFiatID resets all changes to the "fiat_id" field.
+func (m *FiatCurrencyFeedMutation) ResetFiatID() {
+	m.fiat_id = nil
+	delete(m.clearedFields, fiatcurrencyfeed.FieldFiatID)
+}
+
+// SetFeedType sets the "feed_type" field.
+func (m *FiatCurrencyFeedMutation) SetFeedType(s string) {
+	m.feed_type = &s
+}
+
+// FeedType returns the value of the "feed_type" field in the mutation.
+func (m *FiatCurrencyFeedMutation) FeedType() (r string, exists bool) {
+	v := m.feed_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFeedType returns the old "feed_type" field's value of the FiatCurrencyFeed entity.
+// If the FiatCurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatCurrencyFeedMutation) OldFeedType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFeedType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFeedType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFeedType: %w", err)
+	}
+	return oldValue.FeedType, nil
+}
+
+// ClearFeedType clears the value of the "feed_type" field.
+func (m *FiatCurrencyFeedMutation) ClearFeedType() {
+	m.feed_type = nil
+	m.clearedFields[fiatcurrencyfeed.FieldFeedType] = struct{}{}
+}
+
+// FeedTypeCleared returns if the "feed_type" field was cleared in this mutation.
+func (m *FiatCurrencyFeedMutation) FeedTypeCleared() bool {
+	_, ok := m.clearedFields[fiatcurrencyfeed.FieldFeedType]
+	return ok
+}
+
+// ResetFeedType resets all changes to the "feed_type" field.
+func (m *FiatCurrencyFeedMutation) ResetFeedType() {
+	m.feed_type = nil
+	delete(m.clearedFields, fiatcurrencyfeed.FieldFeedType)
+}
+
+// SetFeedFiatName sets the "feed_fiat_name" field.
+func (m *FiatCurrencyFeedMutation) SetFeedFiatName(s string) {
+	m.feed_fiat_name = &s
+}
+
+// FeedFiatName returns the value of the "feed_fiat_name" field in the mutation.
+func (m *FiatCurrencyFeedMutation) FeedFiatName() (r string, exists bool) {
+	v := m.feed_fiat_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFeedFiatName returns the old "feed_fiat_name" field's value of the FiatCurrencyFeed entity.
+// If the FiatCurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatCurrencyFeedMutation) OldFeedFiatName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFeedFiatName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFeedFiatName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFeedFiatName: %w", err)
+	}
+	return oldValue.FeedFiatName, nil
+}
+
+// ClearFeedFiatName clears the value of the "feed_fiat_name" field.
+func (m *FiatCurrencyFeedMutation) ClearFeedFiatName() {
+	m.feed_fiat_name = nil
+	m.clearedFields[fiatcurrencyfeed.FieldFeedFiatName] = struct{}{}
+}
+
+// FeedFiatNameCleared returns if the "feed_fiat_name" field was cleared in this mutation.
+func (m *FiatCurrencyFeedMutation) FeedFiatNameCleared() bool {
+	_, ok := m.clearedFields[fiatcurrencyfeed.FieldFeedFiatName]
+	return ok
+}
+
+// ResetFeedFiatName resets all changes to the "feed_fiat_name" field.
+func (m *FiatCurrencyFeedMutation) ResetFeedFiatName() {
+	m.feed_fiat_name = nil
+	delete(m.clearedFields, fiatcurrencyfeed.FieldFeedFiatName)
+}
+
+// SetDisabled sets the "disabled" field.
+func (m *FiatCurrencyFeedMutation) SetDisabled(b bool) {
+	m.disabled = &b
+}
+
+// Disabled returns the value of the "disabled" field in the mutation.
+func (m *FiatCurrencyFeedMutation) Disabled() (r bool, exists bool) {
+	v := m.disabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisabled returns the old "disabled" field's value of the FiatCurrencyFeed entity.
+// If the FiatCurrencyFeed object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatCurrencyFeedMutation) OldDisabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisabled: %w", err)
+	}
+	return oldValue.Disabled, nil
+}
+
+// ClearDisabled clears the value of the "disabled" field.
+func (m *FiatCurrencyFeedMutation) ClearDisabled() {
+	m.disabled = nil
+	m.clearedFields[fiatcurrencyfeed.FieldDisabled] = struct{}{}
+}
+
+// DisabledCleared returns if the "disabled" field was cleared in this mutation.
+func (m *FiatCurrencyFeedMutation) DisabledCleared() bool {
+	_, ok := m.clearedFields[fiatcurrencyfeed.FieldDisabled]
+	return ok
+}
+
+// ResetDisabled resets all changes to the "disabled" field.
+func (m *FiatCurrencyFeedMutation) ResetDisabled() {
+	m.disabled = nil
+	delete(m.clearedFields, fiatcurrencyfeed.FieldDisabled)
+}
+
+// Where appends a list predicates to the FiatCurrencyFeedMutation builder.
+func (m *FiatCurrencyFeedMutation) Where(ps ...predicate.FiatCurrencyFeed) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *FiatCurrencyFeedMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (FiatCurrencyFeed).
+func (m *FiatCurrencyFeedMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *FiatCurrencyFeedMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldDeletedAt)
+	}
+	if m.fiat_id != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldFiatID)
+	}
+	if m.feed_type != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldFeedType)
+	}
+	if m.feed_fiat_name != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldFeedFiatName)
+	}
+	if m.disabled != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldDisabled)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *FiatCurrencyFeedMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case fiatcurrencyfeed.FieldCreatedAt:
+		return m.CreatedAt()
+	case fiatcurrencyfeed.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case fiatcurrencyfeed.FieldDeletedAt:
+		return m.DeletedAt()
+	case fiatcurrencyfeed.FieldFiatID:
+		return m.FiatID()
+	case fiatcurrencyfeed.FieldFeedType:
+		return m.FeedType()
+	case fiatcurrencyfeed.FieldFeedFiatName:
+		return m.FeedFiatName()
+	case fiatcurrencyfeed.FieldDisabled:
+		return m.Disabled()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *FiatCurrencyFeedMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case fiatcurrencyfeed.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case fiatcurrencyfeed.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case fiatcurrencyfeed.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case fiatcurrencyfeed.FieldFiatID:
+		return m.OldFiatID(ctx)
+	case fiatcurrencyfeed.FieldFeedType:
+		return m.OldFeedType(ctx)
+	case fiatcurrencyfeed.FieldFeedFiatName:
+		return m.OldFeedFiatName(ctx)
+	case fiatcurrencyfeed.FieldDisabled:
+		return m.OldDisabled(ctx)
+	}
+	return nil, fmt.Errorf("unknown FiatCurrencyFeed field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *FiatCurrencyFeedMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case fiatcurrencyfeed.FieldCreatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case fiatcurrencyfeed.FieldUpdatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case fiatcurrencyfeed.FieldDeletedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case fiatcurrencyfeed.FieldFiatID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFiatID(v)
+		return nil
+	case fiatcurrencyfeed.FieldFeedType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFeedType(v)
+		return nil
+	case fiatcurrencyfeed.FieldFeedFiatName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFeedFiatName(v)
+		return nil
+	case fiatcurrencyfeed.FieldDisabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisabled(v)
+		return nil
+	}
+	return fmt.Errorf("unknown FiatCurrencyFeed field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *FiatCurrencyFeedMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_at != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldCreatedAt)
+	}
+	if m.addupdated_at != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldUpdatedAt)
+	}
+	if m.adddeleted_at != nil {
+		fields = append(fields, fiatcurrencyfeed.FieldDeletedAt)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *FiatCurrencyFeedMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case fiatcurrencyfeed.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case fiatcurrencyfeed.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case fiatcurrencyfeed.FieldDeletedAt:
+		return m.AddedDeletedAt()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *FiatCurrencyFeedMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case fiatcurrencyfeed.FieldCreatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedAt(v)
+		return nil
+	case fiatcurrencyfeed.FieldUpdatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedAt(v)
+		return nil
+	case fiatcurrencyfeed.FieldDeletedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown FiatCurrencyFeed numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *FiatCurrencyFeedMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(fiatcurrencyfeed.FieldFiatID) {
+		fields = append(fields, fiatcurrencyfeed.FieldFiatID)
+	}
+	if m.FieldCleared(fiatcurrencyfeed.FieldFeedType) {
+		fields = append(fields, fiatcurrencyfeed.FieldFeedType)
+	}
+	if m.FieldCleared(fiatcurrencyfeed.FieldFeedFiatName) {
+		fields = append(fields, fiatcurrencyfeed.FieldFeedFiatName)
+	}
+	if m.FieldCleared(fiatcurrencyfeed.FieldDisabled) {
+		fields = append(fields, fiatcurrencyfeed.FieldDisabled)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *FiatCurrencyFeedMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *FiatCurrencyFeedMutation) ClearField(name string) error {
+	switch name {
+	case fiatcurrencyfeed.FieldFiatID:
+		m.ClearFiatID()
+		return nil
+	case fiatcurrencyfeed.FieldFeedType:
+		m.ClearFeedType()
+		return nil
+	case fiatcurrencyfeed.FieldFeedFiatName:
+		m.ClearFeedFiatName()
+		return nil
+	case fiatcurrencyfeed.FieldDisabled:
+		m.ClearDisabled()
+		return nil
+	}
+	return fmt.Errorf("unknown FiatCurrencyFeed nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *FiatCurrencyFeedMutation) ResetField(name string) error {
+	switch name {
+	case fiatcurrencyfeed.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case fiatcurrencyfeed.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case fiatcurrencyfeed.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case fiatcurrencyfeed.FieldFiatID:
+		m.ResetFiatID()
+		return nil
+	case fiatcurrencyfeed.FieldFeedType:
+		m.ResetFeedType()
+		return nil
+	case fiatcurrencyfeed.FieldFeedFiatName:
+		m.ResetFeedFiatName()
+		return nil
+	case fiatcurrencyfeed.FieldDisabled:
+		m.ResetDisabled()
+		return nil
+	}
+	return fmt.Errorf("unknown FiatCurrencyFeed field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *FiatCurrencyFeedMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *FiatCurrencyFeedMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *FiatCurrencyFeedMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *FiatCurrencyFeedMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *FiatCurrencyFeedMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *FiatCurrencyFeedMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *FiatCurrencyFeedMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown FiatCurrencyFeed unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *FiatCurrencyFeedMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown FiatCurrencyFeed edge %s", name)
 }
 
 // FiatCurrencyHistoryMutation represents an operation that mutates the FiatCurrencyHistory nodes in the graph.

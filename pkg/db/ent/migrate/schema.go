@@ -119,6 +119,35 @@ var (
 			},
 		},
 	}
+	// CurrencyFeedsColumns holds the columns for the "currency_feeds" table.
+	CurrencyFeedsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
+		{Name: "feed_coin_name", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "disabled", Type: field.TypeBool, Nullable: true, Default: false},
+	}
+	// CurrencyFeedsTable holds the schema information for the "currency_feeds" table.
+	CurrencyFeedsTable = &schema.Table{
+		Name:       "currency_feeds",
+		Columns:    CurrencyFeedsColumns,
+		PrimaryKey: []*schema.Column{CurrencyFeedsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "currencyfeed_coin_type_id_id",
+				Unique:  false,
+				Columns: []*schema.Column{CurrencyFeedsColumns[4], CurrencyFeedsColumns[0]},
+			},
+			{
+				Name:    "currencyfeed_coin_type_id",
+				Unique:  false,
+				Columns: []*schema.Column{CurrencyFeedsColumns[4]},
+			},
+		},
+	}
 	// CurrencyHistoriesColumns holds the columns for the "currency_histories" table.
 	CurrencyHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -200,6 +229,35 @@ var (
 		Columns:    FiatCurrenciesColumns,
 		PrimaryKey: []*schema.Column{FiatCurrenciesColumns[0]},
 	}
+	// FiatCurrencyFeedsColumns holds the columns for the "fiat_currency_feeds" table.
+	FiatCurrencyFeedsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
+		{Name: "feed_fiat_name", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "disabled", Type: field.TypeBool, Nullable: true, Default: false},
+	}
+	// FiatCurrencyFeedsTable holds the schema information for the "fiat_currency_feeds" table.
+	FiatCurrencyFeedsTable = &schema.Table{
+		Name:       "fiat_currency_feeds",
+		Columns:    FiatCurrencyFeedsColumns,
+		PrimaryKey: []*schema.Column{FiatCurrencyFeedsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "fiatcurrencyfeed_fiat_id_id",
+				Unique:  false,
+				Columns: []*schema.Column{FiatCurrencyFeedsColumns[4], FiatCurrencyFeedsColumns[0]},
+			},
+			{
+				Name:    "fiatcurrencyfeed_fiat_id",
+				Unique:  false,
+				Columns: []*schema.Column{FiatCurrencyFeedsColumns[4]},
+			},
+		},
+	}
 	// FiatCurrencyHistoriesColumns holds the columns for the "fiat_currency_histories" table.
 	FiatCurrencyHistoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -272,10 +330,12 @@ var (
 		CoinDescriptionsTable,
 		CoinExtrasTable,
 		CurrenciesTable,
+		CurrencyFeedsTable,
 		CurrencyHistoriesTable,
 		ExchangeRatesTable,
 		FiatsTable,
 		FiatCurrenciesTable,
+		FiatCurrencyFeedsTable,
 		FiatCurrencyHistoriesTable,
 		SettingsTable,
 		TransTable,

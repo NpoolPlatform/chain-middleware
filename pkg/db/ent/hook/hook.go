@@ -74,6 +74,19 @@ func (f CurrencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return f(ctx, mv)
 }
 
+// The CurrencyFeedFunc type is an adapter to allow the use of ordinary
+// function as CurrencyFeed mutator.
+type CurrencyFeedFunc func(context.Context, *ent.CurrencyFeedMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CurrencyFeedFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CurrencyFeedMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CurrencyFeedMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The CurrencyHistoryFunc type is an adapter to allow the use of ordinary
 // function as CurrencyHistory mutator.
 type CurrencyHistoryFunc func(context.Context, *ent.CurrencyHistoryMutation) (ent.Value, error)
@@ -122,6 +135,19 @@ func (f FiatCurrencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	mv, ok := m.(*ent.FiatCurrencyMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FiatCurrencyMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The FiatCurrencyFeedFunc type is an adapter to allow the use of ordinary
+// function as FiatCurrencyFeed mutator.
+type FiatCurrencyFeedFunc func(context.Context, *ent.FiatCurrencyFeedMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FiatCurrencyFeedFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.FiatCurrencyFeedMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FiatCurrencyFeedMutation", m)
 	}
 	return f(ctx, mv)
 }
