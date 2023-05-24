@@ -9,6 +9,7 @@ import (
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	entcurrency "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 
 	"github.com/google/uuid"
 )
@@ -18,6 +19,34 @@ type createHandler struct {
 }
 
 func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx) error {
+	info, err := tx.
+		Currency.
+		Query().
+		Where(
+			entcurrency.CoinTypeID(*h.CoinTypeID),
+			entcurrency.FeedType(h.FeedType.String()),
+		).
+		ForUpdate().
+		Only(ctx)
+	if err != nil {
+		if !ent.IsNotFound(err) {
+			return err
+		}
+	}
+
+	if info != nil {
+		if _, err := currencycrud.UpdateSet(
+			info.Update(),
+			&currencycrud.Req{
+				MarketValueHigh: h.MarketValueHigh,
+				MarketValueLow:  h.MarketValueLow,
+			},
+		).Save(ctx); err != nil {
+			return err
+		}
+		return nil
+	}
+
 	if _, err := currencycrud.CreateSet(
 		tx.Currency.Create(),
 		&currencycrud.Req{
