@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/NpoolPlatform/chain-middleware/pkg/coin"
+	"github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
@@ -22,7 +22,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	fiatcurrencycrud "github.com/NpoolPlatform/chain-manager/pkg/crud/fiat/currency"
-	"github.com/NpoolPlatform/chain-middleware/pkg/coin/currency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/mw/coin/currency"
 	fiatcurrencypb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/fiat/currency"
 	"github.com/google/uuid"
 

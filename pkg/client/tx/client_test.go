@@ -23,7 +23,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 	"github.com/stretchr/testify/assert"
 
-	coincrud "github.com/NpoolPlatform/chain-middleware/pkg/coin"
+	coincrud "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 

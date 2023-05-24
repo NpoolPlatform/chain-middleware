@@ -10,7 +10,7 @@ import (
 	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
+	servicename "github.com/NpoolPlatform/chain-middleware/pkg/servicename"
 )
 
 var timeout = 10 * time.Second
@@ -21,7 +21,7 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 	_ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	conn, err := grpc2.GetGRPCConn(constant.ServiceName, grpc2.GRPCTAG)
+	conn, err := grpc2.GetGRPCConn(servicename.ServiceDomain, grpc2.GRPCTAG)
 	if err != nil {
 		return nil, err
 	}

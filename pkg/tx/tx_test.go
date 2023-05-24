@@ -10,7 +10,7 @@ import (
 	testinit "github.com/NpoolPlatform/chain-middleware/pkg/testinit"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
-	coinmw "github.com/NpoolPlatform/chain-middleware/pkg/coin"
+	coinmw "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"

@@ -10,7 +10,7 @@ import (
 	testinit "github.com/NpoolPlatform/chain-middleware/pkg/testinit"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
 
-	coinmw "github.com/NpoolPlatform/chain-middleware/pkg/coin"
+	coinmw "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	"github.com/google/uuid"
