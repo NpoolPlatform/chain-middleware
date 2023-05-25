@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	currencycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/currency"
+	currencycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/fiat/currency"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
@@ -16,7 +16,7 @@ import (
 
 type Handler struct {
 	ID              *uuid.UUID
-	CoinTypeID      *uuid.UUID
+	FiatID          *uuid.UUID
 	FeedType        *basetypes.CurrencyFeedType
 	MarketValueHigh *decimal.Decimal
 	MarketValueLow  *decimal.Decimal
@@ -49,7 +49,7 @@ func WithID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
+func WithFiatID(id *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
 			return nil
@@ -58,7 +58,7 @@ func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
 		if err != nil {
 			return err
 		}
-		h.CoinTypeID = &_id
+		h.FiatID = &_id
 		return nil
 	}
 }
@@ -121,28 +121,14 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				Val: id,
 			}
 		}
-		if conds.CoinTypeID != nil {
-			id, err := uuid.Parse(conds.GetCoinTypeID().GetValue())
+		if conds.FiatID != nil {
+			id, err := uuid.Parse(conds.GetFiatID().GetValue())
 			if err != nil {
 				return err
 			}
-			h.Conds.CoinTypeID = &cruder.Cond{
-				Op:  conds.GetCoinTypeID().GetOp(),
+			h.Conds.FiatID = &cruder.Cond{
+				Op:  conds.GetFiatID().GetOp(),
 				Val: id,
-			}
-		}
-		if conds.CoinTypeIDs != nil {
-			ids := []uuid.UUID{}
-			for _, id := range conds.GetCoinTypeIDs().GetValue() {
-				_id, err := uuid.Parse(id)
-				if err != nil {
-					return err
-				}
-				ids = append(ids, _id)
-			}
-			h.Conds.CoinTypeIDs = &cruder.Cond{
-				Op:  conds.GetCoinTypeIDs().GetOp(),
-				Val: ids,
 			}
 		}
 		return nil
