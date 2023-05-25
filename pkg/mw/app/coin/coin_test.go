@@ -26,14 +26,12 @@ func init() {
 }
 
 var (
-	coinName = "BTC111"
 	coinUnit = "BTC"
 	coinENV  = "test"
 )
 
 var ret = &npool.Coin{
 	AppID:                       uuid.NewString(),
-	CoinName:                    coinName,
 	Name:                        "My BTC1",
 	DisplayNames:                []string{"123123", "2323"},
 	Logo:                        uuid.NewString(),
@@ -48,7 +46,6 @@ var ret = &npool.Coin{
 	HotLowFeeAmount:             "0.000000000000000000",
 	HotWalletAccountAmount:      "0.000000000000000000",
 	PaymentAccountCollectAmount: "0.000000000000000000",
-	FeeCoinName:                 coinName,
 	FeeCoinUnit:                 coinUnit,
 	FeeCoinENV:                  coinENV,
 	WithdrawAutoReviewAmount:    "0.000000000000000000",
@@ -76,11 +73,13 @@ var req = &npool.CoinReq{
 func setupCoin(t *testing.T) func(*testing.T) {
 	ret.CoinTypeID = uuid.NewString()
 	req.CoinTypeID = &ret.CoinTypeID
+	ret.CoinName = uuid.NewString()
+	ret.FeeCoinName = ret.CoinName
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
 		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&coinName),
+		coin1.WithName(&ret.CoinName),
 		coin1.WithUnit(&coinUnit),
 		coin1.WithENV(&coinENV),
 	)
@@ -155,7 +154,7 @@ func update(t *testing.T) {
 func delete(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(req.ID),
+		WithID(&ret.ID),
 	)
 	assert.Nil(t, err)
 

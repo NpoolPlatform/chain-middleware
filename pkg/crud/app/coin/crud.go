@@ -66,7 +66,9 @@ func CreateSet(c *ent.AppCoinCreate, req *Req) *ent.AppCoinCreate {
 	if req.Display != nil {
 		c.SetDisplay(*req.Display)
 	}
-	c.SetDisplayIndex(*req.DisplayIndex)
+	if req.DisplayIndex != nil {
+		c.SetDisplayIndex(*req.DisplayIndex)
+	}
 	if req.MaxAmountPerWithdraw != nil {
 		c.SetMaxAmountPerWithdraw(*req.MaxAmountPerWithdraw)
 	}

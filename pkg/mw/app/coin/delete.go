@@ -21,14 +21,19 @@ type deleteHandler struct {
 
 func (h *deleteHandler) deleteAppCoin(ctx context.Context, tx *ent.Tx) error {
 	now := uint32(time.Now().Unix())
-	if _, err := appcoincrud.UpdateSet(
+	info, err := appcoincrud.UpdateSet(
 		tx.AppCoin.UpdateOneID(*h.ID),
 		&appcoincrud.Req{
 			DeletedAt: &now,
 		},
-	).Save(ctx); err != nil {
+	).Save(ctx)
+	if err != nil {
 		return err
 	}
+
+	h.AppID = &info.AppID
+	h.CoinTypeID = &info.CoinTypeID
+
 	return nil
 }
 

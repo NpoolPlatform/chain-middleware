@@ -29,7 +29,7 @@ type queryHandler struct {
 }
 
 func (h *queryHandler) selectAppCoin(stm *ent.AppCoinQuery) {
-	h.stm.Select(
+	h.stm = stm.Select(
 		entappcoin.FieldID,
 		entappcoin.FieldAppID,
 		entappcoin.FieldCoinTypeID,
