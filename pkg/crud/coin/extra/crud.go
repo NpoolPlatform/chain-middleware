@@ -16,6 +16,7 @@ type Req struct {
 	HomePage   *string
 	Specs      *string
 	StableUSD  *bool
+	DeletedAt  *uint32
 }
 
 func CreateSet(c *ent.CoinExtraCreate, req *Req) *ent.CoinExtraCreate {
@@ -46,6 +47,9 @@ func UpdateSet(u *ent.CoinExtraUpdateOne, req *Req) *ent.CoinExtraUpdateOne {
 	}
 	if req.StableUSD != nil {
 		u = u.SetStableUsd(*req.StableUSD)
+	}
+	if req.DeletedAt != nil {
+		u = u.SetDeletedAt(*req.DeletedAt)
 	}
 	return u
 }

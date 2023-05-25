@@ -26,6 +26,7 @@ type Req struct {
 	LeastTransferAmount         *decimal.Decimal
 	NeedMemo                    *bool
 	RefreshCurrency             *bool
+	DeletedAt                   *uint32
 }
 
 func CreateSet(c *ent.SettingCreate, req *Req) *ent.SettingCreate {
@@ -110,6 +111,9 @@ func UpdateSet(u *ent.SettingUpdateOne, req *Req) *ent.SettingUpdateOne {
 	}
 	if req.RefreshCurrency != nil {
 		u.SetRefreshCurrency(*req.RefreshCurrency)
+	}
+	if req.DeletedAt != nil {
+		u.SetDeletedAt(*req.DeletedAt)
 	}
 
 	return u

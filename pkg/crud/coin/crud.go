@@ -21,6 +21,7 @@ type Req struct {
 	ReservedAmount *decimal.Decimal
 	ForPay         *bool
 	Disabled       *bool
+	DeletedAt      *uint32
 }
 
 func CreateSet(c *ent.CoinBaseCreate, req *Req) *ent.CoinBaseCreate {
@@ -69,6 +70,9 @@ func UpdateSet(u *ent.CoinBaseUpdateOne, req *Req) *ent.CoinBaseUpdateOne {
 	}
 	if req.Disabled != nil {
 		u = u.SetDisabled(*req.Disabled)
+	}
+	if req.DeletedAt != nil {
+		u = u.SetDeletedAt(*req.DeletedAt)
 	}
 
 	return u
