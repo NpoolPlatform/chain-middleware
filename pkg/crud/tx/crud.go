@@ -47,7 +47,7 @@ func CreateSet(c *ent.TranCreate, req *Req) *ent.TranCreate {
 	if req.ChainTxID != nil {
 		c.SetChainTxID(*req.ChainTxID)
 	}
-	c.SetState(basetypes.TxState_StateCreated.String())
+	c.SetState(basetypes.TxState_TxStateCreated.String())
 	if req.Extra != nil {
 		c.SetExtra(*req.Extra)
 	}
@@ -62,28 +62,28 @@ func UpdateSet(u *ent.TranUpdateOne, req *Req) (*ent.TranUpdateOne, error) {
 
 	if req.State != nil {
 		switch state {
-		case basetypes.TxState_StateCreated.String():
+		case basetypes.TxState_TxStateCreated.String():
 			switch *req.State {
-			case basetypes.TxState_StateWait:
+			case basetypes.TxState_TxStateWait:
 			default:
 				return nil, fmt.Errorf("state is invalid")
 			}
-		case basetypes.TxState_StateWait.String():
+		case basetypes.TxState_TxStateWait.String():
 			switch *req.State {
-			case basetypes.TxState_StateTransferring:
+			case basetypes.TxState_TxStateTransferring:
 			default:
 				return nil, fmt.Errorf("state is invalid")
 			}
-		case basetypes.TxState_StateTransferring.String():
+		case basetypes.TxState_TxStateTransferring.String():
 			switch *req.State {
-			case basetypes.TxState_StateSuccessful:
-			case basetypes.TxState_StateFail:
+			case basetypes.TxState_TxStateSuccessful:
+			case basetypes.TxState_TxStateFail:
 			default:
 				return nil, fmt.Errorf("state is invalid")
 			}
-		case basetypes.TxState_StateSuccessful.String():
+		case basetypes.TxState_TxStateSuccessful.String():
 			fallthrough //nolint
-		case basetypes.TxState_StateFail.String():
+		case basetypes.TxState_TxStateFail.String():
 			fallthrough //nolint
 		default:
 			return nil, fmt.Errorf("state is invalid")
