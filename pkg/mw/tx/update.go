@@ -2,17 +2,40 @@ package tx
 
 import (
 	"context"
+	"fmt"
 
-	txmgrcli "github.com/NpoolPlatform/chain-manager/pkg/client/tx"
-	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
+	txcrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/tx"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
+
+	"github.com/NpoolPlatform/chain-middleware/pkg/db"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
 )
 
-func UpdateTx(ctx context.Context, in *txmgrpb.TxReq) (*npool.Tx, error) {
-	info, err := txmgrcli.UpdateTx(ctx, in)
+func (h *Handler) UpdateTx(ctx context.Context) (*npool.Tx, error) {
+	if h.ID == nil {
+		return nil, fmt.Errorf("invalid id")
+	}
+
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		stm, err := txcrud.UpdateSet(
+			cli.Tran.UpdateOneID(*h.ID),
+			&txcrud.Req{
+				ChainTxID: h.ChainTxID,
+				State:     h.State,
+				Extra:     h.Extra,
+			},
+		)
+		if err != nil {
+			return err
+		}
+		if _, err := stm.Save(_ctx); err != nil {
+			return err
+		}
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	return GetTx(ctx, info.ID)
+	return h.GetTx(ctx)
 }

@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) CreateFiat(ctx context.Context, in *npool.CreateFiatRequest) (*npool.CreateFiatResponse, error) {
+func (s *Server) UpdateFiat(ctx context.Context, in *npool.UpdateFiatRequest) (*npool.UpdateFiatResponse, error) {
 	req := in.GetInfo()
 	handler, err := fiat1.NewHandler(
 		ctx,
@@ -23,24 +23,24 @@ func (s *Server) CreateFiat(ctx context.Context, in *npool.CreateFiatRequest) (*
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateFiat",
+			"UpdateFiat",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateFiatResponse{}, status.Error(codes.InvalidArgument, err.Error())
+		return &npool.UpdateFiatResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	info, err := handler.CreateFiat(ctx)
+	info, err := handler.UpdateFiat(ctx)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CreateFiat",
+			"UpdateFiat",
 			"In", in,
 			"Error", err,
 		)
-		return &npool.CreateFiatResponse{}, status.Error(codes.Internal, err.Error())
+		return &npool.UpdateFiatResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
-	return &npool.CreateFiatResponse{
+	return &npool.UpdateFiatResponse{
 		Info: info,
 	}, nil
 }

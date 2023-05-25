@@ -1,17 +1,18 @@
-package fiat
+package currencyfeed
 
 import (
-	"github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
+	feed "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency/feed"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 )
 
 type Server struct {
-	fiat.UnimplementedMiddlewareServer
+	feed.UnimplementedMiddlewareServer
 }
 
 func Register(server grpc.ServiceRegistrar) {
-	fiat.RegisterMiddlewareServer(server, &Server{})
+	feed.RegisterMiddlewareServer(server, &Server{})
 }
 
 func RegisterGateway(mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) error {
