@@ -9747,6 +9747,7 @@ type FiatMutation struct {
 	adddeleted_at *int32
 	name          *string
 	logo          *string
+	unit          *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Fiat, error)
@@ -10123,6 +10124,55 @@ func (m *FiatMutation) ResetLogo() {
 	delete(m.clearedFields, fiat.FieldLogo)
 }
 
+// SetUnit sets the "unit" field.
+func (m *FiatMutation) SetUnit(s string) {
+	m.unit = &s
+}
+
+// Unit returns the value of the "unit" field in the mutation.
+func (m *FiatMutation) Unit() (r string, exists bool) {
+	v := m.unit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUnit returns the old "unit" field's value of the Fiat entity.
+// If the Fiat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *FiatMutation) OldUnit(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUnit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUnit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUnit: %w", err)
+	}
+	return oldValue.Unit, nil
+}
+
+// ClearUnit clears the value of the "unit" field.
+func (m *FiatMutation) ClearUnit() {
+	m.unit = nil
+	m.clearedFields[fiat.FieldUnit] = struct{}{}
+}
+
+// UnitCleared returns if the "unit" field was cleared in this mutation.
+func (m *FiatMutation) UnitCleared() bool {
+	_, ok := m.clearedFields[fiat.FieldUnit]
+	return ok
+}
+
+// ResetUnit resets all changes to the "unit" field.
+func (m *FiatMutation) ResetUnit() {
+	m.unit = nil
+	delete(m.clearedFields, fiat.FieldUnit)
+}
+
 // Where appends a list predicates to the FiatMutation builder.
 func (m *FiatMutation) Where(ps ...predicate.Fiat) {
 	m.predicates = append(m.predicates, ps...)
@@ -10142,7 +10192,7 @@ func (m *FiatMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *FiatMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, fiat.FieldCreatedAt)
 	}
@@ -10157,6 +10207,9 @@ func (m *FiatMutation) Fields() []string {
 	}
 	if m.logo != nil {
 		fields = append(fields, fiat.FieldLogo)
+	}
+	if m.unit != nil {
+		fields = append(fields, fiat.FieldUnit)
 	}
 	return fields
 }
@@ -10176,6 +10229,8 @@ func (m *FiatMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case fiat.FieldLogo:
 		return m.Logo()
+	case fiat.FieldUnit:
+		return m.Unit()
 	}
 	return nil, false
 }
@@ -10195,6 +10250,8 @@ func (m *FiatMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case fiat.FieldLogo:
 		return m.OldLogo(ctx)
+	case fiat.FieldUnit:
+		return m.OldUnit(ctx)
 	}
 	return nil, fmt.Errorf("unknown Fiat field %s", name)
 }
@@ -10238,6 +10295,13 @@ func (m *FiatMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLogo(v)
+		return nil
+	case fiat.FieldUnit:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUnit(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Fiat field %s", name)
@@ -10314,6 +10378,9 @@ func (m *FiatMutation) ClearedFields() []string {
 	if m.FieldCleared(fiat.FieldLogo) {
 		fields = append(fields, fiat.FieldLogo)
 	}
+	if m.FieldCleared(fiat.FieldUnit) {
+		fields = append(fields, fiat.FieldUnit)
+	}
 	return fields
 }
 
@@ -10333,6 +10400,9 @@ func (m *FiatMutation) ClearField(name string) error {
 		return nil
 	case fiat.FieldLogo:
 		m.ClearLogo()
+		return nil
+	case fiat.FieldUnit:
+		m.ClearUnit()
 		return nil
 	}
 	return fmt.Errorf("unknown Fiat nullable field %s", name)
@@ -10356,6 +10426,9 @@ func (m *FiatMutation) ResetField(name string) error {
 		return nil
 	case fiat.FieldLogo:
 		m.ResetLogo()
+		return nil
+	case fiat.FieldUnit:
+		m.ResetUnit()
 		return nil
 	}
 	return fmt.Errorf("unknown Fiat field %s", name)

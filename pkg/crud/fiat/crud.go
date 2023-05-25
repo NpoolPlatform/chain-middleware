@@ -14,6 +14,7 @@ type Req struct {
 	ID   *uuid.UUID
 	Name *string
 	Logo *string
+	Unit *string
 }
 
 func CreateSet(c *ent.FiatCreate, req *Req) *ent.FiatCreate {
@@ -26,6 +27,9 @@ func CreateSet(c *ent.FiatCreate, req *Req) *ent.FiatCreate {
 	if req.Logo != nil {
 		c.SetLogo(*req.Logo)
 	}
+	if req.Unit != nil {
+		c.SetUnit(*req.Unit)
+	}
 	return c
 }
 
@@ -35,6 +39,9 @@ func UpdateSet(u *ent.FiatUpdateOne, req *Req) *ent.FiatUpdateOne {
 	}
 	if req.Logo != nil {
 		u.SetLogo(*req.Logo)
+	}
+	if req.Unit != nil {
+		u.SetUnit(*req.Unit)
 	}
 	return u
 }

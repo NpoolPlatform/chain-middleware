@@ -114,6 +114,13 @@ func Logo(v string) predicate.Fiat {
 	})
 }
 
+// Unit applies equality check predicate on the "unit" field. It's identical to UnitEQ.
+func Unit(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUnit), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v uint32) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
@@ -529,6 +536,119 @@ func LogoEqualFold(v string) predicate.Fiat {
 func LogoContainsFold(v string) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldLogo), v))
+	})
+}
+
+// UnitEQ applies the EQ predicate on the "unit" field.
+func UnitEQ(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUnit), v))
+	})
+}
+
+// UnitNEQ applies the NEQ predicate on the "unit" field.
+func UnitNEQ(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldUnit), v))
+	})
+}
+
+// UnitIn applies the In predicate on the "unit" field.
+func UnitIn(vs ...string) predicate.Fiat {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldUnit), v...))
+	})
+}
+
+// UnitNotIn applies the NotIn predicate on the "unit" field.
+func UnitNotIn(vs ...string) predicate.Fiat {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldUnit), v...))
+	})
+}
+
+// UnitGT applies the GT predicate on the "unit" field.
+func UnitGT(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldUnit), v))
+	})
+}
+
+// UnitGTE applies the GTE predicate on the "unit" field.
+func UnitGTE(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldUnit), v))
+	})
+}
+
+// UnitLT applies the LT predicate on the "unit" field.
+func UnitLT(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldUnit), v))
+	})
+}
+
+// UnitLTE applies the LTE predicate on the "unit" field.
+func UnitLTE(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldUnit), v))
+	})
+}
+
+// UnitContains applies the Contains predicate on the "unit" field.
+func UnitContains(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldUnit), v))
+	})
+}
+
+// UnitHasPrefix applies the HasPrefix predicate on the "unit" field.
+func UnitHasPrefix(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldUnit), v))
+	})
+}
+
+// UnitHasSuffix applies the HasSuffix predicate on the "unit" field.
+func UnitHasSuffix(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldUnit), v))
+	})
+}
+
+// UnitIsNil applies the IsNil predicate on the "unit" field.
+func UnitIsNil() predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldUnit)))
+	})
+}
+
+// UnitNotNil applies the NotNil predicate on the "unit" field.
+func UnitNotNil() predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldUnit)))
+	})
+}
+
+// UnitEqualFold applies the EqualFold predicate on the "unit" field.
+func UnitEqualFold(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldUnit), v))
+	})
+}
+
+// UnitContainsFold applies the ContainsFold predicate on the "unit" field.
+func UnitContainsFold(v string) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldUnit), v))
 	})
 }
 

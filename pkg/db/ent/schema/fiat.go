@@ -33,6 +33,10 @@ func (Fiat) Fields() []ent.Field {
 			String("logo").
 			Optional().
 			Default(""),
+		field.
+			String("unit").
+			Optional().
+			Default(""),
 	}
 }
 

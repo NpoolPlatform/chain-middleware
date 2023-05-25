@@ -3,8 +3,8 @@ package currencyhistory
 import (
 	"context"
 
-	historycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/currency/history"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/history"
+	historycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/fiat/currency/history"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/fiat/currency/history"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	"github.com/google/uuid"
@@ -29,16 +29,6 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &historycrud.Conds{}
-		if conds.ID != nil {
-			id, err := uuid.Parse(conds.GetID().GetValue())
-			if err != nil {
-				return err
-			}
-			h.Conds.ID = &cruder.Cond{
-				Op:  conds.GetID().GetOp(),
-				Val: id,
-			}
-		}
 		if conds.CoinTypeID != nil {
 			id, err := uuid.Parse(conds.GetCoinTypeID().GetValue())
 			if err != nil {

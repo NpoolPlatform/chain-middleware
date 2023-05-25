@@ -93,6 +93,20 @@ func (fc *FiatCreate) SetNillableLogo(s *string) *FiatCreate {
 	return fc
 }
 
+// SetUnit sets the "unit" field.
+func (fc *FiatCreate) SetUnit(s string) *FiatCreate {
+	fc.mutation.SetUnit(s)
+	return fc
+}
+
+// SetNillableUnit sets the "unit" field if the given value is not nil.
+func (fc *FiatCreate) SetNillableUnit(s *string) *FiatCreate {
+	if s != nil {
+		fc.SetUnit(*s)
+	}
+	return fc
+}
+
 // SetID sets the "id" field.
 func (fc *FiatCreate) SetID(u uuid.UUID) *FiatCreate {
 	fc.mutation.SetID(u)
@@ -215,6 +229,10 @@ func (fc *FiatCreate) defaults() error {
 		v := fiat.DefaultLogo
 		fc.mutation.SetLogo(v)
 	}
+	if _, ok := fc.mutation.Unit(); !ok {
+		v := fiat.DefaultUnit
+		fc.mutation.SetUnit(v)
+	}
 	if _, ok := fc.mutation.ID(); !ok {
 		if fiat.DefaultID == nil {
 			return fmt.Errorf("ent: uninitialized fiat.DefaultID (forgotten import ent/runtime?)")
@@ -312,6 +330,14 @@ func (fc *FiatCreate) createSpec() (*Fiat, *sqlgraph.CreateSpec) {
 			Column: fiat.FieldLogo,
 		})
 		_node.Logo = value
+	}
+	if value, ok := fc.mutation.Unit(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: fiat.FieldUnit,
+		})
+		_node.Unit = value
 	}
 	return _node, _spec
 }
@@ -454,6 +480,24 @@ func (u *FiatUpsert) UpdateLogo() *FiatUpsert {
 // ClearLogo clears the value of the "logo" field.
 func (u *FiatUpsert) ClearLogo() *FiatUpsert {
 	u.SetNull(fiat.FieldLogo)
+	return u
+}
+
+// SetUnit sets the "unit" field.
+func (u *FiatUpsert) SetUnit(v string) *FiatUpsert {
+	u.Set(fiat.FieldUnit, v)
+	return u
+}
+
+// UpdateUnit sets the "unit" field to the value that was provided on create.
+func (u *FiatUpsert) UpdateUnit() *FiatUpsert {
+	u.SetExcluded(fiat.FieldUnit)
+	return u
+}
+
+// ClearUnit clears the value of the "unit" field.
+func (u *FiatUpsert) ClearUnit() *FiatUpsert {
+	u.SetNull(fiat.FieldUnit)
 	return u
 }
 
@@ -609,6 +653,27 @@ func (u *FiatUpsertOne) UpdateLogo() *FiatUpsertOne {
 func (u *FiatUpsertOne) ClearLogo() *FiatUpsertOne {
 	return u.Update(func(s *FiatUpsert) {
 		s.ClearLogo()
+	})
+}
+
+// SetUnit sets the "unit" field.
+func (u *FiatUpsertOne) SetUnit(v string) *FiatUpsertOne {
+	return u.Update(func(s *FiatUpsert) {
+		s.SetUnit(v)
+	})
+}
+
+// UpdateUnit sets the "unit" field to the value that was provided on create.
+func (u *FiatUpsertOne) UpdateUnit() *FiatUpsertOne {
+	return u.Update(func(s *FiatUpsert) {
+		s.UpdateUnit()
+	})
+}
+
+// ClearUnit clears the value of the "unit" field.
+func (u *FiatUpsertOne) ClearUnit() *FiatUpsertOne {
+	return u.Update(func(s *FiatUpsert) {
+		s.ClearUnit()
 	})
 }
 
@@ -930,6 +995,27 @@ func (u *FiatUpsertBulk) UpdateLogo() *FiatUpsertBulk {
 func (u *FiatUpsertBulk) ClearLogo() *FiatUpsertBulk {
 	return u.Update(func(s *FiatUpsert) {
 		s.ClearLogo()
+	})
+}
+
+// SetUnit sets the "unit" field.
+func (u *FiatUpsertBulk) SetUnit(v string) *FiatUpsertBulk {
+	return u.Update(func(s *FiatUpsert) {
+		s.SetUnit(v)
+	})
+}
+
+// UpdateUnit sets the "unit" field to the value that was provided on create.
+func (u *FiatUpsertBulk) UpdateUnit() *FiatUpsertBulk {
+	return u.Update(func(s *FiatUpsert) {
+		s.UpdateUnit()
+	})
+}
+
+// ClearUnit clears the value of the "unit" field.
+func (u *FiatUpsertBulk) ClearUnit() *FiatUpsertBulk {
+	return u.Update(func(s *FiatUpsert) {
+		s.ClearUnit()
 	})
 }
 

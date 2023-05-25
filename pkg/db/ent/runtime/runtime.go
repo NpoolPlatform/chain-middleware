@@ -617,6 +617,10 @@ func init() {
 	fiatDescLogo := fiatFields[2].Descriptor()
 	// fiat.DefaultLogo holds the default value on creation for the logo field.
 	fiat.DefaultLogo = fiatDescLogo.Default.(string)
+	// fiatDescUnit is the schema descriptor for unit field.
+	fiatDescUnit := fiatFields[3].Descriptor()
+	// fiat.DefaultUnit holds the default value on creation for the unit field.
+	fiat.DefaultUnit = fiatDescUnit.Default.(string)
 	// fiatDescID is the schema descriptor for id field.
 	fiatDescID := fiatFields[0].Descriptor()
 	// fiat.DefaultID holds the default value on creation for the id field.

@@ -241,6 +241,7 @@ var (
 		{Name: "deleted_at", Type: field.TypeUint32},
 		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "logo", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "unit", Type: field.TypeString, Nullable: true, Default: ""},
 	}
 	// FiatsTable holds the schema information for the "fiats" table.
 	FiatsTable = &schema.Table{

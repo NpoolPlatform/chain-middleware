@@ -22,6 +22,8 @@ const (
 	FieldName = "name"
 	// FieldLogo holds the string denoting the logo field in the database.
 	FieldLogo = "logo"
+	// FieldUnit holds the string denoting the unit field in the database.
+	FieldUnit = "unit"
 	// Table holds the table name of the fiat in the database.
 	Table = "fiats"
 )
@@ -34,6 +36,7 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldName,
 	FieldLogo,
+	FieldUnit,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -67,6 +70,8 @@ var (
 	DefaultName string
 	// DefaultLogo holds the default value on creation for the "logo" field.
 	DefaultLogo string
+	// DefaultUnit holds the default value on creation for the "unit" field.
+	DefaultUnit string
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

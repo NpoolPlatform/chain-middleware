@@ -26,6 +26,8 @@ type Fiat struct {
 	Name string `json:"name,omitempty"`
 	// Logo holds the value of the "logo" field.
 	Logo string `json:"logo,omitempty"`
+	// Unit holds the value of the "unit" field.
+	Unit string `json:"unit,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,7 +37,7 @@ func (*Fiat) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case fiat.FieldCreatedAt, fiat.FieldUpdatedAt, fiat.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
-		case fiat.FieldName, fiat.FieldLogo:
+		case fiat.FieldName, fiat.FieldLogo, fiat.FieldUnit:
 			values[i] = new(sql.NullString)
 		case fiat.FieldID:
 			values[i] = new(uuid.UUID)
@@ -90,6 +92,12 @@ func (f *Fiat) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				f.Logo = value.String
 			}
+		case fiat.FieldUnit:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field unit", values[i])
+			} else if value.Valid {
+				f.Unit = value.String
+			}
 		}
 	}
 	return nil
@@ -132,6 +140,9 @@ func (f *Fiat) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("logo=")
 	builder.WriteString(f.Logo)
+	builder.WriteString(", ")
+	builder.WriteString("unit=")
+	builder.WriteString(f.Unit)
 	builder.WriteByte(')')
 	return builder.String()
 }

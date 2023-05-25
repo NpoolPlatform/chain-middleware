@@ -264,6 +264,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			fiat.FieldDeletedAt: {Type: field.TypeUint32, Column: fiat.FieldDeletedAt},
 			fiat.FieldName:      {Type: field.TypeString, Column: fiat.FieldName},
 			fiat.FieldLogo:      {Type: field.TypeString, Column: fiat.FieldLogo},
+			fiat.FieldUnit:      {Type: field.TypeString, Column: fiat.FieldUnit},
 		},
 	}
 	graph.Nodes[11] = &sqlgraph.Node{
@@ -1297,6 +1298,11 @@ func (f *FiatFilter) WhereName(p entql.StringP) {
 // WhereLogo applies the entql string predicate on the logo field.
 func (f *FiatFilter) WhereLogo(p entql.StringP) {
 	f.Where(p.Field(fiat.FieldLogo))
+}
+
+// WhereUnit applies the entql string predicate on the unit field.
+func (f *FiatFilter) WhereUnit(p entql.StringP) {
+	f.Where(p.Field(fiat.FieldUnit))
 }
 
 // addPredicate implements the predicateAdder interface.

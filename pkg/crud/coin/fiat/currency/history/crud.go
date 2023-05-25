@@ -54,6 +54,8 @@ type Conds struct {
 	ID          *cruder.Cond
 	CoinTypeID  *cruder.Cond
 	CoinTypeIDs *cruder.Cond
+	StartAt     *cruder.Cond
+	EndAt       *cruder.Cond
 }
 
 func SetQueryConds(q *ent.CoinFiatCurrencyHistoryQuery, conds *Conds) (*ent.CoinFiatCurrencyHistoryQuery, error) {
@@ -77,6 +79,34 @@ func SetQueryConds(q *ent.CoinFiatCurrencyHistoryQuery, conds *Conds) (*ent.Coin
 		switch conds.CoinTypeIDs.Op {
 		case cruder.EQ:
 			q.Where(entcurrencyhis.CoinTypeIDIn(ids...))
+		default:
+			return nil, fmt.Errorf("invalid currency field")
+		}
+	}
+	if conds.StartAt != nil {
+		at, ok := conds.StartAt.Val.(uint32)
+		if !ok {
+			return nil, fmt.Errorf("invalid startat")
+		}
+		switch conds.StartAt.Op {
+		case cruder.LTE:
+			q.Where(entcurrencyhis.CreatedAtLTE(at))
+		case cruder.GTE:
+			q.Where(entcurrencyhis.CreatedAtGTE(at))
+		default:
+			return nil, fmt.Errorf("invalid currency field")
+		}
+	}
+	if conds.EndAt != nil {
+		at, ok := conds.EndAt.Val.(uint32)
+		if !ok {
+			return nil, fmt.Errorf("invalid endat")
+		}
+		switch conds.EndAt.Op {
+		case cruder.GTE:
+			q.Where(entcurrencyhis.CreatedAtGTE(at))
+		case cruder.LTE:
+			q.Where(entcurrencyhis.CreatedAtLTE(at))
 		default:
 			return nil, fmt.Errorf("invalid currency field")
 		}

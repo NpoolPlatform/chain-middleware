@@ -123,6 +123,26 @@ func (fu *FiatUpdate) ClearLogo() *FiatUpdate {
 	return fu
 }
 
+// SetUnit sets the "unit" field.
+func (fu *FiatUpdate) SetUnit(s string) *FiatUpdate {
+	fu.mutation.SetUnit(s)
+	return fu
+}
+
+// SetNillableUnit sets the "unit" field if the given value is not nil.
+func (fu *FiatUpdate) SetNillableUnit(s *string) *FiatUpdate {
+	if s != nil {
+		fu.SetUnit(*s)
+	}
+	return fu
+}
+
+// ClearUnit clears the value of the "unit" field.
+func (fu *FiatUpdate) ClearUnit() *FiatUpdate {
+	fu.mutation.ClearUnit()
+	return fu
+}
+
 // Mutation returns the FiatMutation object of the builder.
 func (fu *FiatUpdate) Mutation() *FiatMutation {
 	return fu.mutation
@@ -289,6 +309,19 @@ func (fu *FiatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: fiat.FieldLogo,
 		})
 	}
+	if value, ok := fu.mutation.Unit(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: fiat.FieldUnit,
+		})
+	}
+	if fu.mutation.UnitCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: fiat.FieldUnit,
+		})
+	}
 	_spec.Modifiers = fu.modifiers
 	if n, err = sqlgraph.UpdateNodes(ctx, fu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -402,6 +435,26 @@ func (fuo *FiatUpdateOne) SetNillableLogo(s *string) *FiatUpdateOne {
 // ClearLogo clears the value of the "logo" field.
 func (fuo *FiatUpdateOne) ClearLogo() *FiatUpdateOne {
 	fuo.mutation.ClearLogo()
+	return fuo
+}
+
+// SetUnit sets the "unit" field.
+func (fuo *FiatUpdateOne) SetUnit(s string) *FiatUpdateOne {
+	fuo.mutation.SetUnit(s)
+	return fuo
+}
+
+// SetNillableUnit sets the "unit" field if the given value is not nil.
+func (fuo *FiatUpdateOne) SetNillableUnit(s *string) *FiatUpdateOne {
+	if s != nil {
+		fuo.SetUnit(*s)
+	}
+	return fuo
+}
+
+// ClearUnit clears the value of the "unit" field.
+func (fuo *FiatUpdateOne) ClearUnit() *FiatUpdateOne {
+	fuo.mutation.ClearUnit()
 	return fuo
 }
 
@@ -599,6 +652,19 @@ func (fuo *FiatUpdateOne) sqlSave(ctx context.Context) (_node *Fiat, err error) 
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: fiat.FieldLogo,
+		})
+	}
+	if value, ok := fuo.mutation.Unit(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: fiat.FieldUnit,
+		})
+	}
+	if fuo.mutation.UnitCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: fiat.FieldUnit,
 		})
 	}
 	_spec.Modifiers = fuo.modifiers
