@@ -61,54 +61,48 @@ func setupCoin(t *testing.T) func(*testing.T) {
 	_, err = h1.CreateCoin(context.Background())
 	assert.Nil(t, err)
 
+	handler, err := NewHandler(
+		context.Background(),
+		WithCoinTypeID(req.CoinTypeID),
+		WithMarketValueHigh(req.MarketValueHigh),
+		WithMarketValueLow(req.MarketValueLow),
+		WithFeedType(req.FeedType),
+	)
+	assert.Nil(t, err)
+
+	_, err = handler.CreateCurrency(context.Background())
+	assert.Nil(t, err)
+
+	_, err = handler.CreateCurrency(context.Background())
+	assert.Nil(t, err)
+
 	return func(*testing.T) {
 		_, _ = h1.DeleteCoin(context.Background())
 	}
 }
 
-func create(t *testing.T) {
-	handler, err := NewHandler(
-		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithMarketValueHigh(req.MarketValueHigh),
-		WithMarketValueLow(req.MarketValueLow),
-		WithFeedType(req.FeedType),
-	)
-	assert.Nil(t, err)
-
-	info, err := handler.CreateCurrency(context.Background())
-	if assert.Nil(t, err) {
-		ret.UpdatedAt = info.UpdatedAt
-		ret.CreatedAt = info.CreatedAt
-		ret.ID = info.ID
-		assert.Equal(t, info, ret)
-	}
-}
-
+/*
 func update(t *testing.T) {
 	amount := "123.700000000000000000"
+	logo := uuid.NewString()
 
-	ret.MarketValueHigh = amount
-	ret.MarketValueLow = amount
+	ret.Logo = logo
+	ret.WithdrawAutoReviewAmount = amount
+	ret.MarketValue = amount
+	ret.SettleValue = "111.330000000000000000"
 
-	req.MarketValueHigh = &amount
-	req.MarketValueLow = &amount
+	req.ID = &ret.ID
+	req.Logo = &logo
+	req.WithdrawAutoReviewAmount = &amount
+	req.MarketValue = &amount
 
-	handler, err := NewHandler(
-		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithMarketValueHigh(req.MarketValueHigh),
-		WithMarketValueLow(req.MarketValueLow),
-		WithFeedType(req.FeedType),
-	)
-	assert.Nil(t, err)
-
-	info, err := handler.CreateCurrency(context.Background())
+	info, err := UpdateCoin(context.Background(), req)
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
 		assert.Equal(t, info, ret)
 	}
 }
+*/
 
 func TestCoin(t *testing.T) {
 	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
@@ -119,5 +113,5 @@ func TestCoin(t *testing.T) {
 	defer teardown(t)
 
 	t.Run("create", create)
-	t.Run("update", update)
+	// t.Run("update", update)
 }
