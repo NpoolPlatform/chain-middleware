@@ -2,6 +2,7 @@ package appcoin
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
@@ -89,7 +90,7 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 
 func GetCoinOnly(ctx context.Context, conds *npool.Conds) (*npool.Coin, error) {
 	infos, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
-		resp, err := cli.GetCoinOnly(ctx, &npool.GetCoinOnlyRequest{
+		resp, err := cli.GetCoins(ctx, &npool.GetCoinsRequest{
 			Conds:  conds,
 			Offset: 0,
 			Limit:  2,
@@ -102,10 +103,10 @@ func GetCoinOnly(ctx context.Context, conds *npool.Conds) (*npool.Coin, error) {
 	if err != nil {
 		return nil, err
 	}
-	if len(infos) == 0 {
+	if len(infos.([]*npool.Coin)) == 0 {
 		return nil, nil
 	}
-	if len(infos) > 1 {
+	if len(infos.([]*npool.Coin)) > 1 {
 		return nil, fmt.Errorf("too many record")
 	}
 	return infos.([]*npool.Coin)[0], nil
@@ -130,7 +131,9 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 func DeleteCoin(ctx context.Context, id string) (*npool.Coin, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.DeleteCoin(ctx, &npool.DeleteCoinRequest{
-			ID: id,
+			Info: &npool.CoinReq{
+				ID: &id,
+			},
 		})
 		if err != nil {
 			return nil, err
