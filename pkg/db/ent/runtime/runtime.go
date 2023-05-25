@@ -9,6 +9,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
@@ -279,6 +280,54 @@ func init() {
 	coinextraDescID := coinextraFields[0].Descriptor()
 	// coinextra.DefaultID holds the default value on creation for the id field.
 	coinextra.DefaultID = coinextraDescID.Default.(func() uuid.UUID)
+	coinfiatcurrencyMixin := schema.CoinFiatCurrency{}.Mixin()
+	coinfiatcurrency.Policy = privacy.NewPolicies(coinfiatcurrencyMixin[0], schema.CoinFiatCurrency{})
+	coinfiatcurrency.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := coinfiatcurrency.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	coinfiatcurrencyMixinFields0 := coinfiatcurrencyMixin[0].Fields()
+	_ = coinfiatcurrencyMixinFields0
+	coinfiatcurrencyFields := schema.CoinFiatCurrency{}.Fields()
+	_ = coinfiatcurrencyFields
+	// coinfiatcurrencyDescCreatedAt is the schema descriptor for created_at field.
+	coinfiatcurrencyDescCreatedAt := coinfiatcurrencyMixinFields0[0].Descriptor()
+	// coinfiatcurrency.DefaultCreatedAt holds the default value on creation for the created_at field.
+	coinfiatcurrency.DefaultCreatedAt = coinfiatcurrencyDescCreatedAt.Default.(func() uint32)
+	// coinfiatcurrencyDescUpdatedAt is the schema descriptor for updated_at field.
+	coinfiatcurrencyDescUpdatedAt := coinfiatcurrencyMixinFields0[1].Descriptor()
+	// coinfiatcurrency.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	coinfiatcurrency.DefaultUpdatedAt = coinfiatcurrencyDescUpdatedAt.Default.(func() uint32)
+	// coinfiatcurrency.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	coinfiatcurrency.UpdateDefaultUpdatedAt = coinfiatcurrencyDescUpdatedAt.UpdateDefault.(func() uint32)
+	// coinfiatcurrencyDescDeletedAt is the schema descriptor for deleted_at field.
+	coinfiatcurrencyDescDeletedAt := coinfiatcurrencyMixinFields0[2].Descriptor()
+	// coinfiatcurrency.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	coinfiatcurrency.DefaultDeletedAt = coinfiatcurrencyDescDeletedAt.Default.(func() uint32)
+	// coinfiatcurrencyDescCoinTypeID is the schema descriptor for coin_type_id field.
+	coinfiatcurrencyDescCoinTypeID := coinfiatcurrencyFields[1].Descriptor()
+	// coinfiatcurrency.DefaultCoinTypeID holds the default value on creation for the coin_type_id field.
+	coinfiatcurrency.DefaultCoinTypeID = coinfiatcurrencyDescCoinTypeID.Default.(func() uuid.UUID)
+	// coinfiatcurrencyDescFiatID is the schema descriptor for fiat_id field.
+	coinfiatcurrencyDescFiatID := coinfiatcurrencyFields[2].Descriptor()
+	// coinfiatcurrency.DefaultFiatID holds the default value on creation for the fiat_id field.
+	coinfiatcurrency.DefaultFiatID = coinfiatcurrencyDescFiatID.Default.(func() uuid.UUID)
+	// coinfiatcurrencyDescFeedType is the schema descriptor for feed_type field.
+	coinfiatcurrencyDescFeedType := coinfiatcurrencyFields[3].Descriptor()
+	// coinfiatcurrency.DefaultFeedType holds the default value on creation for the feed_type field.
+	coinfiatcurrency.DefaultFeedType = coinfiatcurrencyDescFeedType.Default.(string)
+	// coinfiatcurrencyDescMarketValueLow is the schema descriptor for market_value_low field.
+	coinfiatcurrencyDescMarketValueLow := coinfiatcurrencyFields[4].Descriptor()
+	// coinfiatcurrency.DefaultMarketValueLow holds the default value on creation for the market_value_low field.
+	coinfiatcurrency.DefaultMarketValueLow = coinfiatcurrencyDescMarketValueLow.Default.(decimal.Decimal)
+	// coinfiatcurrencyDescMarketValueHigh is the schema descriptor for market_value_high field.
+	coinfiatcurrencyDescMarketValueHigh := coinfiatcurrencyFields[5].Descriptor()
+	// coinfiatcurrency.DefaultMarketValueHigh holds the default value on creation for the market_value_high field.
+	coinfiatcurrency.DefaultMarketValueHigh = coinfiatcurrencyDescMarketValueHigh.Default.(decimal.Decimal)
 	currencyMixin := schema.Currency{}.Mixin()
 	currency.Policy = privacy.NewPolicies(currencyMixin[0], schema.Currency{})
 	currency.Hooks[0] = func(next ent.Mutator) ent.Mutator {

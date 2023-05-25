@@ -90,6 +90,24 @@ var (
 		Columns:    CoinExtrasColumns,
 		PrimaryKey: []*schema.Column{CoinExtrasColumns[0]},
 	}
+	// CoinFiatCurrenciesColumns holds the columns for the "coin_fiat_currencies" table.
+	CoinFiatCurrenciesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
+		{Name: "market_value_low", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
+		{Name: "market_value_high", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
+	}
+	// CoinFiatCurrenciesTable holds the schema information for the "coin_fiat_currencies" table.
+	CoinFiatCurrenciesTable = &schema.Table{
+		Name:       "coin_fiat_currencies",
+		Columns:    CoinFiatCurrenciesColumns,
+		PrimaryKey: []*schema.Column{CoinFiatCurrenciesColumns[0]},
+	}
 	// CurrenciesColumns holds the columns for the "currencies" table.
 	CurrenciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -329,6 +347,7 @@ var (
 		CoinBasesTable,
 		CoinDescriptionsTable,
 		CoinExtrasTable,
+		CoinFiatCurrenciesTable,
 		CurrenciesTable,
 		CurrencyFeedsTable,
 		CurrencyHistoriesTable,
