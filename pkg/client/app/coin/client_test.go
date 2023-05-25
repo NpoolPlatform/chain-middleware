@@ -17,7 +17,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	commonpb "github.com/NpoolPlatform/message/npool"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/appcoin"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
 	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	"github.com/stretchr/testify/assert"
 
