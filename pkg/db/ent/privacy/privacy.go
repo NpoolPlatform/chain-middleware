@@ -270,6 +270,30 @@ func (f CoinFiatCurrencyMutationRuleFunc) EvalMutation(ctx context.Context, m en
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.CoinFiatCurrencyMutation", m)
 }
 
+// The CoinFiatCurrencyHistoryQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type CoinFiatCurrencyHistoryQueryRuleFunc func(context.Context, *ent.CoinFiatCurrencyHistoryQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f CoinFiatCurrencyHistoryQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.CoinFiatCurrencyHistoryQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.CoinFiatCurrencyHistoryQuery", q)
+}
+
+// The CoinFiatCurrencyHistoryMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type CoinFiatCurrencyHistoryMutationRuleFunc func(context.Context, *ent.CoinFiatCurrencyHistoryMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f CoinFiatCurrencyHistoryMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.CoinFiatCurrencyHistoryMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.CoinFiatCurrencyHistoryMutation", m)
+}
+
 // The CurrencyQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type CurrencyQueryRuleFunc func(context.Context, *ent.CurrencyQuery) error
@@ -555,6 +579,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.CoinFiatCurrencyQuery:
 		return q.Filter(), nil
+	case *ent.CoinFiatCurrencyHistoryQuery:
+		return q.Filter(), nil
 	case *ent.CurrencyQuery:
 		return q.Filter(), nil
 	case *ent.CurrencyFeedQuery:
@@ -591,6 +617,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.CoinExtraMutation:
 		return m.Filter(), nil
 	case *ent.CoinFiatCurrencyMutation:
+		return m.Filter(), nil
+	case *ent.CoinFiatCurrencyHistoryMutation:
 		return m.Filter(), nil
 	case *ent.CurrencyMutation:
 		return m.Filter(), nil

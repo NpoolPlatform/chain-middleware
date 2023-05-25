@@ -15,6 +15,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrency"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
@@ -45,21 +46,22 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		appcoin.Table:             appcoin.ValidColumn,
-		coinbase.Table:            coinbase.ValidColumn,
-		coindescription.Table:     coindescription.ValidColumn,
-		coinextra.Table:           coinextra.ValidColumn,
-		coinfiatcurrency.Table:    coinfiatcurrency.ValidColumn,
-		currency.Table:            currency.ValidColumn,
-		currencyfeed.Table:        currencyfeed.ValidColumn,
-		currencyhistory.Table:     currencyhistory.ValidColumn,
-		exchangerate.Table:        exchangerate.ValidColumn,
-		fiat.Table:                fiat.ValidColumn,
-		fiatcurrency.Table:        fiatcurrency.ValidColumn,
-		fiatcurrencyfeed.Table:    fiatcurrencyfeed.ValidColumn,
-		fiatcurrencyhistory.Table: fiatcurrencyhistory.ValidColumn,
-		setting.Table:             setting.ValidColumn,
-		tran.Table:                tran.ValidColumn,
+		appcoin.Table:                 appcoin.ValidColumn,
+		coinbase.Table:                coinbase.ValidColumn,
+		coindescription.Table:         coindescription.ValidColumn,
+		coinextra.Table:               coinextra.ValidColumn,
+		coinfiatcurrency.Table:        coinfiatcurrency.ValidColumn,
+		coinfiatcurrencyhistory.Table: coinfiatcurrencyhistory.ValidColumn,
+		currency.Table:                currency.ValidColumn,
+		currencyfeed.Table:            currencyfeed.ValidColumn,
+		currencyhistory.Table:         currencyhistory.ValidColumn,
+		exchangerate.Table:            exchangerate.ValidColumn,
+		fiat.Table:                    fiat.ValidColumn,
+		fiatcurrency.Table:            fiatcurrency.ValidColumn,
+		fiatcurrencyfeed.Table:        fiatcurrencyfeed.ValidColumn,
+		fiatcurrencyhistory.Table:     fiatcurrencyhistory.ValidColumn,
+		setting.Table:                 setting.ValidColumn,
+		tran.Table:                    tran.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

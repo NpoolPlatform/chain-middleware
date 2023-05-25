@@ -74,6 +74,19 @@ func (f CoinFiatCurrencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.V
 	return f(ctx, mv)
 }
 
+// The CoinFiatCurrencyHistoryFunc type is an adapter to allow the use of ordinary
+// function as CoinFiatCurrencyHistory mutator.
+type CoinFiatCurrencyHistoryFunc func(context.Context, *ent.CoinFiatCurrencyHistoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CoinFiatCurrencyHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CoinFiatCurrencyHistoryMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CoinFiatCurrencyHistoryMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The CurrencyFunc type is an adapter to allow the use of ordinary
 // function as Currency mutator.
 type CurrencyFunc func(context.Context, *ent.CurrencyMutation) (ent.Value, error)
