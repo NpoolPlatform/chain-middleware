@@ -53,6 +53,7 @@ func UpdateSet(u *ent.FiatCurrencyHistoryUpdateOne, req *Req) *ent.FiatCurrencyH
 type Conds struct {
 	ID      *cruder.Cond
 	FiatID  *cruder.Cond
+	FiatIDs *cruder.Cond
 	StartAt *cruder.Cond
 	EndAt   *cruder.Cond
 }
@@ -78,6 +79,18 @@ func SetQueryConds(q *ent.FiatCurrencyHistoryQuery, conds *Conds) (*ent.FiatCurr
 		switch conds.FiatID.Op {
 		case cruder.EQ:
 			q.Where(entfiatcurrencyhis.FiatID(id))
+		default:
+			return nil, fmt.Errorf("invalid fiatcurrency field")
+		}
+	}
+	if conds.FiatIDs != nil {
+		ids, ok := conds.FiatIDs.Val.([]uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid fiatids")
+		}
+		switch conds.FiatIDs.Op {
+		case cruder.EQ:
+			q.Where(entfiatcurrencyhis.FiatIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid fiatcurrency field")
 		}
