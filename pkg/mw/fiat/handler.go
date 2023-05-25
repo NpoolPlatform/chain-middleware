@@ -8,15 +8,14 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-
 	"github.com/google/uuid"
-	"github.com/shopspring/decimal"
 )
 
 type Handler struct {
 	ID     *uuid.UUID
 	Name   *string
 	Logo   *string
+	Unit   *string
 	Conds  *fiatcrud.Conds
 	Offset int32
 	Limit  int32
@@ -62,6 +61,19 @@ func WithName(name *string) func(context.Context, *Handler) error {
 func WithLogo(logo *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Logo = logo
+		return nil
+	}
+}
+
+func WithUnit(unit *string) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if unit == nil {
+			return nil
+		}
+		if *unit == "" {
+			return fmt.Errorf("invalid fiatunit")
+		}
+		h.Unit = unit
 		return nil
 	}
 }

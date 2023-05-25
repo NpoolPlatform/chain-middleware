@@ -49,6 +49,7 @@ func UpdateSet(u *ent.FiatUpdateOne, req *Req) *ent.FiatUpdateOne {
 type Conds struct {
 	ID   *cruder.Cond
 	Name *cruder.Cond
+	Unit *cruder.Cond
 }
 
 func SetQueryConds(q *ent.FiatQuery, conds *Conds) (*ent.FiatQuery, error) {
@@ -72,6 +73,18 @@ func SetQueryConds(q *ent.FiatQuery, conds *Conds) (*ent.FiatQuery, error) {
 		switch conds.Name.Op {
 		case cruder.EQ:
 			q.Where(entfiat.Name(name))
+		default:
+			return nil, fmt.Errorf("invalid fiat field")
+		}
+	}
+	if conds.Unit != nil {
+		unit, ok := conds.Unit.Val.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid name")
+		}
+		switch conds.Unit.Op {
+		case cruder.EQ:
+			q.Where(entfiat.Unit(unit))
 		default:
 			return nil, fmt.Errorf("invalid fiat field")
 		}
