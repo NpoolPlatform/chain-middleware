@@ -1,4 +1,4 @@
-package currency
+package currencyhistory
 
 import (
 	"context"
@@ -9,9 +9,12 @@ import (
 
 	testinit "github.com/NpoolPlatform/chain-middleware/pkg/testinit"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
+	currencymwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/history"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
+	currency1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin/currency"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +29,7 @@ func init() {
 	}
 }
 
-var ret = &npool.Currency{
+var ret = &currencymwpb.Currency{
 	CoinName:        "My BTC1",
 	CoinLogo:        uuid.NewString(),
 	CoinUnit:        "BTC",
@@ -37,7 +40,7 @@ var ret = &npool.Currency{
 	FeedTypeStr:     basetypes.CurrencyFeedType_CoinGecko.String(),
 }
 
-var req = &npool.CurrencyReq{
+var req = &currencymwpb.CurrencyReq{
 	FeedType:        &ret.FeedType,
 	MarketValueHigh: &ret.MarketValueHigh,
 	MarketValueLow:  &ret.MarketValueLow,
@@ -61,19 +64,19 @@ func setupCoin(t *testing.T) func(*testing.T) {
 	_, err = h1.CreateCoin(context.Background())
 	assert.Nil(t, err)
 
-	handler, err := NewHandler(
+	h2, err := currency1.NewHandler(
 		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithMarketValueHigh(req.MarketValueHigh),
-		WithMarketValueLow(req.MarketValueLow),
-		WithFeedType(req.FeedType),
+		currency1.WithCoinTypeID(req.CoinTypeID),
+		currency1.WithMarketValueHigh(req.MarketValueHigh),
+		currency1.WithMarketValueLow(req.MarketValueLow),
+		currency1.WithFeedType(req.FeedType),
 	)
 	assert.Nil(t, err)
 
-	_, err = handler.CreateCurrency(context.Background())
+	_, err = h2.CreateCurrency(context.Background())
 	assert.Nil(t, err)
 
-	_, err = handler.CreateCurrency(context.Background())
+	_, err = h2.CreateCurrency(context.Background())
 	assert.Nil(t, err)
 
 	return func(*testing.T) {
@@ -81,28 +84,22 @@ func setupCoin(t *testing.T) func(*testing.T) {
 	}
 }
 
-/*
-func update(t *testing.T) {
-	amount := "123.700000000000000000"
-	logo := uuid.NewString()
+func getMany(t *testing.T) {
+	handler, err := NewHandler(
+		context.Background(),
+		WithConds(&npool.Conds{
+			CoinTypeID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
+		}),
+		WithOffset(0),
+		WithLimit(100),
+	)
+	assert.Nil(t, err)
 
-	ret.Logo = logo
-	ret.WithdrawAutoReviewAmount = amount
-	ret.MarketValue = amount
-	ret.SettleValue = "111.330000000000000000"
-
-	req.ID = &ret.ID
-	req.Logo = &logo
-	req.WithdrawAutoReviewAmount = &amount
-	req.MarketValue = &amount
-
-	info, err := UpdateCoin(context.Background(), req)
-	if assert.Nil(t, err) {
-		ret.UpdatedAt = info.UpdatedAt
-		assert.Equal(t, info, ret)
-	}
+	infos, total, err := handler.GetCurrencies(context.Background())
+	assert.Nil(t, err)
+	assert.Equal(t, uint32(2), total)
+	assert.Equal(t, 2, len(infos))
 }
-*/
 
 func TestCoin(t *testing.T) {
 	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
@@ -112,6 +109,5 @@ func TestCoin(t *testing.T) {
 	teardown := setupCoin(t)
 	defer teardown(t)
 
-	t.Run("create", create)
-	// t.Run("update", update)
+	t.Run("getMany", getMany)
 }
