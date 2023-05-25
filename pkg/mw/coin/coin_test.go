@@ -24,7 +24,7 @@ func init() {
 }
 
 var ret = &npool.Coin{
-	Name:                        "bitcoin1",
+	Name:                        uuid.NewString(),
 	Unit:                        "BTC1",
 	ENV:                         "test",
 	ReservedAmount:              "0.000000000000000000",
@@ -36,7 +36,6 @@ var ret = &npool.Coin{
 	HotLowFeeAmount:             "0.000000000000000000",
 	HotWalletAccountAmount:      "0.000000000000000000",
 	PaymentAccountCollectAmount: "0.000000000000000000",
-	FeeCoinName:                 "bitcoin1",
 	FeeCoinUnit:                 "BTC1",
 	FeeCoinENV:                  "test",
 	LeastTransferAmount:         "0.000000000000000000",
@@ -48,14 +47,27 @@ var req = &npool.CoinReq{
 	ENV:  &ret.ENV,
 }
 
+func setupCoin(t *testing.T) func(*testing.T) {
+	ret.FeeCoinName = ret.Name
+	return func(*testing.T) {}
+}
+
 func create(t *testing.T) {
-	info, err := CreateCoin(context.Background(), req)
+	h1, err := NewHandler(
+		context.Background(),
+		WithName(&ret.Name),
+		WithUnit(&ret.Unit),
+		WithENV(&ret.ENV),
+	)
+	assert.Nil(t, err)
+
+	info, err := h1.CreateCoin(context.Background())
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
 		ret.FeeCoinTypeID = info.ID
-		assert.Equal(t, info, ret)
+		assert.Equal(t, info.String(), ret.String())
 	}
 }
 
@@ -90,17 +102,65 @@ func update(t *testing.T) {
 	req.PaymentAccountCollectAmount = &amount
 	req.LeastTransferAmount = &amount
 
-	info, err := UpdateCoin(context.Background(), req)
+	h1, err := NewHandler(
+		context.Background(),
+		WithID(req.ID),
+		WithName(req.Name),
+		WithUnit(req.Unit),
+		WithLogo(req.Logo),
+		WithReservedAmount(req.ReservedAmount),
+		WithHomePage(req.HomePage),
+		WithSpecs(req.Specs),
+		// TODO: this should be get from chain type
+		WithFeeCoinTypeID(req.FeeCoinTypeID),
+		WithWithdrawFeeByStableUSD(req.WithdrawFeeByStableUSD),
+		WithWithdrawFeeAmount(req.WithdrawFeeAmount),
+		WithCollectFeeAmount(req.CollectFeeAmount),
+		WithHotWalletFeeAmount(req.HotWalletFeeAmount),
+		WithLowFeeAmount(req.LowFeeAmount),
+		WithHotLowFeeAmount(req.HotLowFeeAmount),
+		WithHotWalletFeeAmount(req.HotWalletFeeAmount),
+		WithHotWalletAccountAmount(req.HotWalletAccountAmount),
+		WithPaymentAccountCollectAmount(req.PaymentAccountCollectAmount),
+		WithLeastTransferAmount(req.LeastTransferAmount),
+		WithPresale(req.Presale),
+		WithForPay(req.ForPay),
+		WithDisabled(req.Disabled),
+		// TODO: this should be in create from register coin
+		WithStableUSD(req.StableUSD),
+		// TODO: this should be in create from register coin
+		WithNeedMemo(req.NeedMemo),
+		WithRefreshCurrency(req.RefreshCurrency),
+	)
+	assert.Nil(t, err)
+
+	info, err := h1.UpdateCoin(context.Background())
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
-		assert.Equal(t, info, ret)
+		assert.Equal(t, info.String(), ret.String())
 	}
 }
 
-func TestTx(t *testing.T) {
+func delete(t *testing.T) {
+	h1, err := NewHandler(
+		context.Background(),
+		WithID(&ret.ID),
+	)
+	assert.Nil(t, err)
+
+	_, err = h1.DeleteCoin(context.Background())
+	assert.Nil(t, err)
+}
+
+func TestCoin(t *testing.T) {
 	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
 		return
 	}
+
+	teardown := setupCoin(t)
+	defer teardown(t)
+
 	t.Run("create", create)
 	t.Run("update", update)
+	t.Run("delete", delete)
 }

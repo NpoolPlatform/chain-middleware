@@ -96,7 +96,7 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 func create(t *testing.T) {
 	handler, err := NewHandler(
-		ctx,
+		context.Background(),
 		WithID(req.ID),
 		WithAppID(req.AppID),
 		WithCoinTypeID(req.CoinTypeID),
@@ -154,16 +154,16 @@ func update(t *testing.T) {
 
 func delete(t *testing.T) {
 	handler, err := NewHandler(
-		ctx,
+		context.Background(),
 		WithID(req.ID),
 	)
 	assert.Nil(t, err)
 
-	_, err := handler.DeleteCoin(context.Background())
+	_, err = handler.DeleteCoin(context.Background())
 	assert.Nil(t, err)
 }
 
-func TestTx(t *testing.T) {
+func TestCoin(t *testing.T) {
 	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
 		return
 	}

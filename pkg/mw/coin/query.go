@@ -179,12 +179,12 @@ func (h *Handler) GetCoins(ctx context.Context) ([]*npool.Coin, uint32, error) {
 	return handler.infos, handler.total, nil
 }
 
-func (h *Handler) GetCoinOnly(ctx context.Context) (info *npool.Coin, err error) {
+func (h *Handler) GetCoinOnly(ctx context.Context) (*npool.Coin, error) {
 	handler := &queryHandler{
 		Handler: h,
 	}
 
-	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		if err := handler.queryCoins(_ctx, cli); err != nil {
 			return err
 		}
@@ -192,7 +192,9 @@ func (h *Handler) GetCoinOnly(ctx context.Context) (info *npool.Coin, err error)
 		handler.stm.Offset(0).Limit(2)
 		return handler.scan(_ctx)
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	if len(handler.infos) == 0 {
 		return nil, nil
 	}
