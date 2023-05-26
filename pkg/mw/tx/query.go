@@ -15,6 +15,7 @@ import (
 	enttx "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/shopspring/decimal"
 )
 
 type queryHandler struct {
@@ -25,7 +26,7 @@ type queryHandler struct {
 }
 
 func (h *queryHandler) selectTx(stm *ent.TranQuery) {
-	h.stm.Select(
+	h.stm = stm.Select(
 		enttx.FieldID,
 		enttx.FieldCoinTypeID,
 		enttx.FieldFromAccountID,
@@ -98,6 +99,18 @@ func (h *queryHandler) formalize() {
 	for _, info := range h.infos {
 		info.Type = basetypes.TxType(basetypes.TxType_value[info.TypeStr])
 		info.State = basetypes.TxState(basetypes.TxState_value[info.StateStr])
+		amount, err := decimal.NewFromString(info.Amount)
+		if err != nil {
+			info.Amount = decimal.NewFromInt(0).String()
+		} else {
+			info.Amount = amount.String()
+		}
+		amount, err = decimal.NewFromString(info.FeeAmount)
+		if err != nil {
+			info.FeeAmount = decimal.NewFromInt(0).String()
+		} else {
+			info.FeeAmount = amount.String()
+		}
 	}
 }
 
