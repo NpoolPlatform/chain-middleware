@@ -58,39 +58,9 @@ func CreateSet(c *ent.TranCreate, req *Req) *ent.TranCreate {
 }
 
 func UpdateSet(u *ent.TranUpdateOne, req *Req) (*ent.TranUpdateOne, error) {
-	state, _ := u.Mutation().State()
-
 	if req.State != nil {
-		switch state {
-		case basetypes.TxState_TxStateCreated.String():
-			switch *req.State {
-			case basetypes.TxState_TxStateWait:
-			default:
-				return nil, fmt.Errorf("state is invalid")
-			}
-		case basetypes.TxState_TxStateWait.String():
-			switch *req.State {
-			case basetypes.TxState_TxStateTransferring:
-			default:
-				return nil, fmt.Errorf("state is invalid")
-			}
-		case basetypes.TxState_TxStateTransferring.String():
-			switch *req.State {
-			case basetypes.TxState_TxStateSuccessful:
-			case basetypes.TxState_TxStateFail:
-			default:
-				return nil, fmt.Errorf("state is invalid")
-			}
-		case basetypes.TxState_TxStateSuccessful.String():
-			fallthrough //nolint
-		case basetypes.TxState_TxStateFail.String():
-			fallthrough //nolint
-		default:
-			return nil, fmt.Errorf("state is invalid")
-		}
 		u = u.SetState(req.State.String())
 	}
-
 	if req.ChainTxID != nil {
 		u = u.SetChainTxID(*req.ChainTxID)
 	}

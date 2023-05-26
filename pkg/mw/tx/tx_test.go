@@ -98,31 +98,44 @@ func create(t *testing.T) {
 	}
 }
 
-/*
 func update(t *testing.T) {
-	state := basetypes.TxState_TxStateTransferring
+	ret.State = basetypes.TxState_TxStateWait
+	ret.StateStr = ret.State.String()
+	req.State = &ret.State
 
-	ret.State = state
+	handler, err := NewHandler(
+		context.Background(),
+		WithID(&ret.ID),
+		WithChainTxID(req.ChainTxID),
+		WithState(req.State),
+		WithExtra(req.Extra),
+		WithType(req.Type),
+	)
+	assert.Nil(t, err)
 
-	req.ID = &ret.ID
-	req.State = &state
-
-	_, err := UpdateTx(context.Background(), req)
-	assert.NotNil(t, err)
-
-	state = basetypes.TxState_TxStateWait
-
-	ret.State = state
-	ret.StateStr = state.String()
-	req.State = &state
-
-	info, err := UpdateTx(context.Background(), req)
+	info, err := handler.UpdateTx(context.Background())
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
 		assert.Equal(t, info, ret)
 	}
+
+	ret.State = basetypes.TxState_TxStateWait
+	ret.StateStr = ret.State.String()
+	req.State = &ret.State
+
+	handler, err = NewHandler(
+		context.Background(),
+		WithID(&ret.ID),
+		WithChainTxID(req.ChainTxID),
+		WithState(req.State),
+		WithExtra(req.Extra),
+		WithType(req.Type),
+	)
+	assert.Nil(t, err)
+
+	_, err = handler.UpdateTx(context.Background())
+	assert.NotNil(t, err)
 }
-*/
 
 func TestTx(t *testing.T) {
 	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
@@ -133,5 +146,5 @@ func TestTx(t *testing.T) {
 	defer teardown(t)
 
 	t.Run("create", create)
-	// t.Run("update", update)
+	t.Run("update", update)
 }
