@@ -25,7 +25,7 @@ type queryHandler struct {
 }
 
 func (h *queryHandler) selectCurrency(stm *ent.FiatCurrencyQuery) {
-	h.stm.Select(
+	h.stm = stm.Select(
 		entcurrency.FieldID,
 		entcurrency.FieldFiatID,
 		entcurrency.FieldFeedType,

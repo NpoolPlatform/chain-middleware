@@ -10,8 +10,6 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
 	entcurrency "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiatcurrency"
-
-	"github.com/google/uuid"
 )
 
 type createHandler struct {
@@ -35,19 +33,23 @@ func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx) error {
 	}
 
 	if info != nil {
-		if _, err := currencycrud.UpdateSet(
+		info, err = currencycrud.UpdateSet(
 			info.Update(),
 			&currencycrud.Req{
 				MarketValueHigh: h.MarketValueHigh,
 				MarketValueLow:  h.MarketValueLow,
 			},
-		).Save(ctx); err != nil {
+		).Save(ctx)
+		if err != nil {
 			return err
 		}
+
+		h.ID = &info.ID
+
 		return nil
 	}
 
-	if _, err := currencycrud.CreateSet(
+	info, err = currencycrud.CreateSet(
 		tx.FiatCurrency.Create(),
 		&currencycrud.Req{
 			ID:              h.ID,
@@ -56,9 +58,13 @@ func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx) error {
 			MarketValueHigh: h.MarketValueHigh,
 			MarketValueLow:  h.MarketValueLow,
 		},
-	).Save(ctx); err != nil {
+	).Save(ctx)
+	if err != nil {
 		return err
 	}
+
+	h.ID = &info.ID
+
 	return nil
 }
 
@@ -79,11 +85,6 @@ func (h *createHandler) createCurrencyHistory(ctx context.Context, tx *ent.Tx) e
 }
 
 func (h *Handler) CreateCurrency(ctx context.Context) (*npool.Currency, error) {
-	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
-	}
-
 	handler := &createHandler{
 		Handler: h,
 	}
