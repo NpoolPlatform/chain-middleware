@@ -52,7 +52,6 @@ func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx) error {
 	info, err = currencycrud.CreateSet(
 		tx.FiatCurrency.Create(),
 		&currencycrud.Req{
-			ID:              h.ID,
 			FiatID:          h.FiatID,
 			FeedType:        h.FeedType,
 			MarketValueHigh: h.MarketValueHigh,
@@ -72,7 +71,6 @@ func (h *createHandler) createCurrencyHistory(ctx context.Context, tx *ent.Tx) e
 	if _, err := currencyhiscrud.CreateSet(
 		tx.FiatCurrencyHistory.Create(),
 		&currencyhiscrud.Req{
-			ID:              h.ID,
 			FiatID:          h.FiatID,
 			FeedType:        h.FeedType,
 			MarketValueHigh: h.MarketValueHigh,
