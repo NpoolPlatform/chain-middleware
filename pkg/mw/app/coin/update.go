@@ -18,7 +18,7 @@ type updateHandler struct {
 }
 
 func (h *updateHandler) updateAppCoin(ctx context.Context, tx *ent.Tx) error {
-	if _, err := appcoincrud.UpdateSet(
+	info, err := appcoincrud.UpdateSet(
 		tx.AppCoin.UpdateOneID(*h.ID),
 		&appcoincrud.Req{
 			Name:                     h.Name,
@@ -32,9 +32,14 @@ func (h *updateHandler) updateAppCoin(ctx context.Context, tx *ent.Tx) error {
 			DisplayIndex:             h.DisplayIndex,
 			MaxAmountPerWithdraw:     h.MaxAmountPerWithdraw,
 		},
-	).Save(ctx); err != nil {
+	).Save(ctx)
+	if err != nil {
 		return err
 	}
+
+	h.AppID = &info.AppID
+	h.CoinTypeID = &info.CoinTypeID
+
 	return nil
 }
 

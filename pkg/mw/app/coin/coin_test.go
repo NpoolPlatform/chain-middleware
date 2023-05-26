@@ -128,7 +128,6 @@ func create(t *testing.T) {
 	}
 }
 
-/*
 func update(t *testing.T) {
 	amount := "123.700000000000000000"
 	logo := uuid.NewString()
@@ -143,13 +142,32 @@ func update(t *testing.T) {
 	req.WithdrawAutoReviewAmount = &amount
 	req.MarketValue = &amount
 
-	info, err := UpdateCoin(context.Background(), req)
+	handler, err := NewHandler(
+		context.Background(),
+		WithID(req.ID),
+		WithName(req.Name),
+		WithDisplayNames(req.DisplayNames),
+		WithLogo(req.Logo),
+		WithForPay(req.ForPay),
+		WithProductPage(req.ProductPage),
+		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount),
+		WithDailyRewardAmount(req.DailyRewardAmount),
+		WithDisplay(req.Display),
+		WithDisplayIndex(req.DisplayIndex),
+		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw),
+		WithMarketValue(req.MarketValue),
+		WithSettlePercent(req.SettlePercent),
+		WithSettleTips(req.SettleTips),
+		WithSetter(req.Setter),
+	)
+	assert.Nil(t, err)
+
+	info, err := handler.UpdateCoin(context.Background())
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
 		assert.Equal(t, info, ret)
 	}
 }
-*/
 
 func delete(t *testing.T) {
 	handler, err := NewHandler(
@@ -171,6 +189,6 @@ func TestCoin(t *testing.T) {
 	defer teardown(t)
 
 	t.Run("create", create)
-	// t.Run("update", update)
+	t.Run("update", update)
 	t.Run("delete", delete)
 }
