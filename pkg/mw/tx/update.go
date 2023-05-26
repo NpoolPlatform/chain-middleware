@@ -30,33 +30,33 @@ func (h *Handler) UpdateTx(ctx context.Context) (*npool.Tx, error) {
 			return err
 		}
 
-		if req.State != nil {
+		if h.State != nil {
 			switch info.State {
 			case basetypes.TxState_TxStateCreated.String():
-				switch *req.State {
+				switch *h.State {
 				case basetypes.TxState_TxStateWait:
 				default:
-					return fmt.Errorf("state is invalid: %v -> %v", info.State, req.State)
+					return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
 				}
 			case basetypes.TxState_TxStateWait.String():
-				switch *req.State {
+				switch *h.State {
 				case basetypes.TxState_TxStateTransferring:
 				default:
-					return fmt.Errorf("state is invalid: %v -> %v", info.State, req.State)
+					return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
 				}
 			case basetypes.TxState_TxStateTransferring.String():
-				switch *req.State {
+				switch *h.State {
 				case basetypes.TxState_TxStateSuccessful:
 				case basetypes.TxState_TxStateFail:
 				default:
-					return fmt.Errorf("state is invalid: %v -> %v", info.State, req.State)
+					return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
 				}
 			case basetypes.TxState_TxStateSuccessful.String():
 				fallthrough //nolint
 			case basetypes.TxState_TxStateFail.String():
 				fallthrough //nolint
 			default:
-				return fmt.Errorf("state is invalid: %v -> %v", info.State, req.State)
+				return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
 			}
 		}
 
