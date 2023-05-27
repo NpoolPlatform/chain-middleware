@@ -7,7 +7,6 @@ import (
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
 
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
 	servicename "github.com/NpoolPlatform/chain-middleware/pkg/servicename"
@@ -33,7 +32,7 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 	return handler(_ctx, cli)
 }
 
-func CreateTx(ctx context.Context, in *txmgrpb.TxReq) (*npool.Tx, error) {
+func CreateTx(ctx context.Context, in *npool.TxReq) (*npool.Tx, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.CreateTx(ctx, &npool.CreateTxRequest{
 			Info: in,
@@ -49,7 +48,7 @@ func CreateTx(ctx context.Context, in *txmgrpb.TxReq) (*npool.Tx, error) {
 	return info.(*npool.Tx), nil
 }
 
-func CreateTxs(ctx context.Context, in []*txmgrpb.TxReq) ([]*npool.Tx, error) {
+func CreateTxs(ctx context.Context, in []*npool.TxReq) ([]*npool.Tx, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.CreateTxs(ctx, &npool.CreateTxsRequest{
 			Infos: in,
@@ -81,7 +80,7 @@ func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 	return info.(*npool.Tx), nil
 }
 
-func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*npool.Tx, uint32, error) {
+func GetTxs(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Tx, uint32, error) {
 	var total uint32
 
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
@@ -104,7 +103,7 @@ func GetTxs(ctx context.Context, conds *txmgrpb.Conds, offset, limit int32) ([]*
 	return infos.([]*npool.Tx), total, nil
 }
 
-func UpdateTx(ctx context.Context, in *txmgrpb.TxReq) (*npool.Tx, error) {
+func UpdateTx(ctx context.Context, in *npool.TxReq) (*npool.Tx, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.UpdateTx(ctx, &npool.UpdateTxRequest{
 			Info: in,

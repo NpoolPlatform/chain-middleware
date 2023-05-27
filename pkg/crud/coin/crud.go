@@ -89,6 +89,7 @@ type Conds struct {
 	Names    *cruder.Cond
 }
 
+// nolint:funlen,gocyclo
 func SetQueryConds(q *ent.CoinBaseQuery, conds *Conds) (*ent.CoinBaseQuery, error) {
 	if conds.ID != nil {
 		id, ok := conds.ID.Val.(uuid.UUID)

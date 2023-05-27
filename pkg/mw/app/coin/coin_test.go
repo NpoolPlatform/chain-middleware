@@ -169,7 +169,7 @@ func update(t *testing.T) {
 	}
 }
 
-func delete(t *testing.T) {
+func _delete(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
 		WithID(&ret.ID),
@@ -190,5 +190,5 @@ func TestCoin(t *testing.T) {
 
 	t.Run("create", create)
 	t.Run("update", update)
-	t.Run("delete", delete)
+	t.Run("delete", _delete)
 }

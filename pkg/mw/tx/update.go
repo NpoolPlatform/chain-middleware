@@ -13,9 +13,53 @@ import (
 	enttran "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 )
 
+type updateHandler struct {
+	*Handler
+}
+
+func (h *updateHandler) validateState(info *ent.Tran) error {
+	if h.State == nil {
+		return nil
+	}
+
+	switch info.State {
+	case basetypes.TxState_TxStateCreated.String():
+		switch *h.State {
+		case basetypes.TxState_TxStateWait:
+		default:
+			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
+		}
+	case basetypes.TxState_TxStateWait.String():
+		switch *h.State {
+		case basetypes.TxState_TxStateTransferring:
+		default:
+			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
+		}
+	case basetypes.TxState_TxStateTransferring.String():
+		switch *h.State {
+		case basetypes.TxState_TxStateSuccessful:
+		case basetypes.TxState_TxStateFail:
+		default:
+			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
+		}
+	case basetypes.TxState_TxStateSuccessful.String():
+		fallthrough //nolint
+	case basetypes.TxState_TxStateFail.String():
+		fallthrough //nolint
+	default:
+		return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
+	}
+
+	return nil
+}
+
 func (h *Handler) UpdateTx(ctx context.Context) (*npool.Tx, error) {
 	if h.ID == nil {
 		return nil, fmt.Errorf("invalid id")
+	}
+
+	handler := &updateHandler{
+		Handler: h,
 	}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
@@ -30,34 +74,8 @@ func (h *Handler) UpdateTx(ctx context.Context) (*npool.Tx, error) {
 			return err
 		}
 
-		if h.State != nil {
-			switch info.State {
-			case basetypes.TxState_TxStateCreated.String():
-				switch *h.State {
-				case basetypes.TxState_TxStateWait:
-				default:
-					return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
-				}
-			case basetypes.TxState_TxStateWait.String():
-				switch *h.State {
-				case basetypes.TxState_TxStateTransferring:
-				default:
-					return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
-				}
-			case basetypes.TxState_TxStateTransferring.String():
-				switch *h.State {
-				case basetypes.TxState_TxStateSuccessful:
-				case basetypes.TxState_TxStateFail:
-				default:
-					return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
-				}
-			case basetypes.TxState_TxStateSuccessful.String():
-				fallthrough //nolint
-			case basetypes.TxState_TxStateFail.String():
-				fallthrough //nolint
-			default:
-				return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
-			}
+		if err := handler.validateState(info); err != nil {
+			return err
 		}
 
 		stm, err := txcrud.UpdateSet(

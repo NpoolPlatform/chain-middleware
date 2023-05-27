@@ -8,24 +8,18 @@ import (
 	"testing"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/testinit"
-
 	"github.com/NpoolPlatform/go-service-framework/pkg/config"
 
 	"bou.ke/monkey"
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	commonpb "github.com/NpoolPlatform/message/npool"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	txmgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
-	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
-	"github.com/stretchr/testify/assert"
-
-	coincrud "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
-
+	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/tx"
 
 	"github.com/google/uuid"
 )
@@ -39,33 +33,23 @@ func init() {
 	}
 }
 
-var name = uuid.NewString()
-var unit = uuid.NewString()
-var env = "main"
-
-var coinReq = &coinmwpb.CoinReq{
-	Name: &name,
-	Unit: &unit,
-	ENV:  &env,
-}
-
 var ret = &npool.Tx{
 	ID:            uuid.NewString(),
-	CoinName:      name,
-	CoinUnit:      unit,
-	CoinENV:       env,
+	CoinName:      uuid.NewString(),
+	CoinUnit:      "BTC",
+	CoinENV:       "test",
 	FromAccountID: uuid.NewString(),
 	ToAccountID:   uuid.NewString(),
 	Amount:        "123.345",
 	FeeAmount:     "2.001",
-	State:         txmgrpb.TxState_StateCreated,
-	StateStr:      txmgrpb.TxState_StateCreated.String(),
+	State:         basetypes.TxState_TxStateCreated,
+	StateStr:      basetypes.TxState_TxStateCreated.String(),
 	Extra:         uuid.NewString(),
 	Type:          basetypes.TxType_TxWithdraw,
 	TypeStr:       basetypes.TxType_TxWithdraw.String(),
 }
 
-var req = &txmgrpb.TxReq{
+var req = &npool.TxReq{
 	ID:            &ret.ID,
 	FromAccountID: &ret.FromAccountID,
 	ToAccountID:   &ret.ToAccountID,
@@ -76,13 +60,29 @@ var req = &txmgrpb.TxReq{
 	Type:          &ret.Type,
 }
 
-func createTx(t *testing.T) {
-	coin1, err := coincrud.CreateCoin(context.Background(), coinReq)
+func setupTx(t *testing.T) func(*testing.T) {
+	ret.CoinTypeID = uuid.NewString()
+	req.CoinTypeID = &ret.CoinTypeID
+
+	h1, err := coin1.NewHandler(
+		context.Background(),
+		coin1.WithID(&ret.CoinTypeID),
+		coin1.WithName(&ret.CoinName),
+		coin1.WithUnit(&ret.CoinUnit),
+		coin1.WithLogo(&ret.CoinLogo),
+		coin1.WithENV(&ret.CoinENV),
+	)
 	assert.Nil(t, err)
 
-	req.CoinTypeID = &coin1.ID
-	ret.CoinTypeID = coin1.ID
+	_, err = h1.CreateCoin(context.Background())
+	assert.Nil(t, err)
 
+	return func(*testing.T) {
+		_, _ = h1.DeleteCoin(context.Background())
+	}
+}
+
+func createTx(t *testing.T) {
 	info, err := CreateTx(context.Background(), req)
 	if assert.Nil(t, err) {
 		ret.CreatedAt = info.CreatedAt
@@ -93,7 +93,7 @@ func createTx(t *testing.T) {
 }
 
 func updateTx(t *testing.T) {
-	state := txmgrpb.TxState_StateTransferring
+	state := basetypes.TxState_TxStateTransferring
 
 	ret.State = state
 
@@ -103,7 +103,7 @@ func updateTx(t *testing.T) {
 	_, err := UpdateTx(context.Background(), req)
 	assert.NotNil(t, err)
 
-	state = txmgrpb.TxState_StateWait
+	state = basetypes.TxState_TxStateWait
 
 	ret.State = state
 	ret.StateStr = state.String()
@@ -124,11 +124,8 @@ func getTx(t *testing.T) {
 }
 
 func getTxs(t *testing.T) {
-	infos, total, err := GetTxs(context.Background(), &txmgrpb.Conds{
-		ID: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: ret.ID,
-		},
+	infos, total, err := GetTxs(context.Background(), &npool.Conds{
+		ID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
 	}, 0, 1)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
@@ -144,6 +141,9 @@ func TestClient(t *testing.T) {
 	// Here won't pass test due to we always test with localhost
 
 	gport := config.GetIntValueWithNameSpace("", config.KeyGRPCPort)
+
+	teardown := setupTx(t)
+	defer teardown(t)
 
 	monkey.Patch(grpc2.GetGRPCConn, func(service string, tags ...string) (*grpc.ClientConn, error) {
 		return grpc.Dial(fmt.Sprintf("localhost:%v", gport), grpc.WithTransportCredentials(insecure.NewCredentials()))

@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// nolint:lll
 func (s *Server) CreateCoinDescription(ctx context.Context, in *npool.CreateCoinDescriptionRequest) (*npool.CreateCoinDescriptionResponse, error) {
 	req := in.GetInfo()
 	handler, err := description1.NewHandler(

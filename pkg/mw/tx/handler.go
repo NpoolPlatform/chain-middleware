@@ -185,6 +185,7 @@ func WithType(_type *basetypes.TxType) func(context.Context, *Handler) error {
 	}
 }
 
+// nolint:gocyclo
 func WithReqs(reqs []*npool.TxReq) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		_reqs := []*txcrud.Req{}

@@ -40,6 +40,7 @@ func (s *Server) GetCoinDescription(ctx context.Context, in *npool.GetCoinDescri
 	}, nil
 }
 
+// nolint:lll
 func (s *Server) GetCoinDescriptions(ctx context.Context, in *npool.GetCoinDescriptionsRequest) (*npool.GetCoinDescriptionsResponse, error) {
 	handler, err := description1.NewHandler(
 		ctx,
