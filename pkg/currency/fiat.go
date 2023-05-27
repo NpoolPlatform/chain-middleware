@@ -1,3 +1,4 @@
+//nolint:dupl
 package currency
 
 import (
@@ -18,9 +19,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+//nolint:funlen,gocyclo
 func _refreshFiats(ctx context.Context, feedType basetypes.CurrencyFeedType) error {
 	offset := int32(0)
-	limit := int32(100)
+	const limit = int32(100)
 
 	for {
 		h1, err := fiatcurrencyfeed1.NewHandler(
@@ -63,8 +65,7 @@ func _refreshFiats(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 			return fmt.Errorf("invalid feeds")
 		}
 
-		prices := map[string]decimal.Decimal{}
-
+		var prices map[string]decimal.Decimal
 		switch feedType {
 		case basetypes.CurrencyFeedType_CoinGecko:
 			prices, err = coingecko.CoinGeckoUSDPrices(fiatNames)
@@ -136,8 +137,6 @@ func _refreshFiats(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 			return err
 		}
 	}
-
-	return nil
 }
 
 func refreshFiats(ctx context.Context) {

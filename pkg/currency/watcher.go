@@ -1,4 +1,3 @@
-//nolint:dupl
 package currency
 
 import (
@@ -11,13 +10,15 @@ import (
 
 func refresh(ctx context.Context, fiat bool) {
 	refreshCoins(ctx)
-	refreshFiats(ctx)
+	if fiat {
+		refreshFiats(ctx)
+	}
 }
 
 var w *watcher.Watcher
 
 func Watch(ctx context.Context) {
-	refreshTicker := time.NewTicker(60 * time.Second)
+	refreshTicker := time.NewTicker(60 * time.Second) //nolint
 	fiatRefreshCount := 0
 	w = watcher.NewWatcher()
 
