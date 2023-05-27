@@ -31,6 +31,7 @@ func _refreshCoins(ctx context.Context, coins []*coinmwpb.Coin, feedType basetyp
 		coincurrencyfeed1.WithConds(&coincurrencyfeedmwpb.Conds{
 			CoinTypeIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: ids},
 			FeedType:    &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(feedType)},
+			Disabled:    &basetypes.BoolVal{Op: cruder.EQ, Value: false},
 		}),
 		coincurrencyfeed1.WithOffset(0),
 		coincurrencyfeed1.WithLimit(int32(len(ids))),
@@ -53,18 +54,11 @@ func _refreshCoins(ctx context.Context, coins []*coinmwpb.Coin, feedType basetyp
 	}
 
 	feedMap := map[string]*coincurrencyfeedmwpb.Feed{}
+	coinNames := []string{}
+
 	for _, _feed := range feeds {
 		feedMap[_feed.CoinTypeID] = _feed
-	}
-
-	coinNames := []string{}
-	for _, _coin := range coins {
-		_feed, ok := feedMap[_coin.ID]
-		if ok {
-			coinNames = append(coinNames, _feed.FeedCoinName)
-			continue
-		}
-		coinNames = append(coinNames, _coin.Name)
+		coinNames = append(coinNames, _feed.FeedCoinName)
 	}
 
 	prices := map[string]decimal.Decimal{}
