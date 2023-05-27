@@ -53,7 +53,7 @@ var req = &npool.CurrencyReq{
 	MarketValueLow:  &ret.MarketValueLow,
 }
 
-func setupTx(t *testing.T) func(*testing.T) {
+func setupCurrency(t *testing.T) func(*testing.T) {
 	ret.FiatID = uuid.NewString()
 	req.FiatID = &ret.FiatID
 
@@ -112,7 +112,7 @@ func TestClient(t *testing.T) {
 	}
 	// Here won't pass test due to we always test with localhost
 
-	teardown := setupTx(t)
+	teardown := setupCurrency(t)
 	defer teardown(t)
 
 	gport := config.GetIntValueWithNameSpace("", config.KeyGRPCPort)
