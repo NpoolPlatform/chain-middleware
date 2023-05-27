@@ -32,7 +32,7 @@ func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*
 	}
 
 	key := fmt.Sprintf(
-		"%v:%v:%v:%v",
+		"%v:%v:%v",
 		basetypes.Prefix_PrefixCreateCoin,
 		req.GetName(),
 		req.GetENV(),

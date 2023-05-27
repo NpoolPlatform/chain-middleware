@@ -129,7 +129,9 @@ func (h *Handler) GetFiatOnly(ctx context.Context) (info *npool.Fiat, err error)
 		handler.stm.Offset(0).Limit(2)
 		return handler.scan(_ctx)
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	if len(handler.infos) == 0 {
 		return nil, nil
 	}

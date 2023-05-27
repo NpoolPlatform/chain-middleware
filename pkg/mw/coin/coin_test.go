@@ -47,6 +47,7 @@ var req = &npool.CoinReq{
 	ENV:  &ret.ENV,
 }
 
+//nolint
 func setupCoin(t *testing.T) func(*testing.T) {
 	ret.FeeCoinName = ret.Name
 	return func(*testing.T) {}
