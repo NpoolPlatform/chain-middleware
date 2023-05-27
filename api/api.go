@@ -9,10 +9,12 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/api/app/coin/description"
 	"github.com/NpoolPlatform/chain-middleware/api/coin"
 	coincurrency "github.com/NpoolPlatform/chain-middleware/api/coin/currency"
+	coincurrencyfeed "github.com/NpoolPlatform/chain-middleware/api/coin/currency/feed"
 	coincurrencyhis "github.com/NpoolPlatform/chain-middleware/api/coin/currency/history"
 	coinfiatcurrencyhis "github.com/NpoolPlatform/chain-middleware/api/coin/fiat/currency/history"
 	"github.com/NpoolPlatform/chain-middleware/api/fiat"
 	fiatcurrency "github.com/NpoolPlatform/chain-middleware/api/fiat/currency"
+	fiatcurrencyfeed "github.com/NpoolPlatform/chain-middleware/api/fiat/currency/feed"
 	fiatcurrencyhis "github.com/NpoolPlatform/chain-middleware/api/fiat/currency/history"
 	tran "github.com/NpoolPlatform/chain-middleware/api/tx"
 
@@ -30,10 +32,12 @@ func Register(server grpc.ServiceRegistrar) {
 	description.Register(server)
 	coin.Register(server)
 	coincurrency.Register(server)
+	coincurrencyfeed.Register(server)
 	coincurrencyhis.Register(server)
 	coinfiatcurrencyhis.Register(server)
 	fiat.Register(server)
 	fiatcurrency.Register(server)
+	fiatcurrencyfeed.Register(server)
 	fiatcurrencyhis.Register(server)
 	tran.Register(server)
 }
