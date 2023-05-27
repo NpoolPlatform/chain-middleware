@@ -16,12 +16,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	commonpb "github.com/NpoolPlatform/message/npool"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	"github.com/stretchr/testify/assert"
 
-	coincrud "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
+	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
@@ -35,12 +34,6 @@ func init() {
 	if err := testinit.Init(); err != nil {
 		fmt.Printf("cannot init test stub: %v\n", err)
 	}
-}
-
-var coinReq = &coinmwpb.CoinReq{
-	Name: &ret.Name,
-	Unit: &ret.Unit,
-	ENV:  &ret.ENV,
 }
 
 var name = uuid.NewString()
@@ -99,13 +92,30 @@ var req = &npool.CoinReq{
 	MaxAmountPerWithdraw:     &ret.MaxAmountPerWithdraw,
 }
 
-func createCoin(t *testing.T) {
-	coin1, err := coincrud.CreateCoin(context.Background(), coinReq)
+func setupAppCoin(t *testing.T) func(*testing.T) {
+	ret.CoinTypeID = uuid.NewString()
+	ret.FeeCoinLogo = ret.Logo
+	req.CoinTypeID = &ret.CoinTypeID
+
+	h1, err := coin1.NewHandler(
+		context.Background(),
+		coin1.WithID(&ret.CoinTypeID),
+		coin1.WithName(&ret.CoinName),
+		coin1.WithUnit(&ret.Unit),
+		coin1.WithLogo(&ret.Logo),
+		coin1.WithENV(&ret.ENV),
+	)
 	assert.Nil(t, err)
 
-	req.CoinTypeID = &coin1.ID
-	ret.CoinTypeID = coin1.ID
+	_, err = h1.CreateCoin(context.Background())
+	assert.Nil(t, err)
 
+	return func(*testing.T) {
+		_, _ = h1.DeleteCoin(context.Background())
+	}
+}
+
+func createCoin(t *testing.T) {
 	info, err := CreateCoin(context.Background(), req)
 	if assert.Nil(t, err) {
 		ret.CreatedAt = info.CreatedAt
@@ -148,11 +158,8 @@ func getCoin(t *testing.T) {
 
 func getCoins(t *testing.T) {
 	infos, total, err := GetCoins(context.Background(), &npool.Conds{
-		ID: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: ret.ID,
-		},
-	}, 0, 1)
+		ID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+	}, 0, 100)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
 		assert.Equal(t, total, uint32(1))
@@ -168,8 +175,9 @@ func deleteCoin(t *testing.T) {
 		assert.Equal(t, info, ret)
 	}
 
-	_, err = GetCoin(context.Background(), ret.ID)
-	assert.NotNil(t, err)
+	info, err = GetCoin(context.Background(), ret.ID)
+	assert.Nil(t, err)
+	assert.Nil(t, info)
 }
 
 func TestClient(t *testing.T) {
@@ -177,6 +185,9 @@ func TestClient(t *testing.T) {
 		return
 	}
 	// Here won't pass test due to we always test with localhost
+
+	teardown := setupAppCoin(t)
+	defer teardown(t)
 
 	gport := config.GetIntValueWithNameSpace("", config.KeyGRPCPort)
 
