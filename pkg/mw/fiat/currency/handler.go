@@ -20,6 +20,7 @@ type Handler struct {
 	FeedType        *basetypes.CurrencyFeedType
 	MarketValueHigh *decimal.Decimal
 	MarketValueLow  *decimal.Decimal
+	Reqs            []*currencycrud.Req
 	Conds           *currencycrud.Conds
 	Offset          int32
 	Limit           int32
@@ -104,6 +105,56 @@ func WithMarketValueLow(value *string) func(context.Context, *Handler) error {
 			return err
 		}
 		h.MarketValueLow = &_value
+		return nil
+	}
+}
+
+func WithReqs(reqs []*npool.CurrencyReq) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		_reqs := []*currencycrud.Req{}
+		for _, req := range reqs {
+			_req := &currencycrud.Req{}
+			if req.ID != nil {
+				id, err := uuid.Parse(*req.ID)
+				if err != nil {
+					return err
+				}
+				_req.ID = &id
+			}
+			if req.FiatID != nil {
+				id, err := uuid.Parse(*req.FiatID)
+				if err != nil {
+					return err
+				}
+				_req.FiatID = &id
+			}
+			if req.FeedType != nil {
+				switch *req.FeedType {
+				case basetypes.CurrencyFeedType_CoinGecko:
+				case basetypes.CurrencyFeedType_CoinBase:
+				case basetypes.CurrencyFeedType_StableUSDHardCode:
+				default:
+					return fmt.Errorf("invalid feedtype")
+				}
+				_req.FeedType = req.FeedType
+			}
+			if req.MarketValueHigh != nil {
+				amount, err := decimal.NewFromString(*req.MarketValueHigh)
+				if err != nil {
+					return err
+				}
+				_req.MarketValueHigh = &amount
+			}
+			if req.MarketValueLow != nil {
+				amount, err := decimal.NewFromString(*req.MarketValueLow)
+				if err != nil {
+					return err
+				}
+				_req.MarketValueLow = &amount
+			}
+			_reqs = append(_reqs, _req)
+		}
+		h.Reqs = _reqs
 		return nil
 	}
 }

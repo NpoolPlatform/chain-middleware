@@ -104,7 +104,7 @@ func CoinBaseUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
 				"CoinName", name,
 				"error", err,
 			)
-			continue
+			return nil, err
 		}
 		prices[name] = price
 

@@ -64,10 +64,10 @@ func (h *createHandler) createCurrencyHistory(ctx context.Context, tx *ent.Tx, r
 	if _, err := currencyhiscrud.CreateSet(
 		tx.CurrencyHistory.Create(),
 		&currencyhiscrud.Req{
-			CoinTypeID:      h.CoinTypeID,
-			FeedType:        h.FeedType,
-			MarketValueHigh: h.MarketValueHigh,
-			MarketValueLow:  h.MarketValueLow,
+			CoinTypeID:      req.CoinTypeID,
+			FeedType:        req.FeedType,
+			MarketValueHigh: req.MarketValueHigh,
+			MarketValueLow:  req.MarketValueLow,
 		},
 	).Save(ctx); err != nil {
 		return err
