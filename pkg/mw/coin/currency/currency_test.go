@@ -12,6 +12,7 @@ import (
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
+	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -81,7 +82,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
-		assert.Equal(t, info, ret)
+		assert.Equal(t, ret, info)
 	}
 }
 
@@ -106,7 +107,39 @@ func update(t *testing.T) {
 	info, err := handler.CreateCurrency(context.Background())
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
-		assert.Equal(t, info, ret)
+		assert.Equal(t, ret, info)
+	}
+}
+
+func get(t *testing.T) {
+	handler, err := NewHandler(
+		context.Background(),
+		WithID(&ret.ID),
+	)
+	assert.Nil(t, err)
+
+	info, err := handler.GetCurrency(context.Background())
+	if assert.Nil(t, err) {
+		assert.Equal(t, ret, info)
+	}
+}
+
+func getMany(t *testing.T) {
+	handler, err := NewHandler(
+		context.Background(),
+		WithConds(&npool.Conds{
+			CoinTypeID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
+		}),
+		WithOffset(0),
+		WithLimit(100),
+	)
+	assert.Nil(t, err)
+
+	infos, total, err := handler.GetCurrencies(context.Background())
+	if assert.Nil(t, err) {
+		assert.Equal(t, 1, len(infos))
+		assert.Equal(t, uint32(1), total)
+		assert.Equal(t, ret, infos[0])
 	}
 }
 
@@ -120,4 +153,6 @@ func TestCoin(t *testing.T) {
 
 	t.Run("create", create)
 	t.Run("update", update)
+	t.Run("get", get)
+	t.Run("getMany", getMany)
 }
