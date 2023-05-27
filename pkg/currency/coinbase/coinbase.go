@@ -127,7 +127,7 @@ type fiatResp struct {
 	Data fiatData `json:"data"`
 }
 
-func CoinBaseFiatCurrency() (map[string]decimal.Decimal, error) {
+func CoinBaseFiatPrices(fiatNames []string) (map[string]decimal.Decimal, error) {
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
 
 	cli := resty.New()

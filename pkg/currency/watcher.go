@@ -7,16 +7,22 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	watcher "github.com/NpoolPlatform/go-service-framework/pkg/watcher"
-	// cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
-	// basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	// "github.com/shopspring/decimal"
 )
 
 func refresh(ctx context.Context, fiat bool) {
-	logger.Sugar().Infow(
-		"refresh",
-		"Fiat", fiat,
-	)
+	if err := refreshCoins(ctx); err != nil {
+		logger.Sugar().Errorw(
+			"refresh",
+			"Error", err,
+		)
+		return
+	}
+	if err := refreshFiats(ctx); err != nil {
+		logger.Sugar().Errorw(
+			"refresh",
+			"Error", err,
+		)
+	}
 }
 
 var w *watcher.Watcher
