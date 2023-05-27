@@ -6,10 +6,9 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
-
-	npool "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 )
 
 // FiatCurrency holds the schema definition for the FiatCurrency entity.
@@ -37,7 +36,7 @@ func (FiatCurrency) Fields() []ent.Field {
 		field.
 			String("feed_type").
 			Optional().
-			Default(npool.FeedType_DefaultFeedType.String()),
+			Default(basetypes.CurrencyFeedType_DefaultFeedType.String()),
 		field.
 			Other("market_value_low", decimal.Decimal{}).
 			SchemaType(map[string]string{

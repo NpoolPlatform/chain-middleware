@@ -4,7 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
-	npool "github.com/NpoolPlatform/message/npool/chain/mgr/v1/appcoin/description"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/google/uuid"
 )
 
@@ -37,7 +37,7 @@ func (CoinDescription) Fields() []ent.Field {
 		field.
 			String("used_for").
 			Optional().
-			Default(npool.UsedFor_DefaultUsedFor.String()),
+			Default(basetypes.UsedFor_DefaultUsedFor.String()),
 		field.
 			String("title").
 			Optional().

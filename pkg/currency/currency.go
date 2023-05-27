@@ -8,7 +8,7 @@ import (
 
 	coinbase "github.com/NpoolPlatform/chain-middleware/pkg/currency/coinbase"
 	coingecko "github.com/NpoolPlatform/chain-middleware/pkg/currency/coingecko"
-	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	"github.com/shopspring/decimal"
 )
@@ -30,7 +30,7 @@ func stableUSD(coinName string) bool {
 	return ok
 }
 
-func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.Decimal, currencymgrpb.FeedType, error) {
+func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.Decimal, basetypes.CurrencyFeedType, error) {
 	prices := map[string]decimal.Decimal{}
 	names := []string{}
 
@@ -47,7 +47,7 @@ func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.
 		for name, price := range prices1 {
 			prices[name] = price
 		}
-		return prices, currencymgrpb.FeedType_CoinGecko, nil
+		return prices, basetypes.CurrencyFeedType_CoinGecko, nil
 	}
 
 	logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinGecko", "error", err)
@@ -55,21 +55,21 @@ func CoinUSDPrices(ctx context.Context, coinNames []string) (map[string]decimal.
 	prices1, err = coinbase.CoinBaseUSDPrices(names)
 	if err != nil {
 		logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinBase", "error", err)
-		return nil, currencymgrpb.FeedType_DefaultFeedType, err
+		return nil, basetypes.CurrencyFeedType_DefaultFeedType, err
 	}
 
 	for name, price := range prices1 {
 		prices[name] = price
 	}
 
-	return prices, currencymgrpb.FeedType_CoinBase, nil
+	return prices, basetypes.CurrencyFeedType_CoinBase, nil
 }
 
-func CoinCurrencyPrice(ctx context.Context, coinName, currency string) (decimal.Decimal, currencymgrpb.FeedType, error) {
-	return decimal.Decimal{}, currencymgrpb.FeedType_DefaultFeedType, nil
+func CoinCurrencyPrice(ctx context.Context, coinName, currency string) (decimal.Decimal, basetypes.CurrencyFeedType, error) {
+	return decimal.Decimal{}, basetypes.CurrencyFeedType_DefaultFeedType, nil
 }
 
-func USDPrices(fiatCurrencyNames []string) (map[string]decimal.Decimal, currencymgrpb.FeedType, error) {
+func USDPrices(fiatCurrencyNames []string) (map[string]decimal.Decimal, basetypes.CurrencyFeedType, error) {
 	prices := map[string]decimal.Decimal{}
 
 	prices1, err := coingecko.UsdFiatCurrency(fiatCurrencyNames)
@@ -77,7 +77,7 @@ func USDPrices(fiatCurrencyNames []string) (map[string]decimal.Decimal, currency
 		for name, price := range prices1 {
 			prices[strings.ToUpper(name)] = price
 		}
-		return prices, currencymgrpb.FeedType_CoinGecko, nil
+		return prices, basetypes.CurrencyFeedType_CoinGecko, nil
 	}
 
 	logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinGecko", "error", err)
@@ -85,12 +85,12 @@ func USDPrices(fiatCurrencyNames []string) (map[string]decimal.Decimal, currency
 	prices1, err = coinbase.UsdFaitCurrency()
 	if err != nil {
 		logger.Sugar().Errorw("CoinUSDPrices", "Feed", "CoinBase", "error", err)
-		return nil, currencymgrpb.FeedType_DefaultFeedType, err
+		return nil, basetypes.CurrencyFeedType_DefaultFeedType, err
 	}
 
 	for name, price := range prices1 {
 		prices[name] = price
 	}
 
-	return prices, currencymgrpb.FeedType_CoinBase, nil
+	return prices, basetypes.CurrencyFeedType_CoinBase, nil
 }

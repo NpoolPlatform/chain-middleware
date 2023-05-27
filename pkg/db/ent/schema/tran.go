@@ -6,7 +6,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
-	tran "github.com/NpoolPlatform/message/npool/chain/mgr/v1/tx"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
@@ -68,7 +67,7 @@ func (Tran) Fields() []ent.Field {
 		field.
 			String("state").
 			Optional().
-			Default(tran.TxState_DefaultTxState.String()),
+			Default(basetypes.TxState_DefaultTxState.String()),
 		field.
 			String("extra").
 			Optional().

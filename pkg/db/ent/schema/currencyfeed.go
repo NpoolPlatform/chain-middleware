@@ -5,9 +5,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/google/uuid"
-
-	npool "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
 )
 
 // CurrencyFeed holds the schema definition for the CurrencyFeed entity.
@@ -35,7 +34,7 @@ func (CurrencyFeed) Fields() []ent.Field {
 		field.
 			String("feed_type").
 			Optional().
-			Default(npool.FeedType_DefaultFeedType.String()),
+			Default(basetypes.CurrencyFeedType_DefaultFeedType.String()),
 		field.
 			String("feed_coin_name").
 			Optional().
