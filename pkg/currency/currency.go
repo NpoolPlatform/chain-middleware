@@ -61,7 +61,7 @@ func _refreshCoins(ctx context.Context, coins []*coinmwpb.Coin, feedType basetyp
 		coinNames = append(coinNames, _feed.FeedCoinName)
 	}
 	if len(coinNames) == 0 {
-		return nil
+		return fmt.Errorf("invalid feeds")
 	}
 
 	prices := map[string]decimal.Decimal{}
