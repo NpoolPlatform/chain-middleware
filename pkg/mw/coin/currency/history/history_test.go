@@ -88,7 +88,6 @@ func getMany(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
 		WithConds(&npool.Conds{
-			ID:         &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
 			CoinTypeID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
 		}),
 		WithOffset(0),
