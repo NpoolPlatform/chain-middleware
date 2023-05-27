@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 	coincurrency1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin/currency"
 	coincurrencyfeed1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin/currency/feed"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 	coincurrencymwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 	coincurrencyfeedmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency/feed"
 
@@ -20,182 +18,130 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func _refreshCoins(ctx context.Context, coins []*coinmwpb.Coin, feedType basetypes.CurrencyFeedType) error {
-	ids := []string{}
-	for _, _coin := range coins {
-		ids = append(ids, _coin.ID)
-	}
+func _refreshCoins(ctx context.Context, feedType basetypes.CurrencyFeedType) error {
+	offset := int32(0)
+	limit := int32(100)
 
-	h1, err := coincurrencyfeed1.NewHandler(
-		ctx,
-		coincurrencyfeed1.WithConds(&coincurrencyfeedmwpb.Conds{
-			CoinTypeIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: ids},
-			FeedType:    &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(feedType)},
-			Disabled:    &basetypes.BoolVal{Op: cruder.EQ, Value: false},
-		}),
-		coincurrencyfeed1.WithOffset(0),
-		coincurrencyfeed1.WithLimit(int32(len(ids))),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"_refreshCoins",
-			"Error", err,
+	for {
+		h1, err := coincurrencyfeed1.NewHandler(
+			ctx,
+			coincurrencyfeed1.WithConds(&coincurrencyfeedmwpb.Conds{
+				FeedType: &basetypes.Uint32Val{Op: cruder.EQ, Value: uint32(feedType)},
+				Disabled: &basetypes.BoolVal{Op: cruder.EQ, Value: false},
+			}),
+			coincurrencyfeed1.WithOffset(offset),
+			coincurrencyfeed1.WithLimit(limit),
 		)
-		return err
-	}
-
-	feeds, _, err := h1.GetFeeds(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"_refreshCoins",
-			"Error", err,
-		)
-		return err
-	}
-
-	feedMap := map[string]*coincurrencyfeedmwpb.Feed{}
-	coinNames := []string{}
-
-	for _, _feed := range feeds {
-		feedMap[_feed.CoinTypeID] = _feed
-		coinNames = append(coinNames, _feed.FeedCoinName)
-	}
-	if len(coinNames) == 0 {
-		return fmt.Errorf("invalid feeds")
-	}
-
-	prices := map[string]decimal.Decimal{}
-
-	switch feedType {
-	case basetypes.CurrencyFeedType_CoinGecko:
-		prices, err = coingecko.CoinGeckoUSDPrices(coinNames)
-	case basetypes.CurrencyFeedType_CoinBase:
-		prices, err = coinbase.CoinBaseUSDPrices(coinNames)
-	default:
-		return fmt.Errorf("invalid feedtype")
-	}
-
-	if err != nil {
-		logger.Sugar().Errorw(
-			"_refreshCoins",
-			"Error", err,
-		)
-		return err
-	}
-
-	coinMap := map[string]*coinmwpb.Coin{}
-	_coinMap := map[string]*coinmwpb.Coin{}
-	coinRefreshed := map[string]bool{}
-
-	for _, _coin := range coins {
-		coinMap[_coin.ID] = _coin
-		_coinMap[_coin.Name] = _coin
-	}
-	for _, _feed := range feeds {
-		_coinMap[_feed.FeedCoinName] = coinMap[_feed.CoinTypeID]
-	}
-
-	reqs := []*coincurrencymwpb.CurrencyReq{}
-	for _coinName, _price := range prices {
-		_coin, ok := _coinMap[_coinName]
-		if !ok {
-			continue
-		}
-		_priceStr := _price.String()
-		reqs = append(reqs, &coincurrencymwpb.CurrencyReq{
-			CoinTypeID:      &_coin.ID,
-			FeedType:        &feedType,
-			MarketValueHigh: &_priceStr,
-			MarketValueLow:  &_priceStr,
-		})
-		coinRefreshed[_coin.ID] = true
-	}
-
-	for _, _coin := range coins {
-		refreshed, ok := coinRefreshed[_coin.ID]
-		if !ok {
-			_feed := feedMap[_coin.ID]
-			logger.Sugar().Warnw(
+		if err != nil {
+			logger.Sugar().Errorw(
 				"_refreshCoins",
-				"CoinName", _coin.Name,
-				"CoinTypeID", _coin.ID,
-				"Refreshed", refreshed,
-				"Feed", _feed,
+				"Error", err,
 			)
+			return err
 		}
-	}
 
-	h2, err := coincurrency1.NewHandler(
-		ctx,
-		coincurrency1.WithReqs(reqs),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"_refreshCoins",
-			"Error", err,
-		)
-		return err
-	}
+		feeds, _, err := h1.GetFeeds(ctx)
+		if err != nil {
+			logger.Sugar().Errorw(
+				"_refreshCoins",
+				"Error", err,
+			)
+			return err
+		}
+		if len(feeds) == 0 {
+			return nil
+		}
 
-	_, err = h2.CreateCurrencies(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"_refreshCoins",
-			"Error", err,
+		feedMap := map[string]*coincurrencyfeedmwpb.Feed{}
+		coinNames := []string{}
+
+		for _, _feed := range feeds {
+			feedMap[_feed.CoinTypeID] = _feed
+			coinNames = append(coinNames, _feed.FeedCoinName)
+		}
+		if len(coinNames) == 0 {
+			return fmt.Errorf("invalid feeds")
+		}
+
+		prices := map[string]decimal.Decimal{}
+
+		switch feedType {
+		case basetypes.CurrencyFeedType_CoinGecko:
+			prices, err = coingecko.CoinGeckoUSDPrices(coinNames)
+		case basetypes.CurrencyFeedType_CoinBase:
+			prices, err = coinbase.CoinBaseUSDPrices(coinNames)
+		default:
+			return fmt.Errorf("invalid feedtype")
+		}
+		if err != nil {
+			logger.Sugar().Errorw(
+				"_refreshCoins",
+				"Error", err,
+			)
+			return err
+		}
+
+		_feedMap := map[string]*coincurrencyfeedmwpb.Feed{}
+		coinRefreshed := map[string]bool{}
+		for _, _feed := range feeds {
+			_feedMap[_feed.FeedCoinName] = _feed
+		}
+
+		reqs := []*coincurrencymwpb.CurrencyReq{}
+		for _feedCoinName, _price := range prices {
+			_feed, ok := _feedMap[_feedCoinName]
+			if !ok {
+				continue
+			}
+			_priceStr := _price.String()
+			reqs = append(reqs, &coincurrencymwpb.CurrencyReq{
+				CoinTypeID:      &_feed.CoinTypeID,
+				FeedType:        &feedType,
+				MarketValueHigh: &_priceStr,
+				MarketValueLow:  &_priceStr,
+			})
+			coinRefreshed[_feed.CoinTypeID] = true
+		}
+
+		for _, _feed := range feeds {
+			refreshed, ok := coinRefreshed[_feed.CoinTypeID]
+			if !ok {
+				logger.Sugar().Warnw(
+					"_refreshCoins",
+					"CoinTypeID", _feed.CoinTypeID,
+					"Refreshed", refreshed,
+					"FeedCoinName", _feed.FeedCoinName,
+				)
+			}
+		}
+
+		h2, err := coincurrency1.NewHandler(
+			ctx,
+			coincurrency1.WithReqs(reqs),
 		)
-		return err
+		if err != nil {
+			logger.Sugar().Errorw(
+				"_refreshCoins",
+				"Error", err,
+			)
+			return err
+		}
+
+		_, err = h2.CreateCurrencies(ctx)
+		if err != nil {
+			logger.Sugar().Errorw(
+				"_refreshCoins",
+				"Error", err,
+			)
+			return err
+		}
 	}
 
 	return nil
 }
 
-func refreshCoins(ctx context.Context) error {
-	offset := int32(0)
-	limit := int32(100)
-
-	for {
-		h1, err := coin1.NewHandler(
-			ctx,
-			coin1.WithConds(&coinmwpb.Conds{}),
-			coin1.WithOffset(offset),
-			coin1.WithLimit(limit),
-		)
-		if err != nil {
-			logger.Sugar().Errorw(
-				"refreshCoins",
-				"Error", err,
-			)
-			return err
-		}
-
-		coins, _, err := h1.GetCoins(ctx)
-		if err != nil {
-			logger.Sugar().Errorw(
-				"refreshCoins",
-				"Error", err,
-			)
-			return err
-		}
-		if len(coins) == 0 {
-			return nil
-		}
-
-		offset += limit
-
-		err = _refreshCoins(ctx, coins, basetypes.CurrencyFeedType_CoinGecko)
-		if err == nil {
-			continue
-		}
-		logger.Sugar().Warnw(
-			"refreshCoins",
-			"FeedType", basetypes.CurrencyFeedType_CoinGecko.String(),
-			"Error", err,
-		)
-
-		err = _refreshCoins(ctx, coins, basetypes.CurrencyFeedType_CoinBase)
-		if err == nil {
-			continue
-		}
+func refreshCoins(ctx context.Context) {
+	if err := _refreshCoins(ctx, basetypes.CurrencyFeedType_CoinGecko); err != nil {
 		logger.Sugar().Warnw(
 			"refreshCoins",
 			"FeedType", basetypes.CurrencyFeedType_CoinGecko.String(),
@@ -203,7 +149,13 @@ func refreshCoins(ctx context.Context) error {
 		)
 	}
 
-	return nil
+	if err := _refreshCoins(ctx, basetypes.CurrencyFeedType_CoinBase); err != nil {
+		logger.Sugar().Warnw(
+			"refreshCoins",
+			"FeedType", basetypes.CurrencyFeedType_CoinGecko.String(),
+			"Error", err,
+		)
+	}
 }
 
 func refreshFiats(ctx context.Context) error {

@@ -10,19 +10,8 @@ import (
 )
 
 func refresh(ctx context.Context, fiat bool) {
-	if err := refreshCoins(ctx); err != nil {
-		logger.Sugar().Errorw(
-			"refresh",
-			"Error", err,
-		)
-		return
-	}
-	if err := refreshFiats(ctx); err != nil {
-		logger.Sugar().Errorw(
-			"refresh",
-			"Error", err,
-		)
-	}
+	refreshCoins(ctx)
+	refreshFiats(ctx)
 }
 
 var w *watcher.Watcher
