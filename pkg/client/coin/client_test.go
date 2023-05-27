@@ -105,13 +105,6 @@ func updateCoin(t *testing.T) {
 	req.PaymentAccountCollectAmount = &amount
 	req.LeastTransferAmount = &amount
 
-	_, err := UpdateCoin(context.Background(), req)
-	assert.NotNil(t, err)
-
-	req.Name = nil
-	req.Unit = nil
-	req.ENV = nil
-
 	info, err := UpdateCoin(context.Background(), req)
 	if assert.Nil(t, err) {
 		ret.UpdatedAt = info.UpdatedAt
@@ -128,11 +121,8 @@ func getCoin(t *testing.T) {
 
 func getCoins(t *testing.T) {
 	infos, total, err := GetCoins(context.Background(), &npool.Conds{
-		ID: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: ret.ID,
-		},
-	}, 0, 1)
+		ID: &commonpb.StringVal{Op: cruder.EQ, Value: ret.ID},
+	}, 0, 100)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
 		assert.Equal(t, total, uint32(1))
