@@ -2,6 +2,7 @@ package currency
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
@@ -69,4 +70,28 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds, offset, limit int32)
 		return nil, 0, err
 	}
 	return infos.([]*npool.Currency), total, nil
+}
+
+func GetCurrencyOnly(ctx context.Context, conds *npool.Conds) (*npool.Currency, error) {
+	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.GetCurrencies(ctx, &npool.GetCurrenciesRequest{
+			Conds:  conds,
+			Offset: 0,
+			Limit:  2,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Infos, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(infos.([]*npool.Currency)) == 0 {
+		return nil, nil
+	}
+	if len(infos.([]*npool.Currency)) > 1 {
+		return nil, fmt.Errorf("too many record")
+	}
+	return infos.([]*npool.Currency)[0], nil
 }
