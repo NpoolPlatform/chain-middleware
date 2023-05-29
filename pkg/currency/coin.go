@@ -82,26 +82,29 @@ func _refreshCoins(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 			return err
 		}
 
-		_feedMap := map[string]*coincurrencyfeedmwpb.Feed{}
+		_feedMap := map[string][]*coincurrencyfeedmwpb.Feed{}
 		coinRefreshed := map[string]bool{}
 		for _, _feed := range feeds {
-			_feedMap[_feed.FeedCoinName] = _feed
+			_feedMap[_feed.FeedCoinName] = append(_feedMap[_feed.FeedCoinName], _feed)
 		}
 
 		reqs := []*coincurrencymwpb.CurrencyReq{}
 		for _feedCoinName, _price := range prices {
-			_feed, ok := _feedMap[_feedCoinName]
+			_feeds, ok := _feedMap[_feedCoinName]
 			if !ok {
 				continue
 			}
 			_priceStr := _price.String()
-			reqs = append(reqs, &coincurrencymwpb.CurrencyReq{
-				CoinTypeID:      &_feed.CoinTypeID,
-				FeedType:        &feedType,
-				MarketValueHigh: &_priceStr,
-				MarketValueLow:  &_priceStr,
-			})
-			coinRefreshed[_feed.CoinTypeID] = true
+
+			for _, _feed := range _feeds {
+				reqs = append(reqs, &coincurrencymwpb.CurrencyReq{
+					CoinTypeID:      &_feed.CoinTypeID,
+					FeedType:        &feedType,
+					MarketValueHigh: &_priceStr,
+					MarketValueLow:  &_priceStr,
+				})
+				coinRefreshed[_feed.CoinTypeID] = true
+			}
 		}
 
 		for _, _feed := range feeds {
