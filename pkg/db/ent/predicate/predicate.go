@@ -18,6 +18,9 @@ type CoinDescription func(*sql.Selector)
 // CoinExtra is the predicate function for coinextra builders.
 type CoinExtra func(*sql.Selector)
 
+// CoinFiat is the predicate function for coinfiat builders.
+type CoinFiat func(*sql.Selector)
+
 // CoinFiatCurrency is the predicate function for coinfiatcurrency builders.
 type CoinFiatCurrency func(*sql.Selector)
 

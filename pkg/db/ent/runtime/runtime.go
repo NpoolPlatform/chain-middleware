@@ -9,6 +9,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
@@ -281,6 +282,46 @@ func init() {
 	coinextraDescID := coinextraFields[0].Descriptor()
 	// coinextra.DefaultID holds the default value on creation for the id field.
 	coinextra.DefaultID = coinextraDescID.Default.(func() uuid.UUID)
+	coinfiatMixin := schema.CoinFiat{}.Mixin()
+	coinfiat.Policy = privacy.NewPolicies(coinfiatMixin[0], schema.CoinFiat{})
+	coinfiat.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := coinfiat.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	coinfiatMixinFields0 := coinfiatMixin[0].Fields()
+	_ = coinfiatMixinFields0
+	coinfiatFields := schema.CoinFiat{}.Fields()
+	_ = coinfiatFields
+	// coinfiatDescCreatedAt is the schema descriptor for created_at field.
+	coinfiatDescCreatedAt := coinfiatMixinFields0[0].Descriptor()
+	// coinfiat.DefaultCreatedAt holds the default value on creation for the created_at field.
+	coinfiat.DefaultCreatedAt = coinfiatDescCreatedAt.Default.(func() uint32)
+	// coinfiatDescUpdatedAt is the schema descriptor for updated_at field.
+	coinfiatDescUpdatedAt := coinfiatMixinFields0[1].Descriptor()
+	// coinfiat.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	coinfiat.DefaultUpdatedAt = coinfiatDescUpdatedAt.Default.(func() uint32)
+	// coinfiat.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	coinfiat.UpdateDefaultUpdatedAt = coinfiatDescUpdatedAt.UpdateDefault.(func() uint32)
+	// coinfiatDescDeletedAt is the schema descriptor for deleted_at field.
+	coinfiatDescDeletedAt := coinfiatMixinFields0[2].Descriptor()
+	// coinfiat.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	coinfiat.DefaultDeletedAt = coinfiatDescDeletedAt.Default.(func() uint32)
+	// coinfiatDescCoinTypeID is the schema descriptor for coin_type_id field.
+	coinfiatDescCoinTypeID := coinfiatFields[1].Descriptor()
+	// coinfiat.DefaultCoinTypeID holds the default value on creation for the coin_type_id field.
+	coinfiat.DefaultCoinTypeID = coinfiatDescCoinTypeID.Default.(func() uuid.UUID)
+	// coinfiatDescFiatID is the schema descriptor for fiat_id field.
+	coinfiatDescFiatID := coinfiatFields[2].Descriptor()
+	// coinfiat.DefaultFiatID holds the default value on creation for the fiat_id field.
+	coinfiat.DefaultFiatID = coinfiatDescFiatID.Default.(func() uuid.UUID)
+	// coinfiatDescFeedType is the schema descriptor for feed_type field.
+	coinfiatDescFeedType := coinfiatFields[3].Descriptor()
+	// coinfiat.DefaultFeedType holds the default value on creation for the feed_type field.
+	coinfiat.DefaultFeedType = coinfiatDescFeedType.Default.(string)
 	coinfiatcurrencyMixin := schema.CoinFiatCurrency{}.Mixin()
 	coinfiatcurrency.Policy = privacy.NewPolicies(coinfiatcurrencyMixin[0], schema.CoinFiatCurrency{})
 	coinfiatcurrency.Hooks[0] = func(next ent.Mutator) ent.Mutator {
