@@ -1,4 +1,3 @@
-//nolint:dupl
 package currency
 
 import (
@@ -146,7 +145,7 @@ func refreshCoins(ctx context.Context) {
 	if err := _refreshCoins(ctx, basetypes.CurrencyFeedType_CoinGecko); err != nil {
 		logger.Sugar().Warnw(
 			"refreshCoins",
-			"FeedType", basetypes.CurrencyFeedType_CoinGecko.String(),
+			"FeedType", basetypes.CurrencyFeedType_CoinGecko,
 			"Error", err,
 		)
 	}
@@ -154,7 +153,7 @@ func refreshCoins(ctx context.Context) {
 	if err := _refreshCoins(ctx, basetypes.CurrencyFeedType_CoinBase); err != nil {
 		logger.Sugar().Warnw(
 			"refreshCoins",
-			"FeedType", basetypes.CurrencyFeedType_CoinGecko.String(),
+			"FeedType", basetypes.CurrencyFeedType_CoinGecko,
 			"Error", err,
 		)
 	}

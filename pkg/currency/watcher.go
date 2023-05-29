@@ -10,6 +10,7 @@ import (
 
 func refresh(ctx context.Context, fiat bool) {
 	refreshCoins(ctx)
+	refreshCoinFiats(ctx)
 	if fiat {
 		refreshFiats(ctx)
 	}

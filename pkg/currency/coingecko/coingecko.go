@@ -19,15 +19,16 @@ const (
 	timeout = 5
 )
 
-func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
+func CoinGeckoPrices(coinNames, fiatNames []string) (map[string]map[string]decimal.Decimal, error) {
 	if len(coinNames) == 0 {
 		return nil, fmt.Errorf("invalid coinnames")
 	}
 
 	coins := strings.Join(coinNames, ",")
+	fiats := strings.Join(fiatNames, ",")
 
 	socksProxy := os.Getenv("ENV_CURRENCY_REQUEST_PROXY")
-	url := fmt.Sprintf("%v%v?ids=%v&vs_currencies=usd", coinAPI, "/simple/price", coins)
+	url := fmt.Sprintf("%v%v?ids=%v&vs_currencies=%v", coinAPI, "/simple/price", coins, fiats)
 	cli := resty.New()
 	cli = cli.SetTimeout(timeout * time.Second)
 	if socksProxy != "" {
@@ -37,7 +38,7 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 	resp, err := cli.R().Get(url)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CoinGeckoUSDPrices",
+			"CoinGeckoPrices",
 			"URL", url,
 			"Proxy", socksProxy,
 			"Error", err,
@@ -48,7 +49,7 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 	err = json.Unmarshal(resp.Body(), &respMap)
 	if err != nil {
 		logger.Sugar().Errorw(
-			"CoinGeckoUSDPrices",
+			"CoinGeckoPrices",
 			"URL", url,
 			"Proxy", socksProxy,
 			"Resp", string(resp.Body()),
@@ -57,16 +58,33 @@ func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) 
 		return nil, err
 	}
 
-	infoMap := map[string]decimal.Decimal{}
+	infoMap := map[string]map[string]decimal.Decimal{}
 	for key, val := range respMap {
-		price := decimal.NewFromInt(0)
-		for _, v := range val {
-			price = decimal.NewFromFloat(v)
+		_infoMap, ok := infoMap[key]
+		if !ok {
+			_infoMap = map[string]decimal.Decimal{}
 		}
-		infoMap[key] = price
+		for _key, _val := range val {
+			_infoMap[_key] = decimal.NewFromFloat(_val)
+		}
+		infoMap[key] = _infoMap
 	}
 
 	return infoMap, nil
+}
+
+func CoinGeckoUSDPrices(coinNames []string) (map[string]decimal.Decimal, error) {
+	prices, err := CoinGeckoPrices(coinNames, []string{"usd"})
+	if err != nil {
+		return map[string]decimal.Decimal{}, err
+	}
+
+	_prices := map[string]decimal.Decimal{}
+	for key, val := range prices {
+		_prices[key] = val["usd"]
+	}
+
+	return _prices, nil
 }
 
 func CoinGeckoFiatPrices(fiatNames []string) (map[string]decimal.Decimal, error) {
