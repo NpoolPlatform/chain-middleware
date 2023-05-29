@@ -88,21 +88,31 @@ func setupCoinFiat(t *testing.T) func(*testing.T) {
 }
 
 func createCoinFiat(t *testing.T) {
-
+	info, err := CreateCoinFiat(context.Background(), req)
+	if assert.Nil(t, err) {
+		ret.CreatedAt = info.CreatedAt
+		ret.UpdatedAt = info.UpdatedAt
+		ret.ID = info.ID
+		assert.Equal(t, ret, info)
+	}
 }
 
-func getCurrencies(t *testing.T) {
-	infos, total, err := GetCurrencies(context.Background(), &npool.Conds{
+func getCoinFiats(t *testing.T) {
+	infos, total, err := GetCoinFiats(context.Background(), &npool.Conds{
 		CoinTypeID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
 	}, 0, 100)
 	if assert.Nil(t, err) {
-		assert.Equal(t, 2, len(infos))
-		assert.Equal(t, uint32(2), total)
+		assert.Equal(t, 1, len(infos))
+		assert.Equal(t, uint32(1), total)
+		assert.Equal(t, ret, infos[0])
 	}
 }
 
 func deleteCoinFiat(t *testing.T) {
-
+	info, err := DeleteCoinFiat(context.Background(), ret.ID)
+	if assert.Nil(t, err) {
+		assert.Equal(t, ret, info)
+	}
 }
 
 func TestClient(t *testing.T) {
