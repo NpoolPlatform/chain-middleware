@@ -11,6 +11,7 @@ import (
 	coincurrency "github.com/NpoolPlatform/chain-middleware/api/coin/currency"
 	coincurrencyfeed "github.com/NpoolPlatform/chain-middleware/api/coin/currency/feed"
 	coincurrencyhis "github.com/NpoolPlatform/chain-middleware/api/coin/currency/history"
+	coinfiat "github.com/NpoolPlatform/chain-middleware/api/coin/fiat"
 	coinfiatcurrencyhis "github.com/NpoolPlatform/chain-middleware/api/coin/fiat/currency/history"
 	"github.com/NpoolPlatform/chain-middleware/api/fiat"
 	fiatcurrency "github.com/NpoolPlatform/chain-middleware/api/fiat/currency"
@@ -34,6 +35,7 @@ func Register(server grpc.ServiceRegistrar) {
 	coincurrency.Register(server)
 	coincurrencyfeed.Register(server)
 	coincurrencyhis.Register(server)
+	coinfiat.Register(server)
 	coinfiatcurrencyhis.Register(server)
 	fiat.Register(server)
 	fiatcurrency.Register(server)

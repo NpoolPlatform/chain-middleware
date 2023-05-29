@@ -8,27 +8,24 @@ import (
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
-
-	"github.com/google/uuid"
 )
 
 func (h *Handler) CreateCoinFiat(ctx context.Context) (*npool.CoinFiat, error) {
-	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
-	}
-
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		if _, err := coinfiatcrud.CreateSet(
+		info, err := coinfiatcrud.CreateSet(
 			cli.CoinFiat.Create(),
 			&coinfiatcrud.Req{
-				ID:         h.ID,
 				CoinTypeID: h.CoinTypeID,
 				FiatID:     h.FiatID,
+				FeedType:   h.FeedType,
 			},
-		).Save(_ctx); err != nil {
+		).Save(_ctx)
+		if err != nil {
 			return err
 		}
+
+		h.ID = &info.ID
+
 		return nil
 	})
 	if err != nil {
