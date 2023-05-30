@@ -78,7 +78,8 @@ func (h *Handler) GetFiat(ctx context.Context) (*npool.Fiat, error) {
 			return err
 		}
 		handler.queryJoin()
-		handler.stm.Offset(0).Limit(2)
+		const singleRowLimit = 2
+		handler.stm.Offset(0).Limit(singleRowLimit)
 		return handler.scan(_ctx)
 	})
 	if err != nil {
@@ -126,7 +127,8 @@ func (h *Handler) GetFiatOnly(ctx context.Context) (info *npool.Fiat, err error)
 			return err
 		}
 		handler.queryJoin()
-		handler.stm.Offset(0).Limit(2)
+		const singleRowLimit = 2
+		handler.stm.Offset(0).Limit(singleRowLimit)
 		return handler.scan(_ctx)
 	})
 	if err != nil {

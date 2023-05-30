@@ -125,7 +125,8 @@ func (h *Handler) GetCoinFiat(ctx context.Context) (*npool.CoinFiat, error) {
 			return err
 		}
 		handler.queryJoin()
-		handler.stm.Offset(0).Limit(2)
+		const singleRowLimit = 2
+		handler.stm.Offset(0).Limit(singleRowLimit)
 		return handler.scan(_ctx)
 	})
 	if err != nil {

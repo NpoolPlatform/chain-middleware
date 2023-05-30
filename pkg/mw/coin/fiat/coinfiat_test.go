@@ -100,13 +100,14 @@ func createCoinFiat(t *testing.T) {
 }
 
 func getCoinFiats(t *testing.T) {
+	const singleRowLimit = 2
 	handler, err := NewHandler(
 		context.Background(),
 		WithConds(&npool.Conds{
 			CoinTypeID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
 		}),
 		WithOffset(0),
-		WithLimit(2),
+		WithLimit(singleRowLimit),
 	)
 	assert.Nil(t, err)
 
