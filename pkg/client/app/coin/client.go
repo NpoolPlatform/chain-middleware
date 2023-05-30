@@ -88,6 +88,22 @@ func GetCoins(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*
 	return infos.([]*npool.Coin), total, nil
 }
 
+func ExistCoinConds(ctx context.Context, conds *npool.Conds) (bool, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.ExistCoinConds(ctx, &npool.ExistCoinCondsRequest{
+			Conds: conds,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Info, nil
+	})
+	if err != nil {
+		return false, err
+	}
+	return info.(bool), nil
+}
+
 func GetCoinOnly(ctx context.Context, conds *npool.Conds) (*npool.Coin, error) {
 	infos, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		const singleRowLimit = 2

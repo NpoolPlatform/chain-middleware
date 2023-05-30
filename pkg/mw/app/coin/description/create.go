@@ -31,11 +31,6 @@ func (h *Handler) CreateCoinDescription(ctx context.Context) (*npool.CoinDescrip
 		_ = redis2.Unlock(lockKey)
 	}()
 
-	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
-	}
-
 	h.Conds = &descriptioncrud.Conds{
 		AppID:      &cruder.Cond{Op: cruder.EQ, Val: *h.AppID},
 		CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.CoinTypeID},
@@ -47,6 +42,11 @@ func (h *Handler) CreateCoinDescription(ctx context.Context) (*npool.CoinDescrip
 	}
 	if exist {
 		return nil, fmt.Errorf("description exist")
+	}
+
+	id := uuid.New()
+	if h.ID == nil {
+		h.ID = &id
 	}
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
