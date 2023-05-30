@@ -2,9 +2,12 @@ package currency
 
 import (
 	"context"
+	"fmt"
 
 	currencycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/fiat/currency"
 	currencyhiscrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/fiat/currency/history"
+	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
@@ -20,6 +23,19 @@ type createHandler struct {
 }
 
 func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx, req *currencycrud.Req) error {
+	lockKey := fmt.Sprintf(
+		"%v:%v:%v",
+		basetypes.Prefix_PrefixCreateFiatCurrency,
+		*h.FiatID,
+		*h.FeedType,
+	)
+	if err := redis2.TryLock(lockKey, 0); err != nil {
+		return err
+	}
+	defer func() {
+		_ = redis2.Unlock(lockKey)
+	}()
+
 	info, err := tx.
 		FiatCurrency.
 		Query().
