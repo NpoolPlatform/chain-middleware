@@ -74,10 +74,11 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds, offset, limit int32)
 
 func GetCurrencyOnly(ctx context.Context, conds *npool.Conds) (*npool.Currency, error) {
 	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		const singleRowLimit = 2
 		resp, err := cli.GetCurrencies(ctx, &npool.GetCurrenciesRequest{
 			Conds:  conds,
 			Offset: 0,
-			Limit:  2, //nolint
+			Limit:  singleRowLimit,
 		})
 		if err != nil {
 			return nil, err
