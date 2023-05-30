@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	fiatcrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/fiat"
+	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
@@ -40,6 +42,19 @@ func (h *Handler) CreateFiat(ctx context.Context) (*npool.Fiat, error) {
 	if h.Unit == nil {
 		return nil, fmt.Errorf("invalid fiatunit")
 	}
+
+	lockKey := fmt.Sprintf(
+		"%v:%v:%v",
+		basetypes.Prefix_PrefixCreateFiat,
+		*h.Name,
+		*h.Unit,
+	)
+	if err := redis2.TryLock(lockKey, 0); err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = redis2.Unlock(lockKey)
+	}()
 
 	h.Conds = &fiatcrud.Conds{
 		Name: &cruder.Cond{Op: cruder.EQ, Val: *h.Name},
