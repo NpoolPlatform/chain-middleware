@@ -59,6 +59,7 @@ func (h *queryHandler) queryAppCoin(cli *ent.Client) error {
 			Query().
 			Where(
 				entappcoin.ID(*h.ID),
+				entappcoin.DeletedAt(0),
 			),
 	)
 	return nil

@@ -212,5 +212,6 @@ func SetQueryConds(q *ent.AppCoinQuery, conds *Conds) (*ent.AppCoinQuery, error)
 			return nil, fmt.Errorf("invalid appcoin field")
 		}
 	}
+	q.Where(entappcoin.DeletedAt(0))
 	return q, nil
 }
