@@ -53,6 +53,7 @@ type Conds struct {
 	CoinTypeID  *cruder.Cond
 	CoinTypeIDs *cruder.Cond
 	Disabled    *cruder.Cond
+	FeedType    *cruder.Cond
 }
 
 func SetQueryConds(q *ent.CurrencyFeedQuery, conds *Conds) (*ent.CurrencyFeedQuery, error) {
@@ -100,6 +101,18 @@ func SetQueryConds(q *ent.CurrencyFeedQuery, conds *Conds) (*ent.CurrencyFeedQue
 		switch conds.Disabled.Op {
 		case cruder.EQ:
 			q.Where(entcurrencyfeed.Disabled(disabled))
+		default:
+			return nil, fmt.Errorf("invalid currencyfeed field")
+		}
+	}
+	if conds.FeedType != nil {
+		feedType, ok := conds.FeedType.Val.(basetypes.CurrencyFeedType)
+		if !ok {
+			return nil, fmt.Errorf("invalid feedtype")
+		}
+		switch conds.FeedType.Op {
+		case cruder.EQ:
+			q.Where(entcurrencyfeed.FeedType(feedType.String()))
 		default:
 			return nil, fmt.Errorf("invalid currencyfeed field")
 		}
