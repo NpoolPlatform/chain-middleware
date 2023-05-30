@@ -109,8 +109,11 @@ func (h *Handler) GetCurrency(ctx context.Context) (*npool.Currency, error) {
 			return err
 		}
 		handler.queryJoin()
-		const singleRowLimit = 2
-		handler.stm.Offset(0).Limit(singleRowLimit)
+		const singleRowLimit = 1
+		handler.stm.
+			Order(ent.Desc(entcurrency.FieldUpdatedAt)).
+			Offset(0).
+			Limit(singleRowLimit)
 		return handler.scan(_ctx)
 	})
 	if err != nil {
@@ -118,9 +121,6 @@ func (h *Handler) GetCurrency(ctx context.Context) (*npool.Currency, error) {
 	}
 	if len(handler.infos) == 0 {
 		return nil, nil
-	}
-	if len(handler.infos) > 1 {
-		return nil, fmt.Errorf("too many record")
 	}
 
 	handler.formalize()
@@ -138,6 +138,7 @@ func (h *Handler) GetCurrencies(ctx context.Context) ([]*npool.Currency, uint32,
 		}
 		handler.queryJoin()
 		handler.stm.
+			Order(ent.Desc(entcurrency.FieldUpdatedAt)).
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit))
 		return handler.scan(_ctx)
