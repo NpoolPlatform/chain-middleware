@@ -5,16 +5,32 @@ import (
 	"fmt"
 
 	descriptioncrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/app/coin/description"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin/description"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
 	"github.com/google/uuid"
 )
 
 func (h *Handler) CreateCoinDescription(ctx context.Context) (*npool.CoinDescription, error) {
+	lockKey := fmt.Sprintf(
+		"%v:%v:%v:%v",
+		basetypes.Prefix_PrefixCreateAppCoinDescription,
+		*h.AppID,
+		*h.CoinTypeID,
+		*h.UsedFor,
+	)
+	if err := redis2.TryLock(lockKey, 0); err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = redis2.Unlock(lockKey)
+	}()
+
 	id := uuid.New()
 	if h.ID == nil {
 		h.ID = &id
