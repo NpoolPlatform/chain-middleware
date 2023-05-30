@@ -53,6 +53,7 @@ type Conds struct {
 	FiatID   *cruder.Cond
 	FiatIDs  *cruder.Cond
 	Disabled *cruder.Cond
+	FeedType *cruder.Cond
 }
 
 func SetQueryConds(q *ent.FiatCurrencyFeedQuery, conds *Conds) (*ent.FiatCurrencyFeedQuery, error) {
@@ -100,6 +101,18 @@ func SetQueryConds(q *ent.FiatCurrencyFeedQuery, conds *Conds) (*ent.FiatCurrenc
 		switch conds.Disabled.Op {
 		case cruder.EQ:
 			q.Where(entcurrencyfeed.Disabled(disabled))
+		default:
+			return nil, fmt.Errorf("invalid currencyfeed field")
+		}
+	}
+	if conds.FeedType != nil {
+		feedType, ok := conds.FeedType.Val.(basetypes.CurrencyFeedType)
+		if !ok {
+			return nil, fmt.Errorf("invalid feedtype")
+		}
+		switch conds.FeedType.Op {
+		case cruder.EQ:
+			q.Where(entcurrencyfeed.FeedType(feedType.String()))
 		default:
 			return nil, fmt.Errorf("invalid currencyfeed field")
 		}
