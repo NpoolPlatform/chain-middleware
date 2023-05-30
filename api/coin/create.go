@@ -2,12 +2,9 @@ package coin
 
 import (
 	"context"
-	"fmt"
 
 	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
-	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
 	"google.golang.org/grpc/codes"
@@ -30,24 +27,6 @@ func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*
 		)
 		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
-
-	key := fmt.Sprintf(
-		"%v:%v:%v",
-		basetypes.Prefix_PrefixCreateCoin,
-		req.GetName(),
-		req.GetENV(),
-	)
-	if err := redis2.TryLock(key, 0); err != nil {
-		logger.Sugar().Errorw(
-			"CreateCoin",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.CreateCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-	defer func() {
-		_ = redis2.Unlock(key)
-	}()
 
 	info, err := handler.CreateCoin(ctx)
 	if err != nil {

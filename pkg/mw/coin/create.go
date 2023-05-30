@@ -9,6 +9,8 @@ import (
 	basecrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin"
 	extracrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/extra"
 	settingcrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/setting"
+	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
@@ -89,10 +91,18 @@ func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
 		return nil, fmt.Errorf("invalid coinenv")
 	}
 
-	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
+	lockKey := fmt.Sprintf(
+		"%v:%v:%v",
+		basetypes.Prefix_PrefixCreateCoin,
+		*h.Name,
+		*h.ENV,
+	)
+	if err := redis2.TryLock(lockKey, 0); err != nil {
+		return nil, err
 	}
+	defer func() {
+		_ = redis2.Unlock(lockKey)
+	}()
 
 	h.Conds = &basecrud.Conds{
 		Name: &cruder.Cond{Op: cruder.EQ, Val: *h.Name},
@@ -110,6 +120,11 @@ func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
 			return nil, fmt.Errorf("invalid coinunit")
 		}
 		return coin, nil
+	}
+
+	id := uuid.New()
+	if h.ID == nil {
+		h.ID = &id
 	}
 
 	handler := &createHandler{
