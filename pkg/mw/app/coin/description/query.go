@@ -110,7 +110,7 @@ func (h *Handler) GetCoinDescription(ctx context.Context) (*npool.CoinDescriptio
 			return err
 		}
 		handler.queryJoin()
-		handler.stm.Offset(0).Limit(2)
+		handler.stm.Offset(0).Limit(2) //nolint
 		return handler.scan(_ctx)
 	})
 	if err != nil {

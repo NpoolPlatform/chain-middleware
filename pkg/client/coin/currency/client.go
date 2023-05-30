@@ -77,7 +77,7 @@ func GetCurrencyOnly(ctx context.Context, conds *npool.Conds) (*npool.Currency, 
 		resp, err := cli.GetCurrencies(ctx, &npool.GetCurrenciesRequest{
 			Conds:  conds,
 			Offset: 0,
-			Limit:  2,
+			Limit:  2, //nolint
 		})
 		if err != nil {
 			return nil, err
