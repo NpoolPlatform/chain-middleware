@@ -56,6 +56,7 @@ type Conds struct {
 	FeedType *cruder.Cond
 }
 
+//nolint:gocyclo
 func SetQueryConds(q *ent.FiatCurrencyFeedQuery, conds *Conds) (*ent.FiatCurrencyFeedQuery, error) {
 	if conds.ID != nil {
 		id, ok := conds.ID.Val.(uuid.UUID)
