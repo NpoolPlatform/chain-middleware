@@ -76,7 +76,7 @@ func SetQueryConds(q *ent.CoinExtraQuery, conds *Conds) (*ent.CoinExtraQuery, er
 		}
 	}
 	if conds.CoinTypeID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+		id, ok := conds.CoinTypeID.Val.(uuid.UUID)
 		if !ok {
 			return nil, fmt.Errorf("invalid cointypeid")
 		}

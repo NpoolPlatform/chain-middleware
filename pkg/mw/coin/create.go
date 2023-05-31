@@ -52,22 +52,24 @@ func (h *createHandler) createChainBase(ctx context.Context, tx *ent.Tx) error {
 			return err
 		}
 	}
-	if info == nil {
-		if _, err := chainbasecrud.CreateSet(
-			tx.ChainBase.Create(),
-			&chainbasecrud.Req{
-				Name:       h.ChainType,
-				NativeUnit: h.ChainNativeUnit,
-				AtomicUnit: h.ChainAtomicUnit,
-				UnitExp:    h.ChainUnitExp,
-				ENV:        h.ENV,
-				ChainID:    h.ChainID,
-				Nickname:   h.ChainNickname,
-				GasType:    h.GasType,
-			},
-		).Save(ctx); err != nil {
-			return err
-		}
+	if info != nil {
+		return nil
+	}
+
+	if _, err := chainbasecrud.CreateSet(
+		tx.ChainBase.Create(),
+		&chainbasecrud.Req{
+			Name:       h.ChainType,
+			NativeUnit: h.ChainNativeUnit,
+			AtomicUnit: h.ChainAtomicUnit,
+			UnitExp:    h.ChainUnitExp,
+			ENV:        h.ENV,
+			ChainID:    h.ChainID,
+			Nickname:   h.ChainNickname,
+			GasType:    h.GasType,
+		},
+	).Save(ctx); err != nil {
+		return err
 	}
 	return nil
 }
@@ -157,6 +159,10 @@ func (h *createHandler) createCoinBase(ctx context.Context, tx *ent.Tx) error {
 }
 
 func (h *createHandler) createNativeCoinExtra(ctx context.Context, tx *ent.Tx) error {
+	if h.FeeCoinTypeID == nil {
+		return nil
+	}
+
 	stm, err := extracrud.SetQueryConds(
 		tx.CoinExtra.Query(),
 		&extracrud.Conds{
@@ -169,7 +175,9 @@ func (h *createHandler) createNativeCoinExtra(ctx context.Context, tx *ent.Tx) e
 
 	info, err := stm.Only(ctx)
 	if err != nil {
-		return err
+		if !ent.IsNotFound(err) {
+			return err
+		}
 	}
 	if info != nil {
 		return nil
@@ -199,7 +207,9 @@ func (h *createHandler) createCoinExtra(ctx context.Context, tx *ent.Tx) error {
 
 	info, err := stm.Only(ctx)
 	if err != nil {
-		return err
+		if !ent.IsNotFound(err) {
+			return err
+		}
 	}
 	if info != nil {
 		return nil
@@ -219,6 +229,10 @@ func (h *createHandler) createCoinExtra(ctx context.Context, tx *ent.Tx) error {
 }
 
 func (h *createHandler) createNativeCoinSetting(ctx context.Context, tx *ent.Tx) error {
+	if h.FeeCoinTypeID == nil {
+		return nil
+	}
+
 	stm, err := settingcrud.SetQueryConds(
 		tx.Setting.Query(),
 		&settingcrud.Conds{
@@ -231,7 +245,9 @@ func (h *createHandler) createNativeCoinSetting(ctx context.Context, tx *ent.Tx)
 
 	info, err := stm.Only(ctx)
 	if err != nil {
-		return err
+		if !ent.IsNotFound(err) {
+			return err
+		}
 	}
 	if info != nil {
 		return nil
@@ -261,7 +277,9 @@ func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error
 
 	info, err := stm.Only(ctx)
 	if err != nil {
-		return err
+		if !ent.IsNotFound(err) {
+			return err
+		}
 	}
 	if info != nil {
 		return nil
