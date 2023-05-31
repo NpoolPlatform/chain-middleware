@@ -85,7 +85,6 @@ type Conds struct {
 	Nickname   *cruder.Cond
 }
 
-// nolint:funlen,gocyclo
 func SetQueryConds(q *ent.ChainBaseQuery, conds *Conds) (*ent.ChainBaseQuery, error) {
 	if conds.Name != nil {
 		name, ok := conds.Name.Val.(string)

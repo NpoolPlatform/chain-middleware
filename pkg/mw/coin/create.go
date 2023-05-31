@@ -19,6 +19,9 @@ import (
 	"github.com/google/uuid"
 )
 
+// TODO: get chain base, if not exist, create chain base
+// TODO: set coin's fee coin type id with chain type
+
 type createHandler struct {
 	*Handler
 }
