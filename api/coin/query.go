@@ -44,7 +44,7 @@ func (s *Server) GetCoin(ctx context.Context, in *npool.GetCoinRequest) (*npool.
 func (s *Server) GetCoins(ctx context.Context, in *npool.GetCoinsRequest) (*npool.GetCoinsResponse, error) {
 	handler, err := coin1.NewHandler(
 		ctx,
-		coin1.WithConds(in.Conds),
+		coin1.WithConds(in.GetConds()),
 		coin1.WithOffset(in.GetOffset()),
 		coin1.WithLimit(in.GetLimit()),
 	)
@@ -76,7 +76,7 @@ func (s *Server) GetCoins(ctx context.Context, in *npool.GetCoinsRequest) (*npoo
 func (s *Server) GetCoinOnly(ctx context.Context, in *npool.GetCoinOnlyRequest) (*npool.GetCoinOnlyResponse, error) {
 	handler, err := coin1.NewHandler(
 		ctx,
-		coin1.WithConds(in.Conds),
+		coin1.WithConds(in.GetConds()),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
