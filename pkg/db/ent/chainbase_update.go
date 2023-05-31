@@ -250,6 +250,26 @@ func (cbu *ChainBaseUpdate) ClearNickname() *ChainBaseUpdate {
 	return cbu
 }
 
+// SetGasType sets the "gas_type" field.
+func (cbu *ChainBaseUpdate) SetGasType(s string) *ChainBaseUpdate {
+	cbu.mutation.SetGasType(s)
+	return cbu
+}
+
+// SetNillableGasType sets the "gas_type" field if the given value is not nil.
+func (cbu *ChainBaseUpdate) SetNillableGasType(s *string) *ChainBaseUpdate {
+	if s != nil {
+		cbu.SetGasType(*s)
+	}
+	return cbu
+}
+
+// ClearGasType clears the value of the "gas_type" field.
+func (cbu *ChainBaseUpdate) ClearGasType() *ChainBaseUpdate {
+	cbu.mutation.ClearGasType()
+	return cbu
+}
+
 // Mutation returns the ChainBaseMutation object of the builder.
 func (cbu *ChainBaseUpdate) Mutation() *ChainBaseMutation {
 	return cbu.mutation
@@ -501,6 +521,19 @@ func (cbu *ChainBaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: chainbase.FieldNickname,
 		})
 	}
+	if value, ok := cbu.mutation.GasType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: chainbase.FieldGasType,
+		})
+	}
+	if cbu.mutation.GasTypeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: chainbase.FieldGasType,
+		})
+	}
 	_spec.Modifiers = cbu.modifiers
 	if n, err = sqlgraph.UpdateNodes(ctx, cbu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -741,6 +774,26 @@ func (cbuo *ChainBaseUpdateOne) SetNillableNickname(s *string) *ChainBaseUpdateO
 // ClearNickname clears the value of the "nickname" field.
 func (cbuo *ChainBaseUpdateOne) ClearNickname() *ChainBaseUpdateOne {
 	cbuo.mutation.ClearNickname()
+	return cbuo
+}
+
+// SetGasType sets the "gas_type" field.
+func (cbuo *ChainBaseUpdateOne) SetGasType(s string) *ChainBaseUpdateOne {
+	cbuo.mutation.SetGasType(s)
+	return cbuo
+}
+
+// SetNillableGasType sets the "gas_type" field if the given value is not nil.
+func (cbuo *ChainBaseUpdateOne) SetNillableGasType(s *string) *ChainBaseUpdateOne {
+	if s != nil {
+		cbuo.SetGasType(*s)
+	}
+	return cbuo
+}
+
+// ClearGasType clears the value of the "gas_type" field.
+func (cbuo *ChainBaseUpdateOne) ClearGasType() *ChainBaseUpdateOne {
+	cbuo.mutation.ClearGasType()
 	return cbuo
 }
 
@@ -1023,6 +1076,19 @@ func (cbuo *ChainBaseUpdateOne) sqlSave(ctx context.Context) (_node *ChainBase, 
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: chainbase.FieldNickname,
+		})
+	}
+	if value, ok := cbuo.mutation.GasType(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: chainbase.FieldGasType,
+		})
+	}
+	if cbuo.mutation.GasTypeCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: chainbase.FieldGasType,
 		})
 	}
 	_spec.Modifiers = cbuo.modifiers

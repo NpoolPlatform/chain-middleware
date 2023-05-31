@@ -6,6 +6,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
 	entchainbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
 type Req struct {
@@ -17,6 +18,7 @@ type Req struct {
 	ENV        *string
 	ChainID    *string
 	Nickname   *string
+	GasType    *basetypes.GasType
 	DeletedAt  *uint32
 }
 
@@ -45,6 +47,9 @@ func CreateSet(c *ent.ChainBaseCreate, req *Req) *ent.ChainBaseCreate {
 	if req.Nickname != nil {
 		c.SetNickname(*req.Nickname)
 	}
+	if req.GasType != nil {
+		c.SetGasType(req.GasType.String())
+	}
 	return c
 }
 
@@ -70,10 +75,12 @@ func UpdateSet(u *ent.ChainBaseUpdateOne, req *Req) *ent.ChainBaseUpdateOne {
 	if req.Nickname != nil {
 		u = u.SetNickname(*req.Nickname)
 	}
+	if req.GasType != nil {
+		u = u.SetGasType(req.GasType.String())
+	}
 	if req.DeletedAt != nil {
 		u = u.SetDeletedAt(*req.DeletedAt)
 	}
-
 	return u
 }
 
@@ -85,6 +92,7 @@ type Conds struct {
 	Nickname   *cruder.Cond
 }
 
+//nolint:gocyclo
 func SetQueryConds(q *ent.ChainBaseQuery, conds *Conds) (*ent.ChainBaseQuery, error) {
 	if conds.Name != nil {
 		name, ok := conds.Name.Val.(string)

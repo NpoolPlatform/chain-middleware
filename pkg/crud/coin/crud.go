@@ -82,6 +82,7 @@ type Conds struct {
 	ID       *cruder.Cond
 	IDs      *cruder.Cond
 	Name     *cruder.Cond
+	Unit     *cruder.Cond
 	ENV      *cruder.Cond
 	Presale  *cruder.Cond
 	ForPay   *cruder.Cond
@@ -124,6 +125,20 @@ func SetQueryConds(q *ent.CoinBaseQuery, conds *Conds) (*ent.CoinBaseQuery, erro
 		case cruder.EQ:
 			q.Where(
 				entcoinbase.Name(name),
+			)
+		default:
+			return nil, fmt.Errorf("invalid coinbase field")
+		}
+	}
+	if conds.Unit != nil {
+		unit, ok := conds.Unit.Val.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid unit")
+		}
+		switch conds.Unit.Op {
+		case cruder.EQ:
+			q.Where(
+				entcoinbase.Unit(unit),
 			)
 		default:
 			return nil, fmt.Errorf("invalid coinbase field")

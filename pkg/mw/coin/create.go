@@ -6,6 +6,7 @@ import (
 
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
+	chainbasecrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/chain"
 	basecrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin"
 	extracrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/extra"
 	settingcrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/setting"
@@ -19,14 +20,124 @@ import (
 	"github.com/google/uuid"
 )
 
-// TODO: get chain base, if not exist, create chain base
-// TODO: set coin's fee coin type id with chain type
-
 type createHandler struct {
 	*Handler
 }
 
+func (h *createHandler) createChainBase(ctx context.Context, tx *ent.Tx) error {
+	if h.ChainType == nil {
+		return nil
+	}
+	conds := &chainbasecrud.Conds{
+		Name: &cruder.Cond{Op: cruder.EQ, Val: *h.ChainType},
+	}
+	if h.ChainNativeUnit != nil {
+		conds.NativeUnit = &cruder.Cond{Op: cruder.EQ, Val: *h.ChainNativeUnit}
+	}
+	if h.ENV != nil {
+		conds.ENV = &cruder.Cond{Op: cruder.EQ, Val: *h.ENV}
+	}
+	if h.ChainID != nil {
+		conds.ChainID = &cruder.Cond{Op: cruder.EQ, Val: *h.ChainID}
+	}
+
+	stm, err := chainbasecrud.SetQueryConds(tx.ChainBase.Query(), conds)
+	if err != nil {
+		return err
+	}
+
+	info, err := stm.Only(ctx)
+	if err != nil {
+		if !ent.IsNotFound(err) {
+			return err
+		}
+	}
+	if info == nil {
+		if _, err := chainbasecrud.CreateSet(
+			tx.ChainBase.Create(),
+			&chainbasecrud.Req{
+				Name:       h.ChainType,
+				NativeUnit: h.ChainNativeUnit,
+				AtomicUnit: h.ChainAtomicUnit,
+				UnitExp:    h.ChainUnitExp,
+				ENV:        h.ENV,
+				ChainID:    h.ChainID,
+				Nickname:   h.ChainNickname,
+				GasType:    h.GasType,
+			},
+		).Save(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (h *createHandler) createNativeCoinBase(ctx context.Context, tx *ent.Tx) error {
+	if h.ChainNativeCoinName == nil {
+		return nil
+	}
+
+	stm, err := basecrud.SetQueryConds(
+		tx.CoinBase.Query(),
+		&basecrud.Conds{
+			Name: &cruder.Cond{Op: cruder.EQ, Val: *h.ChainNativeCoinName},
+			Unit: &cruder.Cond{Op: cruder.EQ, Val: *h.ChainNativeUnit},
+			ENV:  &cruder.Cond{Op: cruder.EQ, Val: *h.ENV},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	info, err := stm.Only(ctx)
+	if err != nil {
+		if !ent.IsNotFound(err) {
+			return err
+		}
+	}
+
+	if info == nil {
+		info, err = basecrud.CreateSet(
+			tx.CoinBase.Create(),
+			&basecrud.Req{
+				Name: h.ChainNativeCoinName,
+				Unit: h.ChainNativeUnit,
+				ENV:  h.ENV,
+			},
+		).Save(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	h.FeeCoinTypeID = &info.ID
+
+	return nil
+}
 func (h *createHandler) createCoinBase(ctx context.Context, tx *ent.Tx) error {
+	stm, err := basecrud.SetQueryConds(
+		tx.CoinBase.Query(),
+		&basecrud.Conds{
+			Name: &cruder.Cond{Op: cruder.EQ, Val: *h.Name},
+			Unit: &cruder.Cond{Op: cruder.EQ, Val: *h.Unit},
+			ENV:  &cruder.Cond{Op: cruder.EQ, Val: *h.ENV},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	info, err := stm.Only(ctx)
+	if err != nil {
+		if !ent.IsNotFound(err) {
+			return err
+		}
+	}
+	if info != nil {
+		h.ID = &info.ID
+		return nil
+	}
+
 	if _, err := basecrud.CreateSet(
 		tx.CoinBase.Create(),
 		&basecrud.Req{
@@ -45,7 +156,55 @@ func (h *createHandler) createCoinBase(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
+func (h *createHandler) createNativeCoinExtra(ctx context.Context, tx *ent.Tx) error {
+	stm, err := extracrud.SetQueryConds(
+		tx.CoinExtra.Query(),
+		&extracrud.Conds{
+			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.FeeCoinTypeID},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	info, err := stm.Only(ctx)
+	if err != nil {
+		return err
+	}
+	if info != nil {
+		return nil
+	}
+
+	if _, err := extracrud.CreateSet(
+		tx.CoinExtra.Create(),
+		&extracrud.Req{
+			CoinTypeID: h.FeeCoinTypeID,
+		},
+	).Save(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (h *createHandler) createCoinExtra(ctx context.Context, tx *ent.Tx) error {
+	stm, err := extracrud.SetQueryConds(
+		tx.CoinExtra.Query(),
+		&extracrud.Conds{
+			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.ID},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	info, err := stm.Only(ctx)
+	if err != nil {
+		return err
+	}
+	if info != nil {
+		return nil
+	}
+
 	if _, err := extracrud.CreateSet(
 		tx.CoinExtra.Create(),
 		&extracrud.Req{
@@ -59,7 +218,55 @@ func (h *createHandler) createCoinExtra(ctx context.Context, tx *ent.Tx) error {
 	return nil
 }
 
+func (h *createHandler) createNativeCoinSetting(ctx context.Context, tx *ent.Tx) error {
+	stm, err := settingcrud.SetQueryConds(
+		tx.Setting.Query(),
+		&settingcrud.Conds{
+			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.FeeCoinTypeID},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	info, err := stm.Only(ctx)
+	if err != nil {
+		return err
+	}
+	if info != nil {
+		return nil
+	}
+
+	if _, err := settingcrud.CreateSet(
+		tx.Setting.Create(),
+		&settingcrud.Req{
+			CoinTypeID:    h.FeeCoinTypeID,
+			FeeCoinTypeID: h.FeeCoinTypeID,
+		},
+	).Save(ctx); err != nil {
+		return err
+	}
+	return nil
+}
 func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error {
+	stm, err := settingcrud.SetQueryConds(
+		tx.Setting.Query(),
+		&settingcrud.Conds{
+			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.ID},
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	info, err := stm.Only(ctx)
+	if err != nil {
+		return err
+	}
+	if info != nil {
+		return nil
+	}
+
 	if _, err := settingcrud.CreateSet(
 		tx.Setting.Create(),
 		&settingcrud.Req{
@@ -107,24 +314,6 @@ func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
 		_ = redis2.Unlock(lockKey)
 	}()
 
-	h.Conds = &basecrud.Conds{
-		Name: &cruder.Cond{Op: cruder.EQ, Val: *h.Name},
-		ENV:  &cruder.Cond{Op: cruder.EQ, Val: *h.ENV},
-	}
-	h.Offset = 0
-	h.Limit = 2
-
-	coin, err := h.GetCoinOnly(ctx)
-	if err != nil {
-		return nil, err
-	}
-	if coin != nil {
-		if coin.Unit != *h.Unit {
-			return nil, fmt.Errorf("invalid coinunit")
-		}
-		return coin, nil
-	}
-
 	id := uuid.New()
 	if h.ID == nil {
 		h.ID = &id
@@ -134,7 +323,19 @@ func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
 		Handler: h,
 	}
 
-	err = db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+	err := db.WithTx(ctx, func(_ctx context.Context, tx *ent.Tx) error {
+		if err := handler.createChainBase(_ctx, tx); err != nil {
+			return err
+		}
+		if err := handler.createNativeCoinBase(_ctx, tx); err != nil {
+			return err
+		}
+		if err := handler.createNativeCoinExtra(_ctx, tx); err != nil {
+			return err
+		}
+		if err := handler.createNativeCoinSetting(_ctx, tx); err != nil {
+			return err
+		}
 		if err := handler.createCoinBase(_ctx, tx); err != nil {
 			return err
 		}

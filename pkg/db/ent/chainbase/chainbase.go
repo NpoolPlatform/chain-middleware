@@ -33,6 +33,8 @@ const (
 	FieldChainID = "chain_id"
 	// FieldNickname holds the string denoting the nickname field in the database.
 	FieldNickname = "nickname"
+	// FieldGasType holds the string denoting the gas_type field in the database.
+	FieldGasType = "gas_type"
 	// Table holds the table name of the chainbase in the database.
 	Table = "chain_bases"
 )
@@ -51,6 +53,7 @@ var Columns = []string{
 	FieldEnv,
 	FieldChainID,
 	FieldNickname,
+	FieldGasType,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -96,4 +99,6 @@ var (
 	DefaultChainID string
 	// DefaultNickname holds the default value on creation for the "nickname" field.
 	DefaultNickname string
+	// DefaultGasType holds the default value on creation for the "gas_type" field.
+	DefaultGasType string
 )

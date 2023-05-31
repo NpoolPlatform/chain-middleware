@@ -82,6 +82,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			chainbase.FieldEnv:        {Type: field.TypeString, Column: chainbase.FieldEnv},
 			chainbase.FieldChainID:    {Type: field.TypeString, Column: chainbase.FieldChainID},
 			chainbase.FieldNickname:   {Type: field.TypeString, Column: chainbase.FieldNickname},
+			chainbase.FieldGasType:    {Type: field.TypeString, Column: chainbase.FieldGasType},
 		},
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
@@ -648,6 +649,11 @@ func (f *ChainBaseFilter) WhereChainID(p entql.StringP) {
 // WhereNickname applies the entql string predicate on the nickname field.
 func (f *ChainBaseFilter) WhereNickname(p entql.StringP) {
 	f.Where(p.Field(chainbase.FieldNickname))
+}
+
+// WhereGasType applies the entql string predicate on the gas_type field.
+func (f *ChainBaseFilter) WhereGasType(p entql.StringP) {
+	f.Where(p.Field(chainbase.FieldGasType))
 }
 
 // addPredicate implements the predicateAdder interface.

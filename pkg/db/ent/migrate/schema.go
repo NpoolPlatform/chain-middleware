@@ -48,6 +48,7 @@ var (
 		{Name: "env", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "chain_id", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "nickname", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "gas_type", Type: field.TypeString, Nullable: true, Default: "DefaultGasType"},
 	}
 	// ChainBasesTable holds the schema information for the "chain_bases" table.
 	ChainBasesTable = &schema.Table{

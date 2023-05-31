@@ -179,6 +179,10 @@ func init() {
 	chainbaseDescNickname := chainbaseFields[8].Descriptor()
 	// chainbase.DefaultNickname holds the default value on creation for the nickname field.
 	chainbase.DefaultNickname = chainbaseDescNickname.Default.(string)
+	// chainbaseDescGasType is the schema descriptor for gas_type field.
+	chainbaseDescGasType := chainbaseFields[9].Descriptor()
+	// chainbase.DefaultGasType holds the default value on creation for the gas_type field.
+	chainbase.DefaultGasType = chainbaseDescGasType.Default.(string)
 	coinbaseMixin := schema.CoinBase{}.Mixin()
 	coinbase.Policy = privacy.NewPolicies(coinbaseMixin[0], schema.CoinBase{})
 	coinbase.Hooks[0] = func(next ent.Mutator) ent.Mutator {

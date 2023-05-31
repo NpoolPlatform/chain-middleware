@@ -37,6 +37,8 @@ type ChainBase struct {
 	ChainID string `json:"chain_id,omitempty"`
 	// Nickname holds the value of the "nickname" field.
 	Nickname string `json:"nickname,omitempty"`
+	// GasType holds the value of the "gas_type" field.
+	GasType string `json:"gas_type,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -46,7 +48,7 @@ func (*ChainBase) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case chainbase.FieldID, chainbase.FieldCreatedAt, chainbase.FieldUpdatedAt, chainbase.FieldDeletedAt, chainbase.FieldUnitExp:
 			values[i] = new(sql.NullInt64)
-		case chainbase.FieldName, chainbase.FieldLogo, chainbase.FieldNativeUnit, chainbase.FieldAtomicUnit, chainbase.FieldEnv, chainbase.FieldChainID, chainbase.FieldNickname:
+		case chainbase.FieldName, chainbase.FieldLogo, chainbase.FieldNativeUnit, chainbase.FieldAtomicUnit, chainbase.FieldEnv, chainbase.FieldChainID, chainbase.FieldNickname, chainbase.FieldGasType:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ChainBase", columns[i])
@@ -135,6 +137,12 @@ func (cb *ChainBase) assignValues(columns []string, values []interface{}) error 
 			} else if value.Valid {
 				cb.Nickname = value.String
 			}
+		case chainbase.FieldGasType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field gas_type", values[i])
+			} else if value.Valid {
+				cb.GasType = value.String
+			}
 		}
 	}
 	return nil
@@ -195,6 +203,9 @@ func (cb *ChainBase) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("nickname=")
 	builder.WriteString(cb.Nickname)
+	builder.WriteString(", ")
+	builder.WriteString("gas_type=")
+	builder.WriteString(cb.GasType)
 	builder.WriteByte(')')
 	return builder.String()
 }

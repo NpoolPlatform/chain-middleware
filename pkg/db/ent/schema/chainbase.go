@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
 // ChainBase holds the schema definition for the ChainBase entity.
@@ -55,6 +56,10 @@ func (ChainBase) Fields() []ent.Field {
 			String("nickname").
 			Optional().
 			Default(""),
+		field.
+			String("gas_type").
+			Optional().
+			Default(basetypes.GasType_DefaultGasType.String()),
 	}
 }
 

@@ -155,6 +155,13 @@ func Nickname(v string) predicate.ChainBase {
 	})
 }
 
+// GasType applies equality check predicate on the "gas_type" field. It's identical to GasTypeEQ.
+func GasType(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGasType), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v uint32) predicate.ChainBase {
 	return predicate.ChainBase(func(s *sql.Selector) {
@@ -1213,6 +1220,119 @@ func NicknameEqualFold(v string) predicate.ChainBase {
 func NicknameContainsFold(v string) predicate.ChainBase {
 	return predicate.ChainBase(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldNickname), v))
+	})
+}
+
+// GasTypeEQ applies the EQ predicate on the "gas_type" field.
+func GasTypeEQ(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeNEQ applies the NEQ predicate on the "gas_type" field.
+func GasTypeNEQ(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeIn applies the In predicate on the "gas_type" field.
+func GasTypeIn(vs ...string) predicate.ChainBase {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldGasType), v...))
+	})
+}
+
+// GasTypeNotIn applies the NotIn predicate on the "gas_type" field.
+func GasTypeNotIn(vs ...string) predicate.ChainBase {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldGasType), v...))
+	})
+}
+
+// GasTypeGT applies the GT predicate on the "gas_type" field.
+func GasTypeGT(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeGTE applies the GTE predicate on the "gas_type" field.
+func GasTypeGTE(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeLT applies the LT predicate on the "gas_type" field.
+func GasTypeLT(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeLTE applies the LTE predicate on the "gas_type" field.
+func GasTypeLTE(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeContains applies the Contains predicate on the "gas_type" field.
+func GasTypeContains(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeHasPrefix applies the HasPrefix predicate on the "gas_type" field.
+func GasTypeHasPrefix(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeHasSuffix applies the HasSuffix predicate on the "gas_type" field.
+func GasTypeHasSuffix(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeIsNil applies the IsNil predicate on the "gas_type" field.
+func GasTypeIsNil() predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldGasType)))
+	})
+}
+
+// GasTypeNotNil applies the NotNil predicate on the "gas_type" field.
+func GasTypeNotNil() predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldGasType)))
+	})
+}
+
+// GasTypeEqualFold applies the EqualFold predicate on the "gas_type" field.
+func GasTypeEqualFold(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldGasType), v))
+	})
+}
+
+// GasTypeContainsFold applies the ContainsFold predicate on the "gas_type" field.
+func GasTypeContainsFold(v string) predicate.ChainBase {
+	return predicate.ChainBase(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldGasType), v))
 	})
 }
 

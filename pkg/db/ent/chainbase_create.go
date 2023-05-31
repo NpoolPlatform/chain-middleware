@@ -175,6 +175,20 @@ func (cbc *ChainBaseCreate) SetNillableNickname(s *string) *ChainBaseCreate {
 	return cbc
 }
 
+// SetGasType sets the "gas_type" field.
+func (cbc *ChainBaseCreate) SetGasType(s string) *ChainBaseCreate {
+	cbc.mutation.SetGasType(s)
+	return cbc
+}
+
+// SetNillableGasType sets the "gas_type" field if the given value is not nil.
+func (cbc *ChainBaseCreate) SetNillableGasType(s *string) *ChainBaseCreate {
+	if s != nil {
+		cbc.SetGasType(*s)
+	}
+	return cbc
+}
+
 // SetID sets the "id" field.
 func (cbc *ChainBaseCreate) SetID(u uint32) *ChainBaseCreate {
 	cbc.mutation.SetID(u)
@@ -313,6 +327,10 @@ func (cbc *ChainBaseCreate) defaults() error {
 		v := chainbase.DefaultNickname
 		cbc.mutation.SetNickname(v)
 	}
+	if _, ok := cbc.mutation.GasType(); !ok {
+		v := chainbase.DefaultGasType
+		cbc.mutation.SetGasType(v)
+	}
 	return nil
 }
 
@@ -448,6 +466,14 @@ func (cbc *ChainBaseCreate) createSpec() (*ChainBase, *sqlgraph.CreateSpec) {
 			Column: chainbase.FieldNickname,
 		})
 		_node.Nickname = value
+	}
+	if value, ok := cbc.mutation.GasType(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: chainbase.FieldGasType,
+		})
+		_node.GasType = value
 	}
 	return _node, _spec
 }
@@ -704,6 +730,24 @@ func (u *ChainBaseUpsert) UpdateNickname() *ChainBaseUpsert {
 // ClearNickname clears the value of the "nickname" field.
 func (u *ChainBaseUpsert) ClearNickname() *ChainBaseUpsert {
 	u.SetNull(chainbase.FieldNickname)
+	return u
+}
+
+// SetGasType sets the "gas_type" field.
+func (u *ChainBaseUpsert) SetGasType(v string) *ChainBaseUpsert {
+	u.Set(chainbase.FieldGasType, v)
+	return u
+}
+
+// UpdateGasType sets the "gas_type" field to the value that was provided on create.
+func (u *ChainBaseUpsert) UpdateGasType() *ChainBaseUpsert {
+	u.SetExcluded(chainbase.FieldGasType)
+	return u
+}
+
+// ClearGasType clears the value of the "gas_type" field.
+func (u *ChainBaseUpsert) ClearGasType() *ChainBaseUpsert {
+	u.SetNull(chainbase.FieldGasType)
 	return u
 }
 
@@ -992,6 +1036,27 @@ func (u *ChainBaseUpsertOne) UpdateNickname() *ChainBaseUpsertOne {
 func (u *ChainBaseUpsertOne) ClearNickname() *ChainBaseUpsertOne {
 	return u.Update(func(s *ChainBaseUpsert) {
 		s.ClearNickname()
+	})
+}
+
+// SetGasType sets the "gas_type" field.
+func (u *ChainBaseUpsertOne) SetGasType(v string) *ChainBaseUpsertOne {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.SetGasType(v)
+	})
+}
+
+// UpdateGasType sets the "gas_type" field to the value that was provided on create.
+func (u *ChainBaseUpsertOne) UpdateGasType() *ChainBaseUpsertOne {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.UpdateGasType()
+	})
+}
+
+// ClearGasType clears the value of the "gas_type" field.
+func (u *ChainBaseUpsertOne) ClearGasType() *ChainBaseUpsertOne {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.ClearGasType()
 	})
 }
 
@@ -1445,6 +1510,27 @@ func (u *ChainBaseUpsertBulk) UpdateNickname() *ChainBaseUpsertBulk {
 func (u *ChainBaseUpsertBulk) ClearNickname() *ChainBaseUpsertBulk {
 	return u.Update(func(s *ChainBaseUpsert) {
 		s.ClearNickname()
+	})
+}
+
+// SetGasType sets the "gas_type" field.
+func (u *ChainBaseUpsertBulk) SetGasType(v string) *ChainBaseUpsertBulk {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.SetGasType(v)
+	})
+}
+
+// UpdateGasType sets the "gas_type" field to the value that was provided on create.
+func (u *ChainBaseUpsertBulk) UpdateGasType() *ChainBaseUpsertBulk {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.UpdateGasType()
+	})
+}
+
+// ClearGasType clears the value of the "gas_type" field.
+func (u *ChainBaseUpsertBulk) ClearGasType() *ChainBaseUpsertBulk {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.ClearGasType()
 	})
 }
 

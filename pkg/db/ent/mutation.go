@@ -1596,6 +1596,7 @@ type ChainBaseMutation struct {
 	env           *string
 	chain_id      *string
 	nickname      *string
+	gas_type      *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*ChainBase, error)
@@ -2287,6 +2288,55 @@ func (m *ChainBaseMutation) ResetNickname() {
 	delete(m.clearedFields, chainbase.FieldNickname)
 }
 
+// SetGasType sets the "gas_type" field.
+func (m *ChainBaseMutation) SetGasType(s string) {
+	m.gas_type = &s
+}
+
+// GasType returns the value of the "gas_type" field in the mutation.
+func (m *ChainBaseMutation) GasType() (r string, exists bool) {
+	v := m.gas_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGasType returns the old "gas_type" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldGasType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGasType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGasType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGasType: %w", err)
+	}
+	return oldValue.GasType, nil
+}
+
+// ClearGasType clears the value of the "gas_type" field.
+func (m *ChainBaseMutation) ClearGasType() {
+	m.gas_type = nil
+	m.clearedFields[chainbase.FieldGasType] = struct{}{}
+}
+
+// GasTypeCleared returns if the "gas_type" field was cleared in this mutation.
+func (m *ChainBaseMutation) GasTypeCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldGasType]
+	return ok
+}
+
+// ResetGasType resets all changes to the "gas_type" field.
+func (m *ChainBaseMutation) ResetGasType() {
+	m.gas_type = nil
+	delete(m.clearedFields, chainbase.FieldGasType)
+}
+
 // Where appends a list predicates to the ChainBaseMutation builder.
 func (m *ChainBaseMutation) Where(ps ...predicate.ChainBase) {
 	m.predicates = append(m.predicates, ps...)
@@ -2306,7 +2356,7 @@ func (m *ChainBaseMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChainBaseMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, chainbase.FieldCreatedAt)
 	}
@@ -2340,6 +2390,9 @@ func (m *ChainBaseMutation) Fields() []string {
 	if m.nickname != nil {
 		fields = append(fields, chainbase.FieldNickname)
 	}
+	if m.gas_type != nil {
+		fields = append(fields, chainbase.FieldGasType)
+	}
 	return fields
 }
 
@@ -2370,6 +2423,8 @@ func (m *ChainBaseMutation) Field(name string) (ent.Value, bool) {
 		return m.ChainID()
 	case chainbase.FieldNickname:
 		return m.Nickname()
+	case chainbase.FieldGasType:
+		return m.GasType()
 	}
 	return nil, false
 }
@@ -2401,6 +2456,8 @@ func (m *ChainBaseMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldChainID(ctx)
 	case chainbase.FieldNickname:
 		return m.OldNickname(ctx)
+	case chainbase.FieldGasType:
+		return m.OldGasType(ctx)
 	}
 	return nil, fmt.Errorf("unknown ChainBase field %s", name)
 }
@@ -2486,6 +2543,13 @@ func (m *ChainBaseMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetNickname(v)
+		return nil
+	case chainbase.FieldGasType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGasType(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ChainBase field %s", name)
@@ -2592,6 +2656,9 @@ func (m *ChainBaseMutation) ClearedFields() []string {
 	if m.FieldCleared(chainbase.FieldNickname) {
 		fields = append(fields, chainbase.FieldNickname)
 	}
+	if m.FieldCleared(chainbase.FieldGasType) {
+		fields = append(fields, chainbase.FieldGasType)
+	}
 	return fields
 }
 
@@ -2629,6 +2696,9 @@ func (m *ChainBaseMutation) ClearField(name string) error {
 		return nil
 	case chainbase.FieldNickname:
 		m.ClearNickname()
+		return nil
+	case chainbase.FieldGasType:
+		m.ClearGasType()
 		return nil
 	}
 	return fmt.Errorf("unknown ChainBase nullable field %s", name)
@@ -2670,6 +2740,9 @@ func (m *ChainBaseMutation) ResetField(name string) error {
 		return nil
 	case chainbase.FieldNickname:
 		m.ResetNickname()
+		return nil
+	case chainbase.FieldGasType:
+		m.ResetGasType()
 		return nil
 	}
 	return fmt.Errorf("unknown ChainBase field %s", name)
