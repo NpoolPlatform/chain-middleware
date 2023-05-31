@@ -90,7 +90,7 @@ func SetQueryConds(q *ent.FiatCurrencyHistoryQuery, conds *Conds) (*ent.FiatCurr
 			return nil, fmt.Errorf("invalid fiatids")
 		}
 		switch conds.FiatIDs.Op {
-		case cruder.EQ:
+		case cruder.IN:
 			q.Where(entfiatcurrencyhis.FiatIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid fiatcurrency field")

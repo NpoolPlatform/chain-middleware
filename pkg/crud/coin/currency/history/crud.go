@@ -90,7 +90,7 @@ func SetQueryConds(q *ent.CurrencyHistoryQuery, conds *Conds) (*ent.CurrencyHist
 			return nil, fmt.Errorf("invalid cointypeids")
 		}
 		switch conds.CoinTypeIDs.Op {
-		case cruder.EQ:
+		case cruder.IN:
 			q.Where(entcurrencyhis.CoinTypeIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid currency field")
