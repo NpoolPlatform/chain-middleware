@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/appcoin"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
@@ -40,6 +41,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// AppCoin is the client for interacting with the AppCoin builders.
 	AppCoin *AppCoinClient
+	// ChainBase is the client for interacting with the ChainBase builders.
+	ChainBase *ChainBaseClient
 	// CoinBase is the client for interacting with the CoinBase builders.
 	CoinBase *CoinBaseClient
 	// CoinDescription is the client for interacting with the CoinDescription builders.
@@ -86,6 +89,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AppCoin = NewAppCoinClient(c.config)
+	c.ChainBase = NewChainBaseClient(c.config)
 	c.CoinBase = NewCoinBaseClient(c.config)
 	c.CoinDescription = NewCoinDescriptionClient(c.config)
 	c.CoinExtra = NewCoinExtraClient(c.config)
@@ -136,6 +140,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                     ctx,
 		config:                  cfg,
 		AppCoin:                 NewAppCoinClient(cfg),
+		ChainBase:               NewChainBaseClient(cfg),
 		CoinBase:                NewCoinBaseClient(cfg),
 		CoinDescription:         NewCoinDescriptionClient(cfg),
 		CoinExtra:               NewCoinExtraClient(cfg),
@@ -172,6 +177,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                     ctx,
 		config:                  cfg,
 		AppCoin:                 NewAppCoinClient(cfg),
+		ChainBase:               NewChainBaseClient(cfg),
 		CoinBase:                NewCoinBaseClient(cfg),
 		CoinDescription:         NewCoinDescriptionClient(cfg),
 		CoinExtra:               NewCoinExtraClient(cfg),
@@ -218,6 +224,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.AppCoin.Use(hooks...)
+	c.ChainBase.Use(hooks...)
 	c.CoinBase.Use(hooks...)
 	c.CoinDescription.Use(hooks...)
 	c.CoinExtra.Use(hooks...)
@@ -325,6 +332,97 @@ func (c *AppCoinClient) GetX(ctx context.Context, id uuid.UUID) *AppCoin {
 func (c *AppCoinClient) Hooks() []Hook {
 	hooks := c.hooks.AppCoin
 	return append(hooks[:len(hooks):len(hooks)], appcoin.Hooks[:]...)
+}
+
+// ChainBaseClient is a client for the ChainBase schema.
+type ChainBaseClient struct {
+	config
+}
+
+// NewChainBaseClient returns a client for the ChainBase from the given config.
+func NewChainBaseClient(c config) *ChainBaseClient {
+	return &ChainBaseClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `chainbase.Hooks(f(g(h())))`.
+func (c *ChainBaseClient) Use(hooks ...Hook) {
+	c.hooks.ChainBase = append(c.hooks.ChainBase, hooks...)
+}
+
+// Create returns a builder for creating a ChainBase entity.
+func (c *ChainBaseClient) Create() *ChainBaseCreate {
+	mutation := newChainBaseMutation(c.config, OpCreate)
+	return &ChainBaseCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ChainBase entities.
+func (c *ChainBaseClient) CreateBulk(builders ...*ChainBaseCreate) *ChainBaseCreateBulk {
+	return &ChainBaseCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ChainBase.
+func (c *ChainBaseClient) Update() *ChainBaseUpdate {
+	mutation := newChainBaseMutation(c.config, OpUpdate)
+	return &ChainBaseUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ChainBaseClient) UpdateOne(cb *ChainBase) *ChainBaseUpdateOne {
+	mutation := newChainBaseMutation(c.config, OpUpdateOne, withChainBase(cb))
+	return &ChainBaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ChainBaseClient) UpdateOneID(id uint32) *ChainBaseUpdateOne {
+	mutation := newChainBaseMutation(c.config, OpUpdateOne, withChainBaseID(id))
+	return &ChainBaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ChainBase.
+func (c *ChainBaseClient) Delete() *ChainBaseDelete {
+	mutation := newChainBaseMutation(c.config, OpDelete)
+	return &ChainBaseDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ChainBaseClient) DeleteOne(cb *ChainBase) *ChainBaseDeleteOne {
+	return c.DeleteOneID(cb.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *ChainBaseClient) DeleteOneID(id uint32) *ChainBaseDeleteOne {
+	builder := c.Delete().Where(chainbase.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ChainBaseDeleteOne{builder}
+}
+
+// Query returns a query builder for ChainBase.
+func (c *ChainBaseClient) Query() *ChainBaseQuery {
+	return &ChainBaseQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a ChainBase entity by its id.
+func (c *ChainBaseClient) Get(ctx context.Context, id uint32) (*ChainBase, error) {
+	return c.Query().Where(chainbase.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ChainBaseClient) GetX(ctx context.Context, id uint32) *ChainBase {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ChainBaseClient) Hooks() []Hook {
+	hooks := c.hooks.ChainBase
+	return append(hooks[:len(hooks):len(hooks)], chainbase.Hooks[:]...)
 }
 
 // CoinBaseClient is a client for the CoinBase schema.

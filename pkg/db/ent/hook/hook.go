@@ -22,6 +22,19 @@ func (f AppCoinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
+// The ChainBaseFunc type is an adapter to allow the use of ordinary
+// function as ChainBase mutator.
+type ChainBaseFunc func(context.Context, *ent.ChainBaseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChainBaseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ChainBaseMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChainBaseMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The CoinBaseFunc type is an adapter to allow the use of ordinary
 // function as CoinBase mutator.
 type CoinBaseFunc func(context.Context, *ent.CoinBaseMutation) (ent.Value, error)

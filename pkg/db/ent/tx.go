@@ -16,6 +16,8 @@ type Tx struct {
 	config
 	// AppCoin is the client for interacting with the AppCoin builders.
 	AppCoin *AppCoinClient
+	// ChainBase is the client for interacting with the ChainBase builders.
+	ChainBase *ChainBaseClient
 	// CoinBase is the client for interacting with the CoinBase builders.
 	CoinBase *CoinBaseClient
 	// CoinDescription is the client for interacting with the CoinDescription builders.
@@ -184,6 +186,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AppCoin = NewAppCoinClient(tx.config)
+	tx.ChainBase = NewChainBaseClient(tx.config)
 	tx.CoinBase = NewCoinBaseClient(tx.config)
 	tx.CoinDescription = NewCoinDescriptionClient(tx.config)
 	tx.CoinExtra = NewCoinExtraClient(tx.config)

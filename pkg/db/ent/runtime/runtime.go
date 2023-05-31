@@ -6,6 +6,7 @@ import (
 	"context"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/appcoin"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
@@ -118,6 +119,66 @@ func init() {
 	appcoinDescID := appcoinFields[0].Descriptor()
 	// appcoin.DefaultID holds the default value on creation for the id field.
 	appcoin.DefaultID = appcoinDescID.Default.(func() uuid.UUID)
+	chainbaseMixin := schema.ChainBase{}.Mixin()
+	chainbase.Policy = privacy.NewPolicies(chainbaseMixin[0], schema.ChainBase{})
+	chainbase.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := chainbase.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	chainbaseMixinFields0 := chainbaseMixin[0].Fields()
+	_ = chainbaseMixinFields0
+	chainbaseFields := schema.ChainBase{}.Fields()
+	_ = chainbaseFields
+	// chainbaseDescCreatedAt is the schema descriptor for created_at field.
+	chainbaseDescCreatedAt := chainbaseMixinFields0[0].Descriptor()
+	// chainbase.DefaultCreatedAt holds the default value on creation for the created_at field.
+	chainbase.DefaultCreatedAt = chainbaseDescCreatedAt.Default.(func() uint32)
+	// chainbaseDescUpdatedAt is the schema descriptor for updated_at field.
+	chainbaseDescUpdatedAt := chainbaseMixinFields0[1].Descriptor()
+	// chainbase.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	chainbase.DefaultUpdatedAt = chainbaseDescUpdatedAt.Default.(func() uint32)
+	// chainbase.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	chainbase.UpdateDefaultUpdatedAt = chainbaseDescUpdatedAt.UpdateDefault.(func() uint32)
+	// chainbaseDescDeletedAt is the schema descriptor for deleted_at field.
+	chainbaseDescDeletedAt := chainbaseMixinFields0[2].Descriptor()
+	// chainbase.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	chainbase.DefaultDeletedAt = chainbaseDescDeletedAt.Default.(func() uint32)
+	// chainbaseDescName is the schema descriptor for name field.
+	chainbaseDescName := chainbaseFields[1].Descriptor()
+	// chainbase.DefaultName holds the default value on creation for the name field.
+	chainbase.DefaultName = chainbaseDescName.Default.(string)
+	// chainbaseDescLogo is the schema descriptor for logo field.
+	chainbaseDescLogo := chainbaseFields[2].Descriptor()
+	// chainbase.DefaultLogo holds the default value on creation for the logo field.
+	chainbase.DefaultLogo = chainbaseDescLogo.Default.(string)
+	// chainbaseDescNativeUnit is the schema descriptor for native_unit field.
+	chainbaseDescNativeUnit := chainbaseFields[3].Descriptor()
+	// chainbase.DefaultNativeUnit holds the default value on creation for the native_unit field.
+	chainbase.DefaultNativeUnit = chainbaseDescNativeUnit.Default.(string)
+	// chainbaseDescAtomicUnit is the schema descriptor for atomic_unit field.
+	chainbaseDescAtomicUnit := chainbaseFields[4].Descriptor()
+	// chainbase.DefaultAtomicUnit holds the default value on creation for the atomic_unit field.
+	chainbase.DefaultAtomicUnit = chainbaseDescAtomicUnit.Default.(string)
+	// chainbaseDescUnitExp is the schema descriptor for unit_exp field.
+	chainbaseDescUnitExp := chainbaseFields[5].Descriptor()
+	// chainbase.DefaultUnitExp holds the default value on creation for the unit_exp field.
+	chainbase.DefaultUnitExp = chainbaseDescUnitExp.Default.(uint32)
+	// chainbaseDescEnv is the schema descriptor for env field.
+	chainbaseDescEnv := chainbaseFields[6].Descriptor()
+	// chainbase.DefaultEnv holds the default value on creation for the env field.
+	chainbase.DefaultEnv = chainbaseDescEnv.Default.(string)
+	// chainbaseDescChainID is the schema descriptor for chain_id field.
+	chainbaseDescChainID := chainbaseFields[7].Descriptor()
+	// chainbase.DefaultChainID holds the default value on creation for the chain_id field.
+	chainbase.DefaultChainID = chainbaseDescChainID.Default.(string)
+	// chainbaseDescNickname is the schema descriptor for nickname field.
+	chainbaseDescNickname := chainbaseFields[8].Descriptor()
+	// chainbase.DefaultNickname holds the default value on creation for the nickname field.
+	chainbase.DefaultNickname = chainbaseDescNickname.Default.(string)
 	coinbaseMixin := schema.CoinBase{}.Mixin()
 	coinbase.Policy = privacy.NewPolicies(coinbaseMixin[0], schema.CoinBase{})
 	coinbase.Hooks[0] = func(next ent.Mutator) ent.Mutator {

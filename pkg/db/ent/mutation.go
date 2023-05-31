@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/appcoin"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
@@ -42,6 +43,7 @@ const (
 
 	// Node types.
 	TypeAppCoin                 = "AppCoin"
+	TypeChainBase               = "ChainBase"
 	TypeCoinBase                = "CoinBase"
 	TypeCoinDescription         = "CoinDescription"
 	TypeCoinExtra               = "CoinExtra"
@@ -1571,6 +1573,1154 @@ func (m *AppCoinMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AppCoinMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown AppCoin edge %s", name)
+}
+
+// ChainBaseMutation represents an operation that mutates the ChainBase nodes in the graph.
+type ChainBaseMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uint32
+	created_at    *uint32
+	addcreated_at *int32
+	updated_at    *uint32
+	addupdated_at *int32
+	deleted_at    *uint32
+	adddeleted_at *int32
+	name          *string
+	logo          *string
+	native_unit   *string
+	atomic_unit   *string
+	unit_exp      *uint32
+	addunit_exp   *int32
+	env           *string
+	chain_id      *string
+	nickname      *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*ChainBase, error)
+	predicates    []predicate.ChainBase
+}
+
+var _ ent.Mutation = (*ChainBaseMutation)(nil)
+
+// chainbaseOption allows management of the mutation configuration using functional options.
+type chainbaseOption func(*ChainBaseMutation)
+
+// newChainBaseMutation creates new mutation for the ChainBase entity.
+func newChainBaseMutation(c config, op Op, opts ...chainbaseOption) *ChainBaseMutation {
+	m := &ChainBaseMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeChainBase,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withChainBaseID sets the ID field of the mutation.
+func withChainBaseID(id uint32) chainbaseOption {
+	return func(m *ChainBaseMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ChainBase
+		)
+		m.oldValue = func(ctx context.Context) (*ChainBase, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ChainBase.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withChainBase sets the old ChainBase of the mutation.
+func withChainBase(node *ChainBase) chainbaseOption {
+	return func(m *ChainBaseMutation) {
+		m.oldValue = func(context.Context) (*ChainBase, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ChainBaseMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ChainBaseMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ChainBase entities.
+func (m *ChainBaseMutation) SetID(id uint32) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ChainBaseMutation) ID() (id uint32, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ChainBaseMutation) IDs(ctx context.Context) ([]uint32, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint32{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ChainBase.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ChainBaseMutation) SetCreatedAt(u uint32) {
+	m.created_at = &u
+	m.addcreated_at = nil
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ChainBaseMutation) CreatedAt() (r uint32, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldCreatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// AddCreatedAt adds u to the "created_at" field.
+func (m *ChainBaseMutation) AddCreatedAt(u int32) {
+	if m.addcreated_at != nil {
+		*m.addcreated_at += u
+	} else {
+		m.addcreated_at = &u
+	}
+}
+
+// AddedCreatedAt returns the value that was added to the "created_at" field in this mutation.
+func (m *ChainBaseMutation) AddedCreatedAt() (r int32, exists bool) {
+	v := m.addcreated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ChainBaseMutation) ResetCreatedAt() {
+	m.created_at = nil
+	m.addcreated_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ChainBaseMutation) SetUpdatedAt(u uint32) {
+	m.updated_at = &u
+	m.addupdated_at = nil
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ChainBaseMutation) UpdatedAt() (r uint32, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldUpdatedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// AddUpdatedAt adds u to the "updated_at" field.
+func (m *ChainBaseMutation) AddUpdatedAt(u int32) {
+	if m.addupdated_at != nil {
+		*m.addupdated_at += u
+	} else {
+		m.addupdated_at = &u
+	}
+}
+
+// AddedUpdatedAt returns the value that was added to the "updated_at" field in this mutation.
+func (m *ChainBaseMutation) AddedUpdatedAt() (r int32, exists bool) {
+	v := m.addupdated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ChainBaseMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+	m.addupdated_at = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *ChainBaseMutation) SetDeletedAt(u uint32) {
+	m.deleted_at = &u
+	m.adddeleted_at = nil
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *ChainBaseMutation) DeletedAt() (r uint32, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldDeletedAt(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// AddDeletedAt adds u to the "deleted_at" field.
+func (m *ChainBaseMutation) AddDeletedAt(u int32) {
+	if m.adddeleted_at != nil {
+		*m.adddeleted_at += u
+	} else {
+		m.adddeleted_at = &u
+	}
+}
+
+// AddedDeletedAt returns the value that was added to the "deleted_at" field in this mutation.
+func (m *ChainBaseMutation) AddedDeletedAt() (r int32, exists bool) {
+	v := m.adddeleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *ChainBaseMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	m.adddeleted_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *ChainBaseMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ChainBaseMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *ChainBaseMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[chainbase.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *ChainBaseMutation) NameCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ChainBaseMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, chainbase.FieldName)
+}
+
+// SetLogo sets the "logo" field.
+func (m *ChainBaseMutation) SetLogo(s string) {
+	m.logo = &s
+}
+
+// Logo returns the value of the "logo" field in the mutation.
+func (m *ChainBaseMutation) Logo() (r string, exists bool) {
+	v := m.logo
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLogo returns the old "logo" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldLogo(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLogo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLogo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLogo: %w", err)
+	}
+	return oldValue.Logo, nil
+}
+
+// ClearLogo clears the value of the "logo" field.
+func (m *ChainBaseMutation) ClearLogo() {
+	m.logo = nil
+	m.clearedFields[chainbase.FieldLogo] = struct{}{}
+}
+
+// LogoCleared returns if the "logo" field was cleared in this mutation.
+func (m *ChainBaseMutation) LogoCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldLogo]
+	return ok
+}
+
+// ResetLogo resets all changes to the "logo" field.
+func (m *ChainBaseMutation) ResetLogo() {
+	m.logo = nil
+	delete(m.clearedFields, chainbase.FieldLogo)
+}
+
+// SetNativeUnit sets the "native_unit" field.
+func (m *ChainBaseMutation) SetNativeUnit(s string) {
+	m.native_unit = &s
+}
+
+// NativeUnit returns the value of the "native_unit" field in the mutation.
+func (m *ChainBaseMutation) NativeUnit() (r string, exists bool) {
+	v := m.native_unit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNativeUnit returns the old "native_unit" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldNativeUnit(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNativeUnit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNativeUnit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNativeUnit: %w", err)
+	}
+	return oldValue.NativeUnit, nil
+}
+
+// ClearNativeUnit clears the value of the "native_unit" field.
+func (m *ChainBaseMutation) ClearNativeUnit() {
+	m.native_unit = nil
+	m.clearedFields[chainbase.FieldNativeUnit] = struct{}{}
+}
+
+// NativeUnitCleared returns if the "native_unit" field was cleared in this mutation.
+func (m *ChainBaseMutation) NativeUnitCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldNativeUnit]
+	return ok
+}
+
+// ResetNativeUnit resets all changes to the "native_unit" field.
+func (m *ChainBaseMutation) ResetNativeUnit() {
+	m.native_unit = nil
+	delete(m.clearedFields, chainbase.FieldNativeUnit)
+}
+
+// SetAtomicUnit sets the "atomic_unit" field.
+func (m *ChainBaseMutation) SetAtomicUnit(s string) {
+	m.atomic_unit = &s
+}
+
+// AtomicUnit returns the value of the "atomic_unit" field in the mutation.
+func (m *ChainBaseMutation) AtomicUnit() (r string, exists bool) {
+	v := m.atomic_unit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAtomicUnit returns the old "atomic_unit" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldAtomicUnit(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAtomicUnit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAtomicUnit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAtomicUnit: %w", err)
+	}
+	return oldValue.AtomicUnit, nil
+}
+
+// ClearAtomicUnit clears the value of the "atomic_unit" field.
+func (m *ChainBaseMutation) ClearAtomicUnit() {
+	m.atomic_unit = nil
+	m.clearedFields[chainbase.FieldAtomicUnit] = struct{}{}
+}
+
+// AtomicUnitCleared returns if the "atomic_unit" field was cleared in this mutation.
+func (m *ChainBaseMutation) AtomicUnitCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldAtomicUnit]
+	return ok
+}
+
+// ResetAtomicUnit resets all changes to the "atomic_unit" field.
+func (m *ChainBaseMutation) ResetAtomicUnit() {
+	m.atomic_unit = nil
+	delete(m.clearedFields, chainbase.FieldAtomicUnit)
+}
+
+// SetUnitExp sets the "unit_exp" field.
+func (m *ChainBaseMutation) SetUnitExp(u uint32) {
+	m.unit_exp = &u
+	m.addunit_exp = nil
+}
+
+// UnitExp returns the value of the "unit_exp" field in the mutation.
+func (m *ChainBaseMutation) UnitExp() (r uint32, exists bool) {
+	v := m.unit_exp
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUnitExp returns the old "unit_exp" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldUnitExp(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUnitExp is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUnitExp requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUnitExp: %w", err)
+	}
+	return oldValue.UnitExp, nil
+}
+
+// AddUnitExp adds u to the "unit_exp" field.
+func (m *ChainBaseMutation) AddUnitExp(u int32) {
+	if m.addunit_exp != nil {
+		*m.addunit_exp += u
+	} else {
+		m.addunit_exp = &u
+	}
+}
+
+// AddedUnitExp returns the value that was added to the "unit_exp" field in this mutation.
+func (m *ChainBaseMutation) AddedUnitExp() (r int32, exists bool) {
+	v := m.addunit_exp
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUnitExp clears the value of the "unit_exp" field.
+func (m *ChainBaseMutation) ClearUnitExp() {
+	m.unit_exp = nil
+	m.addunit_exp = nil
+	m.clearedFields[chainbase.FieldUnitExp] = struct{}{}
+}
+
+// UnitExpCleared returns if the "unit_exp" field was cleared in this mutation.
+func (m *ChainBaseMutation) UnitExpCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldUnitExp]
+	return ok
+}
+
+// ResetUnitExp resets all changes to the "unit_exp" field.
+func (m *ChainBaseMutation) ResetUnitExp() {
+	m.unit_exp = nil
+	m.addunit_exp = nil
+	delete(m.clearedFields, chainbase.FieldUnitExp)
+}
+
+// SetEnv sets the "env" field.
+func (m *ChainBaseMutation) SetEnv(s string) {
+	m.env = &s
+}
+
+// Env returns the value of the "env" field in the mutation.
+func (m *ChainBaseMutation) Env() (r string, exists bool) {
+	v := m.env
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnv returns the old "env" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldEnv(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnv is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnv requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnv: %w", err)
+	}
+	return oldValue.Env, nil
+}
+
+// ClearEnv clears the value of the "env" field.
+func (m *ChainBaseMutation) ClearEnv() {
+	m.env = nil
+	m.clearedFields[chainbase.FieldEnv] = struct{}{}
+}
+
+// EnvCleared returns if the "env" field was cleared in this mutation.
+func (m *ChainBaseMutation) EnvCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldEnv]
+	return ok
+}
+
+// ResetEnv resets all changes to the "env" field.
+func (m *ChainBaseMutation) ResetEnv() {
+	m.env = nil
+	delete(m.clearedFields, chainbase.FieldEnv)
+}
+
+// SetChainID sets the "chain_id" field.
+func (m *ChainBaseMutation) SetChainID(s string) {
+	m.chain_id = &s
+}
+
+// ChainID returns the value of the "chain_id" field in the mutation.
+func (m *ChainBaseMutation) ChainID() (r string, exists bool) {
+	v := m.chain_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChainID returns the old "chain_id" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldChainID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChainID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChainID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChainID: %w", err)
+	}
+	return oldValue.ChainID, nil
+}
+
+// ClearChainID clears the value of the "chain_id" field.
+func (m *ChainBaseMutation) ClearChainID() {
+	m.chain_id = nil
+	m.clearedFields[chainbase.FieldChainID] = struct{}{}
+}
+
+// ChainIDCleared returns if the "chain_id" field was cleared in this mutation.
+func (m *ChainBaseMutation) ChainIDCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldChainID]
+	return ok
+}
+
+// ResetChainID resets all changes to the "chain_id" field.
+func (m *ChainBaseMutation) ResetChainID() {
+	m.chain_id = nil
+	delete(m.clearedFields, chainbase.FieldChainID)
+}
+
+// SetNickname sets the "nickname" field.
+func (m *ChainBaseMutation) SetNickname(s string) {
+	m.nickname = &s
+}
+
+// Nickname returns the value of the "nickname" field in the mutation.
+func (m *ChainBaseMutation) Nickname() (r string, exists bool) {
+	v := m.nickname
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNickname returns the old "nickname" field's value of the ChainBase entity.
+// If the ChainBase object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChainBaseMutation) OldNickname(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNickname is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNickname requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNickname: %w", err)
+	}
+	return oldValue.Nickname, nil
+}
+
+// ClearNickname clears the value of the "nickname" field.
+func (m *ChainBaseMutation) ClearNickname() {
+	m.nickname = nil
+	m.clearedFields[chainbase.FieldNickname] = struct{}{}
+}
+
+// NicknameCleared returns if the "nickname" field was cleared in this mutation.
+func (m *ChainBaseMutation) NicknameCleared() bool {
+	_, ok := m.clearedFields[chainbase.FieldNickname]
+	return ok
+}
+
+// ResetNickname resets all changes to the "nickname" field.
+func (m *ChainBaseMutation) ResetNickname() {
+	m.nickname = nil
+	delete(m.clearedFields, chainbase.FieldNickname)
+}
+
+// Where appends a list predicates to the ChainBaseMutation builder.
+func (m *ChainBaseMutation) Where(ps ...predicate.ChainBase) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *ChainBaseMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (ChainBase).
+func (m *ChainBaseMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ChainBaseMutation) Fields() []string {
+	fields := make([]string, 0, 11)
+	if m.created_at != nil {
+		fields = append(fields, chainbase.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, chainbase.FieldUpdatedAt)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, chainbase.FieldDeletedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, chainbase.FieldName)
+	}
+	if m.logo != nil {
+		fields = append(fields, chainbase.FieldLogo)
+	}
+	if m.native_unit != nil {
+		fields = append(fields, chainbase.FieldNativeUnit)
+	}
+	if m.atomic_unit != nil {
+		fields = append(fields, chainbase.FieldAtomicUnit)
+	}
+	if m.unit_exp != nil {
+		fields = append(fields, chainbase.FieldUnitExp)
+	}
+	if m.env != nil {
+		fields = append(fields, chainbase.FieldEnv)
+	}
+	if m.chain_id != nil {
+		fields = append(fields, chainbase.FieldChainID)
+	}
+	if m.nickname != nil {
+		fields = append(fields, chainbase.FieldNickname)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ChainBaseMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case chainbase.FieldCreatedAt:
+		return m.CreatedAt()
+	case chainbase.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case chainbase.FieldDeletedAt:
+		return m.DeletedAt()
+	case chainbase.FieldName:
+		return m.Name()
+	case chainbase.FieldLogo:
+		return m.Logo()
+	case chainbase.FieldNativeUnit:
+		return m.NativeUnit()
+	case chainbase.FieldAtomicUnit:
+		return m.AtomicUnit()
+	case chainbase.FieldUnitExp:
+		return m.UnitExp()
+	case chainbase.FieldEnv:
+		return m.Env()
+	case chainbase.FieldChainID:
+		return m.ChainID()
+	case chainbase.FieldNickname:
+		return m.Nickname()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ChainBaseMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case chainbase.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case chainbase.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case chainbase.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case chainbase.FieldName:
+		return m.OldName(ctx)
+	case chainbase.FieldLogo:
+		return m.OldLogo(ctx)
+	case chainbase.FieldNativeUnit:
+		return m.OldNativeUnit(ctx)
+	case chainbase.FieldAtomicUnit:
+		return m.OldAtomicUnit(ctx)
+	case chainbase.FieldUnitExp:
+		return m.OldUnitExp(ctx)
+	case chainbase.FieldEnv:
+		return m.OldEnv(ctx)
+	case chainbase.FieldChainID:
+		return m.OldChainID(ctx)
+	case chainbase.FieldNickname:
+		return m.OldNickname(ctx)
+	}
+	return nil, fmt.Errorf("unknown ChainBase field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ChainBaseMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case chainbase.FieldCreatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case chainbase.FieldUpdatedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case chainbase.FieldDeletedAt:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case chainbase.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case chainbase.FieldLogo:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLogo(v)
+		return nil
+	case chainbase.FieldNativeUnit:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNativeUnit(v)
+		return nil
+	case chainbase.FieldAtomicUnit:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAtomicUnit(v)
+		return nil
+	case chainbase.FieldUnitExp:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUnitExp(v)
+		return nil
+	case chainbase.FieldEnv:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnv(v)
+		return nil
+	case chainbase.FieldChainID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChainID(v)
+		return nil
+	case chainbase.FieldNickname:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNickname(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ChainBase field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ChainBaseMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_at != nil {
+		fields = append(fields, chainbase.FieldCreatedAt)
+	}
+	if m.addupdated_at != nil {
+		fields = append(fields, chainbase.FieldUpdatedAt)
+	}
+	if m.adddeleted_at != nil {
+		fields = append(fields, chainbase.FieldDeletedAt)
+	}
+	if m.addunit_exp != nil {
+		fields = append(fields, chainbase.FieldUnitExp)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ChainBaseMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case chainbase.FieldCreatedAt:
+		return m.AddedCreatedAt()
+	case chainbase.FieldUpdatedAt:
+		return m.AddedUpdatedAt()
+	case chainbase.FieldDeletedAt:
+		return m.AddedDeletedAt()
+	case chainbase.FieldUnitExp:
+		return m.AddedUnitExp()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ChainBaseMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case chainbase.FieldCreatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedAt(v)
+		return nil
+	case chainbase.FieldUpdatedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdatedAt(v)
+		return nil
+	case chainbase.FieldDeletedAt:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeletedAt(v)
+		return nil
+	case chainbase.FieldUnitExp:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUnitExp(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ChainBase numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ChainBaseMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(chainbase.FieldName) {
+		fields = append(fields, chainbase.FieldName)
+	}
+	if m.FieldCleared(chainbase.FieldLogo) {
+		fields = append(fields, chainbase.FieldLogo)
+	}
+	if m.FieldCleared(chainbase.FieldNativeUnit) {
+		fields = append(fields, chainbase.FieldNativeUnit)
+	}
+	if m.FieldCleared(chainbase.FieldAtomicUnit) {
+		fields = append(fields, chainbase.FieldAtomicUnit)
+	}
+	if m.FieldCleared(chainbase.FieldUnitExp) {
+		fields = append(fields, chainbase.FieldUnitExp)
+	}
+	if m.FieldCleared(chainbase.FieldEnv) {
+		fields = append(fields, chainbase.FieldEnv)
+	}
+	if m.FieldCleared(chainbase.FieldChainID) {
+		fields = append(fields, chainbase.FieldChainID)
+	}
+	if m.FieldCleared(chainbase.FieldNickname) {
+		fields = append(fields, chainbase.FieldNickname)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ChainBaseMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ChainBaseMutation) ClearField(name string) error {
+	switch name {
+	case chainbase.FieldName:
+		m.ClearName()
+		return nil
+	case chainbase.FieldLogo:
+		m.ClearLogo()
+		return nil
+	case chainbase.FieldNativeUnit:
+		m.ClearNativeUnit()
+		return nil
+	case chainbase.FieldAtomicUnit:
+		m.ClearAtomicUnit()
+		return nil
+	case chainbase.FieldUnitExp:
+		m.ClearUnitExp()
+		return nil
+	case chainbase.FieldEnv:
+		m.ClearEnv()
+		return nil
+	case chainbase.FieldChainID:
+		m.ClearChainID()
+		return nil
+	case chainbase.FieldNickname:
+		m.ClearNickname()
+		return nil
+	}
+	return fmt.Errorf("unknown ChainBase nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ChainBaseMutation) ResetField(name string) error {
+	switch name {
+	case chainbase.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case chainbase.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case chainbase.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case chainbase.FieldName:
+		m.ResetName()
+		return nil
+	case chainbase.FieldLogo:
+		m.ResetLogo()
+		return nil
+	case chainbase.FieldNativeUnit:
+		m.ResetNativeUnit()
+		return nil
+	case chainbase.FieldAtomicUnit:
+		m.ResetAtomicUnit()
+		return nil
+	case chainbase.FieldUnitExp:
+		m.ResetUnitExp()
+		return nil
+	case chainbase.FieldEnv:
+		m.ResetEnv()
+		return nil
+	case chainbase.FieldChainID:
+		m.ResetChainID()
+		return nil
+	case chainbase.FieldNickname:
+		m.ResetNickname()
+		return nil
+	}
+	return fmt.Errorf("unknown ChainBase field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ChainBaseMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ChainBaseMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ChainBaseMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ChainBaseMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ChainBaseMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ChainBaseMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ChainBaseMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown ChainBase unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ChainBaseMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown ChainBase edge %s", name)
 }
 
 // CoinBaseMutation represents an operation that mutates the CoinBase nodes in the graph.

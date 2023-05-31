@@ -29,6 +29,7 @@ type config struct {
 // hooks per client, for fast access.
 type hooks struct {
 	AppCoin                 []ent.Hook
+	ChainBase               []ent.Hook
 	CoinBase                []ent.Hook
 	CoinDescription         []ent.Hook
 	CoinExtra               []ent.Hook

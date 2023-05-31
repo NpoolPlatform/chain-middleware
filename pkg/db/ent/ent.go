@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/appcoin"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
@@ -48,6 +49,7 @@ type OrderFunc func(*sql.Selector)
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		appcoin.Table:                 appcoin.ValidColumn,
+		chainbase.Table:               chainbase.ValidColumn,
 		coinbase.Table:                coinbase.ValidColumn,
 		coindescription.Table:         coindescription.ValidColumn,
 		coinextra.Table:               coinextra.ValidColumn,

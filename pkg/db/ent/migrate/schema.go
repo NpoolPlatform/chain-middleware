@@ -34,6 +34,27 @@ var (
 		Columns:    AppCoinsColumns,
 		PrimaryKey: []*schema.Column{AppCoinsColumns[0]},
 	}
+	// ChainBasesColumns holds the columns for the "chain_bases" table.
+	ChainBasesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "logo", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "native_unit", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "atomic_unit", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "unit_exp", Type: field.TypeUint32, Nullable: true, Default: 0},
+		{Name: "env", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "chain_id", Type: field.TypeString, Nullable: true, Default: ""},
+		{Name: "nickname", Type: field.TypeString, Nullable: true, Default: ""},
+	}
+	// ChainBasesTable holds the schema information for the "chain_bases" table.
+	ChainBasesTable = &schema.Table{
+		Name:       "chain_bases",
+		Columns:    ChainBasesColumns,
+		PrimaryKey: []*schema.Column{ChainBasesColumns[0]},
+	}
 	// CoinBasesColumns holds the columns for the "coin_bases" table.
 	CoinBasesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -379,6 +400,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AppCoinsTable,
+		ChainBasesTable,
 		CoinBasesTable,
 		CoinDescriptionsTable,
 		CoinExtrasTable,
