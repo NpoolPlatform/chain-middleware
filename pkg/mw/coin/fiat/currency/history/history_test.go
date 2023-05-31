@@ -108,7 +108,7 @@ func getMany(t *testing.T) {
 		context.Background(),
 		WithConds(&npool.Conds{
 			CoinTypeID:  &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
-			CoinTypeIDs: &basetypes.StringSliceVal{Op: cruder.EQ, Value: []string{ret.CoinTypeID}},
+			CoinTypeIDs: &basetypes.StringSliceVal{Op: cruder.IN, Value: []string{ret.CoinTypeID}},
 		}),
 		WithOffset(0),
 		WithLimit(100),
