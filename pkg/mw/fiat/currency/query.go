@@ -65,17 +65,23 @@ func (h *queryHandler) queryCurrencies(ctx context.Context, cli *ent.Client) err
 
 func (h *queryHandler) queryJoinFiat(s *sql.Selector) {
 	t := sql.Table(entfiat.Table)
-	s.
-		LeftJoin(t).
+	s.LeftJoin(t).
 		On(
 			s.C(entcurrency.FieldFiatID),
 			t.C(entfiat.FieldID),
-		).
-		AppendSelect(
-			sql.As(t.C(entfiat.FieldName), "fiat_name"),
-			sql.As(t.C(entfiat.FieldLogo), "fiat_logo"),
-			sql.As(t.C(entfiat.FieldUnit), "fiat_unit"),
 		)
+
+	if h.Conds != nil && h.Conds.FiatName != nil {
+		s.OnP(
+			sql.EQ(s.C(entfiat.FieldName), h.Conds.FiatName.Val),
+		)
+	}
+
+	s.AppendSelect(
+		sql.As(t.C(entfiat.FieldName), "fiat_name"),
+		sql.As(t.C(entfiat.FieldLogo), "fiat_logo"),
+		sql.As(t.C(entfiat.FieldUnit), "fiat_unit"),
+	)
 }
 
 func (h *queryHandler) queryJoin() {

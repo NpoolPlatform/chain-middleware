@@ -59,7 +59,6 @@ func _watch(ctx context.Context, cancel context.CancelFunc, w func(ctx context.C
 				"State", "Panic",
 				"Error", err,
 			)
-			debug.PrintStack()
 			cancel()
 		}
 	}()

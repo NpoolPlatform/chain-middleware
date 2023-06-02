@@ -51,9 +51,10 @@ func UpdateSet(u *ent.FiatCurrencyUpdateOne, req *Req) *ent.FiatCurrencyUpdateOn
 }
 
 type Conds struct {
-	ID      *cruder.Cond
-	FiatID  *cruder.Cond
-	FiatIDs *cruder.Cond
+	ID       *cruder.Cond
+	FiatID   *cruder.Cond
+	FiatIDs  *cruder.Cond
+	FiatName *cruder.Cond
 }
 
 func SetQueryConds(q *ent.FiatCurrencyQuery, conds *Conds) (*ent.FiatCurrencyQuery, error) {
