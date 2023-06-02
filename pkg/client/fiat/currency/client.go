@@ -70,3 +70,24 @@ func GetCurrencies(ctx context.Context, conds *npool.Conds, offset, limit int32)
 	}
 	return infos.([]*npool.Currency), total, nil
 }
+
+func GetCurrencyOnly(ctx context.Context, conds *npool.Conds) (*npool.Currency, error) {
+	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.GetCurrencies(ctx, &npool.GetCurrenciesRequest{
+			Conds:  conds,
+			Offset: 0,
+			Limit:  int32(1),
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Infos, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(infos.([]*npool.Currency)) == 0 {
+		return nil, nil
+	}
+	return infos.([]*npool.Currency)[0], nil
+}
