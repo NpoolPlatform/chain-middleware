@@ -59,7 +59,7 @@ func (h *Handler) UpdateFiat(ctx context.Context) (*npool.Fiat, error) {
 	if err != nil {
 		return nil, err
 	}
-	if fiat != nil {
+	if fiat != nil && fiat.ID != h.ID.String() {
 		return nil, fmt.Errorf("fiat exist")
 	}
 
