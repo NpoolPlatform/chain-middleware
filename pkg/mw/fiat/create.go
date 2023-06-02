@@ -44,10 +44,9 @@ func (h *Handler) CreateFiat(ctx context.Context) (*npool.Fiat, error) {
 	}
 
 	lockKey := fmt.Sprintf(
-		"%v:%v:%v",
-		basetypes.Prefix_PrefixCreateFiat,
+		"%v:%v",
+		basetypes.Prefix_PrefixSetFiat,
 		*h.Name,
-		*h.Unit,
 	)
 	if err := redis2.TryLock(lockKey, 0); err != nil {
 		return nil, err
@@ -58,7 +57,6 @@ func (h *Handler) CreateFiat(ctx context.Context) (*npool.Fiat, error) {
 
 	h.Conds = &fiatcrud.Conds{
 		Name: &cruder.Cond{Op: cruder.EQ, Val: *h.Name},
-		Unit: &cruder.Cond{Op: cruder.EQ, Val: *h.Unit},
 	}
 	h.Offset = 0
 	h.Limit = 2
