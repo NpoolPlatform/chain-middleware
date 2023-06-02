@@ -70,9 +70,9 @@ func _refreshFiats(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 		var prices map[string]decimal.Decimal
 		switch feedType {
 		case basetypes.CurrencyFeedType_CoinGecko:
-			prices, err = coingecko.CoinGeckoUSDPrices(fiatNames)
+			prices, err = coingecko.CoinGeckoFiatPrices(fiatNames)
 		case basetypes.CurrencyFeedType_CoinBase:
-			prices, err = coinbase.CoinBaseUSDPrices(fiatNames)
+			prices, err = coinbase.CoinBaseFiatPrices(fiatNames)
 		default:
 			return fmt.Errorf("invalid feedtype")
 		}
