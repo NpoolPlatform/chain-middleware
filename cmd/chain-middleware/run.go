@@ -63,10 +63,6 @@ func _watch(ctx context.Context, cancel context.CancelFunc, w func(ctx context.C
 		}
 	}()
 	w(ctx)
-	logger.Sugar().Errorw(
-		"Watch",
-		"State", "Exit",
-	)
 }
 
 func watch(ctx context.Context, cancel context.CancelFunc) error {

@@ -23,6 +23,8 @@ func Watch(ctx context.Context) {
 	fiatRefreshCount := 0
 	w = watcher.NewWatcher()
 
+	refresh(ctx, true)
+
 	for {
 		select {
 		case <-refreshTicker.C:
