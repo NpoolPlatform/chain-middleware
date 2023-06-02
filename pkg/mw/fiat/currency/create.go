@@ -26,8 +26,8 @@ func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx, req *cur
 	lockKey := fmt.Sprintf(
 		"%v:%v:%v",
 		basetypes.Prefix_PrefixCreateFiatCurrency,
-		*h.FiatID,
-		*h.FeedType,
+		*req.FiatID,
+		*req.FeedType,
 	)
 	if err := redis2.TryLock(lockKey, 0); err != nil {
 		return err
