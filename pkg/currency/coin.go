@@ -145,6 +145,8 @@ func _refreshCoins(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 			)
 			return err
 		}
+
+		offset += limit
 	}
 }
 

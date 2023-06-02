@@ -138,6 +138,8 @@ func _refreshFiats(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 			)
 			return err
 		}
+
+		offset += limit
 	}
 }
 
