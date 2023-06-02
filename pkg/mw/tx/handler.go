@@ -271,6 +271,9 @@ func WithReqs(reqs []*npool.TxReq) func(context.Context, *Handler) error {
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &txcrud.Conds{}
+		if conds == nil {
+			return nil
+		}
 		if conds.ID != nil {
 			id, err := uuid.Parse(conds.GetID().GetValue())
 			if err != nil {
