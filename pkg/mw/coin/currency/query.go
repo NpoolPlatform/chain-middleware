@@ -3,6 +3,7 @@ package currency
 import (
 	"context"
 	"fmt"
+	"time"
 
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
@@ -17,7 +18,10 @@ import (
 	entcoinextra "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	entcurrency "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 
+	uuid1 "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
+
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
@@ -34,6 +38,7 @@ func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) {
 		Modify(func(s *sql.Selector) {
 			t := sql.Table(entcoinbase.Table)
 			s.AppendSelect(
+				sql.As(t.C(entcoinbase.FieldID), "coin_type_id"),
 				sql.As(t.C(entcoinbase.FieldName), "coin_name"),
 				sql.As(t.C(entcoinbase.FieldLogo), "coin_logo"),
 				sql.As(t.C(entcoinbase.FieldUnit), "coin_unit"),
@@ -105,7 +110,6 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
 		).
 		AppendSelect(
 			sql.As(t.C(entcurrency.FieldID), "id"),
-			sql.As(t.C(entcurrency.FieldCoinTypeID), "coin_type_id"),
 			sql.As(t.C(entcurrency.FieldFeedType), "feed_type"),
 			sql.As(t.C(entcurrency.FieldMarketValueHigh), "market_value_high"),
 			sql.As(t.C(entcurrency.FieldMarketValueLow), "market_value_low"),
@@ -131,6 +135,11 @@ func (h *queryHandler) formalize() {
 		if info.StableUSD {
 			info.MarketValueHigh = decimal.NewFromInt(1).String()
 			info.MarketValueLow = decimal.NewFromInt(1).String()
+			info.CreatedAt = uint32(time.Now().Unix())
+			info.UpdatedAt = uint32(time.Now().Unix())
+			if _, err := uuid.Parse(info.ID); err != nil {
+				info.ID = uuid1.InvalidUUIDStr
+			}
 		}
 		if _, err := decimal.NewFromString(info.MarketValueHigh); err != nil {
 			info.MarketValueHigh = decimal.NewFromInt(0).String()
