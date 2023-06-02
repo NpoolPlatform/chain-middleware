@@ -137,6 +137,7 @@ func (h *queryHandler) formalize() {
 			info.MarketValueLow = decimal.NewFromInt(1).String()
 			info.CreatedAt = uint32(time.Now().Unix())
 			info.UpdatedAt = uint32(time.Now().Unix())
+			info.FeedType = basetypes.CurrencyFeedType_StableUSDHardCode
 			if _, err := uuid.Parse(info.ID); err != nil {
 				info.ID = uuid1.InvalidUUIDStr
 			}
