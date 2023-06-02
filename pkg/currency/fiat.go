@@ -57,6 +57,9 @@ func _refreshFiats(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 		fiatNames := []string{}
 
 		for _, _feed := range feeds {
+			if _feed.FeedFiatName == "" {
+				continue
+			}
 			feedMap[_feed.FiatID] = _feed
 			fiatNames = append(fiatNames, _feed.FeedFiatName)
 		}

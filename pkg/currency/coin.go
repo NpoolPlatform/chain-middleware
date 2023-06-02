@@ -57,6 +57,9 @@ func _refreshCoins(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 		coinNames := []string{}
 
 		for _, _feed := range feeds {
+			if _feed.FeedCoinName == "" {
+				continue
+			}
 			feedMap[_feed.CoinTypeID] = _feed
 			coinNames = append(coinNames, _feed.FeedCoinName)
 		}
