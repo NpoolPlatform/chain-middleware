@@ -24,6 +24,7 @@ func (s *Server) UpdateCoin(ctx context.Context, in *npool.UpdateCoinRequest) (*
 		appcoin1.WithProductPage(req.ProductPage),
 		appcoin1.WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount),
 		appcoin1.WithDailyRewardAmount(req.DailyRewardAmount),
+		appcoin1.WithDisabled(req.Disabled),
 		appcoin1.WithDisplay(req.Display),
 		appcoin1.WithDisplayIndex(req.DisplayIndex),
 		appcoin1.WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw),

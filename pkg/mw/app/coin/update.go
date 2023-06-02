@@ -28,6 +28,7 @@ func (h *updateHandler) updateAppCoin(ctx context.Context, tx *ent.Tx) error {
 			ProductPage:              h.ProductPage,
 			WithdrawAutoReviewAmount: h.WithdrawAutoReviewAmount,
 			DailyRewardAmount:        h.DailyRewardAmount,
+			Disabled:                 h.Disabled,
 			Display:                  h.Display,
 			DisplayIndex:             h.DisplayIndex,
 			MaxAmountPerWithdraw:     h.MaxAmountPerWithdraw,
