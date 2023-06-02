@@ -17,6 +17,10 @@ import (
 )
 
 func (h *Handler) CreateFeed(ctx context.Context) (*npool.Feed, error) {
+	if h.FeedFiatName == nil {
+		return nil, fmt.Errorf("invalid feedfiatname")
+	}
+
 	lockKey := fmt.Sprintf(
 		"%v:%v:%v",
 		basetypes.Prefix_PrefixCreateFiatCurrencyFeed,

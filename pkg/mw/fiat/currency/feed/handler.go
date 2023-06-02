@@ -81,6 +81,12 @@ func WithFeedType(feedType *basetypes.CurrencyFeedType) func(context.Context, *H
 
 func WithFeedFiatName(name *string) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if name == nil {
+			return nil
+		}
+		if *name == "" {
+			return fmt.Errorf("invalid feedfiatname")
+		}
 		h.FeedFiatName = name
 		return nil
 	}
