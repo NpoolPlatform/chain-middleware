@@ -32,6 +32,7 @@ func (h *updateHandler) updateCoinBase(ctx context.Context, tx *ent.Tx) error {
 			ENV:            h.ENV,
 			ReservedAmount: h.ReservedAmount,
 			ForPay:         h.ForPay,
+			Disabled:       h.Disabled,
 		},
 	).Save(ctx); err != nil {
 		return err
@@ -59,6 +60,7 @@ func (h *updateHandler) updateCoinExtra(ctx context.Context, tx *ent.Tx) error {
 			info.Update(),
 			&extracrud.Req{
 				CoinTypeID: h.ID,
+				StableUSD:  h.StableUSD,
 				HomePage:   h.HomePage,
 				Specs:      h.Specs,
 			},
