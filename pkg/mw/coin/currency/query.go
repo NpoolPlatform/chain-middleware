@@ -70,6 +70,9 @@ func (h *queryHandler) queryCoinBases(ctx context.Context, cli *ent.Client) erro
 		ID:  h.Conds.CoinTypeID,
 		IDs: h.Conds.CoinTypeIDs,
 	})
+	if err != nil {
+		return err
+	}
 
 	total, err := stm.Count(ctx)
 	if err != nil {
