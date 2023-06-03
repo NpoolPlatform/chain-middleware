@@ -35,6 +35,13 @@ func CoinGeckoPrices(coinNames, fiatNames []string) (map[string]map[string]decim
 		cli = cli.SetProxy(socksProxy)
 	}
 
+	logger.Sugar().Errorw(
+		"CoinGeckoPrices",
+		"URL", url,
+		"Proxy", socksProxy,
+		"Timeout", timeout,
+	)
+
 	resp, err := cli.R().Get(url)
 	if err != nil {
 		logger.Sugar().Errorw(
