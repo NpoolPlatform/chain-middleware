@@ -162,6 +162,9 @@ func WithReqs(reqs []*npool.CurrencyReq) func(context.Context, *Handler) error {
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &currencycrud.Conds{}
+		if conds == nil {
+			return nil
+		}
 		if conds.ID != nil {
 			id, err := uuid.Parse(conds.GetID().GetValue())
 			if err != nil {
@@ -180,6 +183,12 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 			h.Conds.FiatID = &cruder.Cond{
 				Op:  conds.GetFiatID().GetOp(),
 				Val: id,
+			}
+		}
+		if conds.FiatName != nil {
+			h.Conds.FiatName = &cruder.Cond{
+				Op:  conds.GetFiatName().GetOp(),
+				Val: conds.GetFiatName().GetValue(),
 			}
 		}
 		return nil
