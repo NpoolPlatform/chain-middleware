@@ -1,0 +1,109 @@
+package currencyhistory
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"strconv"
+	"testing"
+
+	testinit "github.com/NpoolPlatform/chain-middleware/pkg/testinit"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+	currencymwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency"
+	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency/history"
+
+	fiat1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/fiat"
+	currency1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/fiat/currency"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
+)
+
+func init() {
+	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
+		return
+	}
+	if err := testinit.Init(); err != nil {
+		fmt.Printf("cannot init test stub: %v\n", err)
+	}
+}
+
+var ret = &currencymwpb.Currency{
+	FiatName:        "My BTC1",
+	FiatLogo:        uuid.NewString(),
+	FiatUnit:        "BTC",
+	MarketValueHigh: "0.000000000000000000",
+	MarketValueLow:  "0.000000000000000000",
+	FeedType:        basetypes.CurrencyFeedType_CoinGecko,
+	FeedTypeStr:     basetypes.CurrencyFeedType_CoinGecko.String(),
+}
+
+var req = &currencymwpb.CurrencyReq{
+	FeedType:        &ret.FeedType,
+	MarketValueHigh: &ret.MarketValueHigh,
+	MarketValueLow:  &ret.MarketValueLow,
+}
+
+func setupFiat(t *testing.T) func(*testing.T) {
+	ret.FiatID = uuid.NewString()
+	req.FiatID = &ret.FiatID
+	ret.FiatName = uuid.NewString()
+
+	h1, err := fiat1.NewHandler(
+		context.Background(),
+		fiat1.WithID(&ret.FiatID),
+		fiat1.WithName(&ret.FiatName),
+		fiat1.WithLogo(&ret.FiatLogo),
+		fiat1.WithUnit(&ret.FiatUnit),
+	)
+	assert.Nil(t, err)
+
+	_, err = h1.CreateFiat(context.Background())
+	assert.Nil(t, err)
+
+	h2, err := currency1.NewHandler(
+		context.Background(),
+		currency1.WithFiatID(req.FiatID),
+		currency1.WithMarketValueHigh(req.MarketValueHigh),
+		currency1.WithMarketValueLow(req.MarketValueLow),
+		currency1.WithFeedType(req.FeedType),
+	)
+	assert.Nil(t, err)
+
+	_, err = h2.CreateCurrency(context.Background())
+	assert.Nil(t, err)
+
+	_, err = h2.CreateCurrency(context.Background())
+	assert.Nil(t, err)
+
+	return func(*testing.T) {}
+}
+
+func getMany(t *testing.T) {
+	handler, err := NewHandler(
+		context.Background(),
+		WithConds(&npool.Conds{
+			FiatID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.FiatID},
+		}),
+		WithOffset(0),
+		WithLimit(100),
+	)
+	assert.Nil(t, err)
+
+	infos, total, err := handler.GetCurrencies(context.Background())
+	assert.Nil(t, err)
+	assert.Equal(t, uint32(2), total)
+	assert.Equal(t, 2, len(infos))
+}
+
+func TestFiat(t *testing.T) {
+	if runByGithubAction, err := strconv.ParseBool(os.Getenv("RUN_BY_GITHUB_ACTION")); err == nil && runByGithubAction {
+		return
+	}
+
+	teardown := setupFiat(t)
+	defer teardown(t)
+
+	t.Run("getMany", getMany)
+}

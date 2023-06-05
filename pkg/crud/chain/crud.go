@@ -1,0 +1,161 @@
+package chainbase
+
+import (
+	"fmt"
+
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	entchainbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
+	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+)
+
+type Req struct {
+	Name       *string
+	Logo       *string
+	NativeUnit *string
+	AtomicUnit *string
+	UnitExp    *uint32
+	ENV        *string
+	ChainID    *string
+	Nickname   *string
+	GasType    *basetypes.GasType
+	DeletedAt  *uint32
+}
+
+func CreateSet(c *ent.ChainBaseCreate, req *Req) *ent.ChainBaseCreate {
+	if req.Name != nil {
+		c.SetName(*req.Name)
+	}
+	if req.Logo != nil {
+		c.SetLogo(*req.Logo)
+	}
+	if req.NativeUnit != nil {
+		c.SetNativeUnit(*req.NativeUnit)
+	}
+	if req.AtomicUnit != nil {
+		c.SetAtomicUnit(*req.AtomicUnit)
+	}
+	if req.UnitExp != nil {
+		c.SetUnitExp(*req.UnitExp)
+	}
+	if req.ENV != nil {
+		c.SetEnv(*req.ENV)
+	}
+	if req.ChainID != nil {
+		c.SetChainID(*req.ChainID)
+	}
+	if req.Nickname != nil {
+		c.SetNickname(*req.Nickname)
+	}
+	if req.GasType != nil {
+		c.SetGasType(req.GasType.String())
+	}
+	return c
+}
+
+func UpdateSet(u *ent.ChainBaseUpdateOne, req *Req) *ent.ChainBaseUpdateOne {
+	if req.Logo != nil {
+		u = u.SetLogo(*req.Logo)
+	}
+	if req.NativeUnit != nil {
+		u = u.SetNativeUnit(*req.NativeUnit)
+	}
+	if req.AtomicUnit != nil {
+		u = u.SetAtomicUnit(*req.AtomicUnit)
+	}
+	if req.UnitExp != nil {
+		u = u.SetUnitExp(*req.UnitExp)
+	}
+	if req.ENV != nil {
+		u = u.SetEnv(*req.ENV)
+	}
+	if req.ChainID != nil {
+		u = u.SetChainID(*req.ChainID)
+	}
+	if req.Nickname != nil {
+		u = u.SetNickname(*req.Nickname)
+	}
+	if req.GasType != nil {
+		u = u.SetGasType(req.GasType.String())
+	}
+	if req.DeletedAt != nil {
+		u = u.SetDeletedAt(*req.DeletedAt)
+	}
+	return u
+}
+
+type Conds struct {
+	Name       *cruder.Cond
+	ENV        *cruder.Cond
+	NativeUnit *cruder.Cond
+	ChainID    *cruder.Cond
+	Nickname   *cruder.Cond
+}
+
+//nolint:gocyclo
+func SetQueryConds(q *ent.ChainBaseQuery, conds *Conds) (*ent.ChainBaseQuery, error) {
+	if conds.Name != nil {
+		name, ok := conds.Name.Val.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid name")
+		}
+		switch conds.Name.Op {
+		case cruder.EQ:
+			q.Where(
+				entchainbase.Name(name),
+			)
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
+	if conds.ENV != nil {
+		env, ok := conds.ENV.Val.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid env")
+		}
+		switch conds.ENV.Op {
+		case cruder.EQ:
+			q.Where(entchainbase.Env(env))
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
+	if conds.NativeUnit != nil {
+		unit, ok := conds.NativeUnit.Val.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid nativeunit")
+		}
+		switch conds.NativeUnit.Op {
+		case cruder.EQ:
+			q.Where(entchainbase.NativeUnit(unit))
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
+	if conds.ChainID != nil {
+		chainID, ok := conds.ChainID.Val.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid chainID")
+		}
+		switch conds.ChainID.Op {
+		case cruder.EQ:
+			q.Where(entchainbase.ChainID(chainID))
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
+	if conds.Nickname != nil {
+		nickname, ok := conds.Nickname.Val.(string)
+		if !ok {
+			return nil, fmt.Errorf("invalid nickname")
+		}
+		switch conds.Nickname.Op {
+		case cruder.EQ:
+			q.Where(entchainbase.Nickname(nickname))
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
+	q.Where(entchainbase.DeletedAt(0))
+	return q, nil
+}

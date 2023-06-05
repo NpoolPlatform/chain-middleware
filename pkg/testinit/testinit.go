@@ -7,7 +7,7 @@ import (
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/app"
 
-	"github.com/NpoolPlatform/chain-manager/pkg/db"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 
 	servicename "github.com/NpoolPlatform/chain-middleware/pkg/servicename"
 

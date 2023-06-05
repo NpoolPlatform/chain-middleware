@@ -16,13 +16,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	commonpb "github.com/NpoolPlatform/message/npool"
-	currencymgrpb "github.com/NpoolPlatform/message/npool/chain/mgr/v1/coin/currency"
-	coinmwpb "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
+	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
+	currency1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin/currency"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
 	"github.com/stretchr/testify/assert"
-
-	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/client/coin"
 
 	cruder "github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 
@@ -43,57 +41,72 @@ var ret = &npool.Currency{
 	CoinName:        uuid.NewString(),
 	CoinUnit:        uuid.NewString(),
 	CoinENV:         "test",
-	FeedType:        currencymgrpb.FeedType_CoinBase,
-	FeedTypeStr:     currencymgrpb.FeedType_CoinBase.String(),
+	FeedType:        basetypes.CurrencyFeedType_CoinBase,
+	FeedTypeStr:     basetypes.CurrencyFeedType_CoinBase.String(),
 	MarketValueHigh: "12.001000000000000000",
 	MarketValueLow:  "11.001000000000000000",
 }
 
-var coin = &coinmwpb.CoinReq{
-	Name: &ret.CoinName,
-	Unit: &ret.CoinUnit,
-	ENV:  &ret.CoinENV,
-}
-
-var req = &currencymgrpb.CurrencyReq{
+var req = &npool.CurrencyReq{
 	ID:              &ret.ID,
 	FeedType:        &ret.FeedType,
 	MarketValueHigh: &ret.MarketValueHigh,
 	MarketValueLow:  &ret.MarketValueLow,
 }
 
-func createCurrency(t *testing.T) {
-	coinRet, err := coin1.CreateCoin(context.Background(), coin)
+func setupCurrency(t *testing.T) func(*testing.T) {
+	ret.CoinTypeID = uuid.NewString()
+	req.CoinTypeID = &ret.CoinTypeID
+
+	h1, err := coin1.NewHandler(
+		context.Background(),
+		coin1.WithID(&ret.CoinTypeID),
+		coin1.WithName(&ret.CoinName),
+		coin1.WithUnit(&ret.CoinUnit),
+		coin1.WithLogo(&ret.CoinLogo),
+		coin1.WithENV(&ret.CoinENV),
+	)
 	assert.Nil(t, err)
-	assert.NotNil(t, coinRet)
 
-	ret.CoinTypeID = coinRet.ID
-	req.CoinTypeID = &coinRet.ID
+	_, err = h1.CreateCoin(context.Background())
+	assert.Nil(t, err)
 
-	info, err := CreateCurrency(context.Background(), req)
+	h2, err := currency1.NewHandler(
+		context.Background(),
+		currency1.WithCoinTypeID(req.CoinTypeID),
+		currency1.WithMarketValueHigh(req.MarketValueHigh),
+		currency1.WithMarketValueLow(req.MarketValueLow),
+		currency1.WithFeedType(req.FeedType),
+	)
+	assert.Nil(t, err)
+
+	info, err := h2.CreateCurrency(context.Background())
+	assert.Nil(t, err)
+
+	ret.ID = info.ID
+	ret.CreatedAt = info.CreatedAt
+	ret.UpdatedAt = info.UpdatedAt
+
+	return func(*testing.T) {
+		_, _ = h1.DeleteCoin(context.Background())
+	}
+}
+
+func getCurrency(t *testing.T) {
+	info, err := GetCurrency(context.Background(), ret.ID)
 	if assert.Nil(t, err) {
-		ret.CreatedAt = info.CreatedAt
-		ret.UpdatedAt = info.UpdatedAt
 		assert.Equal(t, ret, info)
 	}
 }
 
-func updateCurrency(t *testing.T) {
-}
-
-func getCurrency(t *testing.T) {
-}
-
 func getCurrencies(t *testing.T) {
-	infos, err := GetCurrencies(context.Background(), &npool.Conds{
-		CoinTypeID: &commonpb.StringVal{
-			Op:    cruder.EQ,
-			Value: ret.CoinTypeID,
-		},
-	})
+	infos, total, err := GetCurrencies(context.Background(), &npool.Conds{
+		CoinTypeID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
+	}, 0, 100)
 	if assert.Nil(t, err) {
-		assert.Equal(t, len(infos), 1)
-		assert.Equal(t, infos[0], ret)
+		assert.Equal(t, 1, len(infos))
+		assert.Equal(t, uint32(1), total)
+		assert.Equal(t, ret, infos[0])
 	}
 }
 
@@ -103,14 +116,15 @@ func TestClient(t *testing.T) {
 	}
 	// Here won't pass test due to we always test with localhost
 
+	teardown := setupCurrency(t)
+	defer teardown(t)
+
 	gport := config.GetIntValueWithNameSpace("", config.KeyGRPCPort)
 
 	monkey.Patch(grpc2.GetGRPCConn, func(service string, tags ...string) (*grpc.ClientConn, error) {
 		return grpc.Dial(fmt.Sprintf("localhost:%v", gport), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	})
 
-	t.Run("createCurrency", createCurrency)
-	t.Run("updateCurrency", updateCurrency)
 	t.Run("getCurrency", getCurrency)
 	t.Run("getCurrencies", getCurrencies)
 }

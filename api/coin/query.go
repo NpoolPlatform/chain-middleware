@@ -4,54 +4,35 @@ package coin
 import (
 	"context"
 
+	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
+	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
-
-	constant1 "github.com/NpoolPlatform/chain-middleware/pkg/const"
-	constant "github.com/NpoolPlatform/chain-middleware/pkg/message/const"
-	commontracer "github.com/NpoolPlatform/chain-middleware/pkg/tracer"
-
-	coin1 "github.com/NpoolPlatform/chain-middleware/pkg/coin"
-
-	"go.opentelemetry.io/otel"
-	scodes "go.opentelemetry.io/otel/codes"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
-
-	"github.com/google/uuid"
 )
 
-func (s *Server) GetCoin(
-	ctx context.Context,
-	in *npool.GetCoinRequest,
-) (
-	*npool.GetCoinResponse,
-	error,
-) {
-	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoin")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	if _, err := uuid.Parse(in.GetID()); err != nil {
-		logger.Sugar().Errorw("GetCoin", "ID", in.GetID(), "error", err)
+func (s *Server) GetCoin(ctx context.Context, in *npool.GetCoinRequest) (*npool.GetCoinResponse, error) {
+	handler, err := coin1.NewHandler(
+		ctx,
+		coin1.WithID(&in.ID),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetCoin",
+			"In", in,
+			"Error", err,
+		)
 		return &npool.GetCoinResponse{}, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
-
-	info, err := coin1.GetCoin(ctx, in.GetID())
+	info, err := handler.GetCoin(ctx)
 	if err != nil {
-		logger.Sugar().Errorw("GetCoin", "ID", in.GetID(), "error", err)
+		logger.Sugar().Errorw(
+			"GetCoin",
+			"In", in,
+			"Error", err,
+		)
 		return &npool.GetCoinResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
@@ -60,65 +41,29 @@ func (s *Server) GetCoin(
 	}, nil
 }
 
-func (s *Server) GetCoins(
-	ctx context.Context,
-	in *npool.GetCoinsRequest,
-) (
-	*npool.GetCoinsResponse,
-	error,
-) {
-	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoins")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	conds := in.GetConds()
-	if conds == nil {
-		conds = &npool.Conds{}
-	}
-
-	if conds.ID != nil {
-		if _, err := uuid.Parse(conds.GetID().GetValue()); err != nil {
-			logger.Sugar().Errorw("GetCoins", "ID", conds.GetID().GetValue(), "error", err)
-			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if conds.ENV != nil {
-		switch conds.GetENV().GetValue() {
-		case "main", "test":
-		default:
-			logger.Sugar().Errorw("GetCoins", "ENV", conds.GetENV().GetValue(), "error", err)
-			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if conds.Name != nil && conds.GetName().GetValue() == "" {
-		logger.Sugar().Errorw("GetCoins", "Name", conds.GetName().GetValue(), "error", "Name is empty")
-		return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, "Name is empty")
-	}
-	for _, id := range conds.GetIDs().GetValue() {
-		if _, err := uuid.Parse(id); err != nil {
-			logger.Sugar().Errorw("GetCoins", "IDs", conds.GetIDs().GetValue(), "error", err)
-			return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
-
-	limit := in.GetLimit()
-	if limit == 0 {
-		limit = constant1.DefaultRowLimit
-	}
-
-	infos, total, err := coin1.GetCoins(ctx, conds, in.GetOffset(), limit)
+func (s *Server) GetCoins(ctx context.Context, in *npool.GetCoinsRequest) (*npool.GetCoinsResponse, error) {
+	handler, err := coin1.NewHandler(
+		ctx,
+		coin1.WithConds(in.GetConds()),
+		coin1.WithOffset(in.GetOffset()),
+		coin1.WithLimit(in.GetLimit()),
+	)
 	if err != nil {
-		logger.Sugar().Errorw("GetCoins", "Conds", conds, "error", err)
+		logger.Sugar().Errorw(
+			"GetCoins",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetCoinsResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	infos, total, err := handler.GetCoins(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetCoins",
+			"In", in,
+			"Error", err,
+		)
 		return &npool.GetCoinsResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
@@ -128,60 +73,27 @@ func (s *Server) GetCoins(
 	}, nil
 }
 
-func (s *Server) GetCoinOnly(
-	ctx context.Context,
-	in *npool.GetCoinOnlyRequest,
-) (
-	*npool.GetCoinOnlyResponse,
-	error,
-) {
-	var err error
-
-	_, span := otel.Tracer(constant.ServiceName).Start(ctx, "GetCoinOnly")
-	defer span.End()
-
-	defer func() {
-		if err != nil {
-			span.SetStatus(scodes.Error, err.Error())
-			span.RecordError(err)
-		}
-	}()
-
-	conds := in.GetConds()
-	if conds == nil {
-		conds = &npool.Conds{}
-	}
-
-	if conds.ID != nil {
-		if _, err := uuid.Parse(conds.GetID().GetValue()); err != nil {
-			logger.Sugar().Errorw("GetCoinOnly", "ID", conds.GetID().GetValue(), "error", err)
-			return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if conds.ENV != nil {
-		switch conds.GetENV().GetValue() {
-		case "main", "test":
-		default:
-			logger.Sugar().Errorw("GetCoinOnly", "ENV", conds.GetENV().GetValue(), "error", err)
-			return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if conds.Name != nil && conds.GetName().GetValue() == "" {
-		logger.Sugar().Errorw("GetCoinOnly", "Name", conds.GetName().GetValue(), "error", "Name is empty")
-		return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, "Name is empty")
-	}
-	for _, id := range conds.GetIDs().GetValue() {
-		if _, err := uuid.Parse(id); err != nil {
-			logger.Sugar().Errorw("GetCoinOnly", "IDs", conds.GetIDs().GetValue(), "error", err)
-			return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-
-	span = commontracer.TraceInvoker(span, "coin", "coin", "QueryJoin")
-
-	info, err := coin1.GetCoinOnly(ctx, conds)
+func (s *Server) GetCoinOnly(ctx context.Context, in *npool.GetCoinOnlyRequest) (*npool.GetCoinOnlyResponse, error) {
+	handler, err := coin1.NewHandler(
+		ctx,
+		coin1.WithConds(in.GetConds()),
+	)
 	if err != nil {
-		logger.Sugar().Errorw("GetCoinOnly", "Conds", conds, "error", err)
+		logger.Sugar().Errorw(
+			"GetCoinOnly",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	info, err := handler.GetCoinOnly(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetCoinOnly",
+			"In", in,
+			"Error", err,
+		)
 		return &npool.GetCoinOnlyResponse{}, status.Error(codes.Internal, err.Error())
 	}
 
