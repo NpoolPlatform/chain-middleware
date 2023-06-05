@@ -2,6 +2,7 @@ package currencyhistory
 
 import (
 	"context"
+	"fmt"
 
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin/currency"
@@ -51,25 +52,38 @@ func (h *queryHandler) queryCurrencyHistories(ctx context.Context, cli *ent.Clie
 	return nil
 }
 
-func (h *queryHandler) queryJoinCoin(s *sql.Selector) {
-	t1 := sql.Table(entcoinbase.Table)
-	s.LeftJoin(t1).
+func (h *queryHandler) queryJoinCoin(s *sql.Selector) error {
+	t := sql.Table(entcoinbase.Table)
+	s.LeftJoin(t).
 		On(
 			s.C(entcurrencyhis.FieldCoinTypeID),
-			t1.C(entcoinbase.FieldID),
-		).
-		AppendSelect(
-			sql.As(t1.C(entcoinbase.FieldName), "coin_name"),
-			sql.As(t1.C(entcoinbase.FieldLogo), "coin_logo"),
-			sql.As(t1.C(entcoinbase.FieldUnit), "coin_unit"),
-			sql.As(t1.C(entcoinbase.FieldEnv), "coin_env"),
+			t.C(entcoinbase.FieldID),
 		)
+
+	if h.Conds.CoinNames != nil {
+		names, ok := h.Conds.CoinNames.Val.([]string)
+		if !ok {
+			return fmt.Errorf("invalid coinnames")
+		}
+		s.OnP(sql.In(t.C(entcoinbase.FieldName), names))
+	}
+
+	s.AppendSelect(
+		sql.As(t.C(entcoinbase.FieldName), "coin_name"),
+		sql.As(t.C(entcoinbase.FieldLogo), "coin_logo"),
+		sql.As(t.C(entcoinbase.FieldUnit), "coin_unit"),
+		sql.As(t.C(entcoinbase.FieldEnv), "coin_env"),
+	)
+	return nil
 }
 
-func (h *queryHandler) queryJoin() {
+func (h *queryHandler) queryJoin() (err error) {
 	h.stm.Modify(func(s *sql.Selector) {
-		h.queryJoinCoin(s)
+		if err = h.queryJoinCoin(s); err != nil {
+			return
+		}
 	})
+	return err
 }
 
 func (h *queryHandler) scan(ctx context.Context) error {
@@ -95,7 +109,9 @@ func (h *Handler) GetCurrencies(ctx context.Context) ([]*npool.Currency, uint32,
 			Order(ent.Desc(entcurrencyhis.FieldCreatedAt)).
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit))
-		handler.queryJoin()
+		if err := handler.queryJoin(); err != nil {
+			return err
+		}
 		return handler.scan(_ctx)
 	})
 	if err != nil {

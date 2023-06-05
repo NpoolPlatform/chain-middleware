@@ -75,6 +75,12 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				Val: conds.GetEndAt().GetValue(),
 			}
 		}
+		if conds.CoinNames != nil {
+			h.Conds.CoinNames = &cruder.Cond{
+				Op:  conds.GetCoinNames().GetOp(),
+				Val: conds.GetCoinNames().GetValue(),
+			}
+		}
 		return nil
 	}
 }

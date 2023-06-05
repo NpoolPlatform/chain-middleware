@@ -56,6 +56,7 @@ type Conds struct {
 	CoinTypeIDs *cruder.Cond
 	StartAt     *cruder.Cond
 	EndAt       *cruder.Cond
+	CoinNames   *cruder.Cond
 }
 
 // nolint:funlen,gocyclo
