@@ -91,7 +91,7 @@ func (h *Handler) GetCurrencies(ctx context.Context) ([]*npool.Currency, uint32,
 			return err
 		}
 		handler.stm.
-			Order(ent.Desc(entcurrencyhis.FieldCreatedAt)).
+			Order(ent.Asc(entcurrencyhis.FieldCreatedAt)).
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit))
 		handler.queryJoin()
