@@ -34,7 +34,7 @@ type queryHandler struct {
 
 func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) {
 	h.stm = stm.
-		Select(entcoinbase.FieldID).
+		Select(entcoinbase.FieldCreatedAt).
 		Modify(func(s *sql.Selector) {
 			t := sql.Table(entcoinbase.Table)
 			s.AppendSelect(
@@ -102,11 +102,15 @@ func (h *queryHandler) queryJoinCoinExtra(s *sql.Selector) {
 }
 
 func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
+	s.GroupBy(entcurrency.FieldCoinTypeID)
 	t := sql.Table(entcurrency.Table)
 	s.LeftJoin(t).
 		On(
 			s.C(entcoinbase.FieldID),
 			t.C(entcurrency.FieldCoinTypeID),
+		).
+		OnP(
+			sql.EQ(t.C(entcurrency.FieldDeletedAt), 0),
 		).
 		AppendSelect(
 			sql.As(t.C(entcurrency.FieldID), "id"),
@@ -167,7 +171,6 @@ func (h *Handler) GetCurrency(ctx context.Context) (*npool.Currency, error) {
 		handler.queryJoin()
 		const singleRowLimit = 1
 		handler.stm.
-			Order(ent.Desc(entcurrency.FieldUpdatedAt)).
 			Offset(0).
 			Limit(singleRowLimit)
 		return handler.scan(_ctx)
@@ -194,7 +197,6 @@ func (h *Handler) GetCurrencies(ctx context.Context) ([]*npool.Currency, uint32,
 		}
 		handler.queryJoin()
 		handler.stm.
-			Order(ent.Desc(entcurrency.FieldUpdatedAt)).
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit))
 		return handler.scan(_ctx)
