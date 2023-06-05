@@ -58,9 +58,11 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				}
 				ids = append(ids, _id)
 			}
-			h.Conds.CoinTypeIDs = &cruder.Cond{
-				Op:  conds.GetCoinTypeIDs().GetOp(),
-				Val: ids,
+			if len(ids) > 0 {
+				h.Conds.CoinTypeIDs = &cruder.Cond{
+					Op:  conds.GetCoinTypeIDs().GetOp(),
+					Val: ids,
+				}
 			}
 		}
 		if conds.StartAt != nil {
@@ -75,7 +77,7 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				Val: conds.GetEndAt().GetValue(),
 			}
 		}
-		if conds.CoinNames != nil {
+		if conds.CoinNames != nil && len(conds.CoinNames.Value) > 0 {
 			h.Conds.CoinNames = &cruder.Cond{
 				Op:  conds.GetCoinNames().GetOp(),
 				Val: conds.GetCoinNames().GetValue(),
