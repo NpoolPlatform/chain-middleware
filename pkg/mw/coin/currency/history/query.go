@@ -19,37 +19,35 @@ import (
 
 type queryHandler struct {
 	*Handler
-	stm   *ent.CurrencyHistorySelect
-	infos []*npool.Currency
-	total uint32
+	stmSelect *ent.CurrencyHistorySelect
+	stmCount  *ent.CurrencyHistorySelect
+	infos     []*npool.Currency
+	total     uint32
 }
 
-func (h *queryHandler) selectCurrencyHistory(stm *ent.CurrencyHistoryQuery) {
-	h.stm = stm.Select(
-		entcurrencyhis.FieldID,
-		entcurrencyhis.FieldCoinTypeID,
-		entcurrencyhis.FieldFeedType,
-		entcurrencyhis.FieldMarketValueHigh,
-		entcurrencyhis.FieldMarketValueLow,
-		entcurrencyhis.FieldCreatedAt,
-		entcurrencyhis.FieldUpdatedAt,
-	)
+func (h *queryHandler) selectCurrencyHistory(stm *ent.CurrencyHistoryQuery) *ent.CurrencyHistorySelect {
+	return stm.Select(entcurrencyhis.FieldID)
 }
 
-func (h *queryHandler) queryCurrencyHistories(ctx context.Context, cli *ent.Client) error {
+func (h *queryHandler) queryCurrencyHistories(cli *ent.Client) (*ent.CurrencyHistorySelect, error) {
 	stm, err := historycrud.SetQueryConds(cli.CurrencyHistory.Query(), h.Conds)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_total, err := stm.Count(ctx)
-	if err != nil {
-		return err
-	}
+	return h.selectCurrencyHistory(stm), nil
+}
 
-	h.total = uint32(_total)
-	h.selectCurrencyHistory(stm)
-	return nil
+func (h *queryHandler) queryJoinMyself(s *sql.Selector) {
+	t := sql.Table(entcurrencyhis.Table)
+	s.AppendSelect(
+		sql.As(t.C(entcurrencyhis.FieldCoinTypeID), "coin_type_id"),
+		sql.As(t.C(entcurrencyhis.FieldFeedType), "feed_type"),
+		sql.As(t.C(entcurrencyhis.FieldMarketValueHigh), "market_value_high"),
+		sql.As(t.C(entcurrencyhis.FieldMarketValueLow), "market_value_low"),
+		sql.As(t.C(entcurrencyhis.FieldCreatedAt), "created_at"),
+		sql.As(t.C(entcurrencyhis.FieldUpdatedAt), "updated_at"),
+	)
 }
 
 func (h *queryHandler) queryJoinCoin(s *sql.Selector) error {
@@ -69,7 +67,9 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) error {
 		for _, _name := range names {
 			_names = append(_names, _name)
 		}
-		s.Where(sql.In(t.C(entcoinbase.FieldName), _names...))
+		s.Where(
+			sql.In(t.C(entcoinbase.FieldName), _names...),
+		)
 	}
 
 	s.AppendSelect(
@@ -82,7 +82,13 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) error {
 }
 
 func (h *queryHandler) queryJoin() (err error) {
-	h.stm.Modify(func(s *sql.Selector) {
+	h.stmSelect.Modify(func(s *sql.Selector) {
+		h.queryJoinMyself(s)
+		if err = h.queryJoinCoin(s); err != nil {
+			return
+		}
+	})
+	h.stmCount.Modify(func(s *sql.Selector) {
 		if err = h.queryJoinCoin(s); err != nil {
 			return
 		}
@@ -91,7 +97,7 @@ func (h *queryHandler) queryJoin() (err error) {
 }
 
 func (h *queryHandler) scan(ctx context.Context) error {
-	return h.stm.Scan(ctx, &h.infos)
+	return h.stmSelect.Scan(ctx, &h.infos)
 }
 
 func (h *queryHandler) formalize() {
@@ -106,16 +112,32 @@ func (h *Handler) GetCurrencies(ctx context.Context) ([]*npool.Currency, uint32,
 	}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		if err := handler.queryCurrencyHistories(_ctx, cli); err != nil {
+		_stm, err := handler.queryCurrencyHistories(cli)
+		if err != nil {
 			return err
 		}
-		handler.stm.
-			Order(ent.Asc(entcurrencyhis.FieldCreatedAt)).
-			Offset(int(h.Offset)).
-			Limit(int(h.Limit))
+		handler.stmSelect = _stm
+
+		_stm, err = handler.queryCurrencyHistories(cli)
+		if err != nil {
+			return err
+		}
+		handler.stmCount = _stm
+
 		if err := handler.queryJoin(); err != nil {
 			return err
 		}
+
+		_total, err := handler.stmCount.Count(ctx)
+		if err != nil {
+			return err
+		}
+		handler.total = uint32(_total)
+
+		handler.stmSelect.
+			Order(ent.Asc(entcurrencyhis.FieldCreatedAt)).
+			Offset(int(h.Offset)).
+			Limit(int(h.Limit))
 		return handler.scan(_ctx)
 	})
 	if err != nil {
