@@ -66,8 +66,9 @@ func (h *queryHandler) queryFiat(ctx context.Context, cli *ent.Client) error {
 
 func (h *queryHandler) queryFiats(ctx context.Context, cli *ent.Client) error {
 	stm, err := fiatcrud.SetQueryConds(cli.Fiat.Query(), &fiatcrud.Conds{
-		ID:  h.Conds.FiatID,
-		IDs: h.Conds.FiatIDs,
+		ID:   h.Conds.FiatID,
+		IDs:  h.Conds.FiatIDs,
+		Name: h.Conds.FiatName,
 	})
 	if err != nil {
 		return err
