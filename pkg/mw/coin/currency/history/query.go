@@ -69,7 +69,7 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) error {
 		for _, _name := range names {
 			_names = append(_names, _name)
 		}
-		s.OnP(sql.In(t.C(entcoinbase.FieldName), _names...))
+		s.Where(sql.In(t.C(entcoinbase.FieldName), _names...))
 	}
 
 	s.AppendSelect(
