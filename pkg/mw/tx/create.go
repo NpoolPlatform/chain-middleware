@@ -64,7 +64,7 @@ func (h *Handler) CreateTxs(ctx context.Context) ([]*npool.Tx, error) {
 	}
 
 	h.Conds = &txcrud.Conds{
-		IDs: &cruder.Cond{Op: cruder.EQ, Val: ids},
+		IDs: &cruder.Cond{Op: cruder.IN, Val: ids},
 	}
 	h.Offset = 0
 	h.Limit = int32(len(ids))
