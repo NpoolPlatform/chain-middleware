@@ -65,7 +65,11 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) error {
 		if !ok {
 			return fmt.Errorf("invalid coinnames")
 		}
-		s.OnP(sql.In(t.C(entcoinbase.FieldName), names))
+		_names := []interface{}{}
+		for _, _name := range names {
+			_names = append(_names, _name)
+		}
+		s.OnP(sql.In(t.C(entcoinbase.FieldName), _names...))
 	}
 
 	s.AppendSelect(
