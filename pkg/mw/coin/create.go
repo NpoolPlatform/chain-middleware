@@ -31,9 +31,6 @@ func (h *createHandler) createChainBase(ctx context.Context, tx *ent.Tx) error {
 	conds := &chainbasecrud.Conds{
 		Name: &cruder.Cond{Op: cruder.EQ, Val: *h.ChainType},
 	}
-	if h.ChainNativeUnit != nil {
-		conds.NativeUnit = &cruder.Cond{Op: cruder.EQ, Val: *h.ChainNativeUnit}
-	}
 	if h.ENV != nil {
 		conds.ENV = &cruder.Cond{Op: cruder.EQ, Val: *h.ENV}
 	}
@@ -83,7 +80,6 @@ func (h *createHandler) createNativeCoinBase(ctx context.Context, tx *ent.Tx) er
 		tx.CoinBase.Query(),
 		&basecrud.Conds{
 			Name: &cruder.Cond{Op: cruder.EQ, Val: *h.ChainNativeCoinName},
-			Unit: &cruder.Cond{Op: cruder.EQ, Val: *h.ChainNativeUnit},
 			ENV:  &cruder.Cond{Op: cruder.EQ, Val: *h.ENV},
 		},
 	)
@@ -121,7 +117,6 @@ func (h *createHandler) createCoinBase(ctx context.Context, tx *ent.Tx) error {
 		tx.CoinBase.Query(),
 		&basecrud.Conds{
 			Name: &cruder.Cond{Op: cruder.EQ, Val: *h.Name},
-			Unit: &cruder.Cond{Op: cruder.EQ, Val: *h.Unit},
 			ENV:  &cruder.Cond{Op: cruder.EQ, Val: *h.ENV},
 		},
 	)
