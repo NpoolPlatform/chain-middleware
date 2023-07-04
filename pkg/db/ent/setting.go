@@ -49,6 +49,8 @@ type Setting struct {
 	NeedMemo bool `json:"need_memo,omitempty"`
 	// RefreshCurrency holds the value of the "refresh_currency" field.
 	RefreshCurrency bool `json:"refresh_currency,omitempty"`
+	// CheckNewAddressBalance holds the value of the "check_new_address_balance" field.
+	CheckNewAddressBalance bool `json:"check_new_address_balance,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -58,7 +60,7 @@ func (*Setting) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case setting.FieldWithdrawFeeAmount, setting.FieldCollectFeeAmount, setting.FieldHotWalletFeeAmount, setting.FieldLowFeeAmount, setting.FieldHotLowFeeAmount, setting.FieldHotWalletAccountAmount, setting.FieldPaymentAccountCollectAmount, setting.FieldLeastTransferAmount:
 			values[i] = new(decimal.Decimal)
-		case setting.FieldWithdrawFeeByStableUsd, setting.FieldNeedMemo, setting.FieldRefreshCurrency:
+		case setting.FieldWithdrawFeeByStableUsd, setting.FieldNeedMemo, setting.FieldRefreshCurrency, setting.FieldCheckNewAddressBalance:
 			values[i] = new(sql.NullBool)
 		case setting.FieldCreatedAt, setting.FieldUpdatedAt, setting.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
@@ -181,6 +183,12 @@ func (s *Setting) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				s.RefreshCurrency = value.Bool
 			}
+		case setting.FieldCheckNewAddressBalance:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field check_new_address_balance", values[i])
+			} else if value.Valid {
+				s.CheckNewAddressBalance = value.Bool
+			}
 		}
 	}
 	return nil
@@ -256,6 +264,9 @@ func (s *Setting) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("refresh_currency=")
 	builder.WriteString(fmt.Sprintf("%v", s.RefreshCurrency))
+	builder.WriteString(", ")
+	builder.WriteString("check_new_address_balance=")
+	builder.WriteString(fmt.Sprintf("%v", s.CheckNewAddressBalance))
 	builder.WriteByte(')')
 	return builder.String()
 }

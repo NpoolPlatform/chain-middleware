@@ -296,6 +296,7 @@ func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error
 			LeastTransferAmount:         h.LeastTransferAmount,
 			NeedMemo:                    h.NeedMemo,
 			RefreshCurrency:             h.RefreshCurrency,
+			CheckNewAddressBalance:      h.CheckNewAddressBalance,
 		},
 	).Save(ctx); err != nil {
 		return err

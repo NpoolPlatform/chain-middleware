@@ -345,6 +345,26 @@ func (su *SettingUpdate) ClearRefreshCurrency() *SettingUpdate {
 	return su
 }
 
+// SetCheckNewAddressBalance sets the "check_new_address_balance" field.
+func (su *SettingUpdate) SetCheckNewAddressBalance(b bool) *SettingUpdate {
+	su.mutation.SetCheckNewAddressBalance(b)
+	return su
+}
+
+// SetNillableCheckNewAddressBalance sets the "check_new_address_balance" field if the given value is not nil.
+func (su *SettingUpdate) SetNillableCheckNewAddressBalance(b *bool) *SettingUpdate {
+	if b != nil {
+		su.SetCheckNewAddressBalance(*b)
+	}
+	return su
+}
+
+// ClearCheckNewAddressBalance clears the value of the "check_new_address_balance" field.
+func (su *SettingUpdate) ClearCheckNewAddressBalance() *SettingUpdate {
+	su.mutation.ClearCheckNewAddressBalance()
+	return su
+}
+
 // Mutation returns the SettingMutation object of the builder.
 func (su *SettingUpdate) Mutation() *SettingMutation {
 	return su.mutation
@@ -652,6 +672,19 @@ func (su *SettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Column: setting.FieldRefreshCurrency,
+		})
+	}
+	if value, ok := su.mutation.CheckNewAddressBalance(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: setting.FieldCheckNewAddressBalance,
+		})
+	}
+	if su.mutation.CheckNewAddressBalanceCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Column: setting.FieldCheckNewAddressBalance,
 		})
 	}
 	_spec.Modifiers = su.modifiers
@@ -987,6 +1020,26 @@ func (suo *SettingUpdateOne) SetNillableRefreshCurrency(b *bool) *SettingUpdateO
 // ClearRefreshCurrency clears the value of the "refresh_currency" field.
 func (suo *SettingUpdateOne) ClearRefreshCurrency() *SettingUpdateOne {
 	suo.mutation.ClearRefreshCurrency()
+	return suo
+}
+
+// SetCheckNewAddressBalance sets the "check_new_address_balance" field.
+func (suo *SettingUpdateOne) SetCheckNewAddressBalance(b bool) *SettingUpdateOne {
+	suo.mutation.SetCheckNewAddressBalance(b)
+	return suo
+}
+
+// SetNillableCheckNewAddressBalance sets the "check_new_address_balance" field if the given value is not nil.
+func (suo *SettingUpdateOne) SetNillableCheckNewAddressBalance(b *bool) *SettingUpdateOne {
+	if b != nil {
+		suo.SetCheckNewAddressBalance(*b)
+	}
+	return suo
+}
+
+// ClearCheckNewAddressBalance clears the value of the "check_new_address_balance" field.
+func (suo *SettingUpdateOne) ClearCheckNewAddressBalance() *SettingUpdateOne {
+	suo.mutation.ClearCheckNewAddressBalance()
 	return suo
 }
 
@@ -1327,6 +1380,19 @@ func (suo *SettingUpdateOne) sqlSave(ctx context.Context) (_node *Setting, err e
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
 			Column: setting.FieldRefreshCurrency,
+		})
+	}
+	if value, ok := suo.mutation.CheckNewAddressBalance(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: setting.FieldCheckNewAddressBalance,
+		})
+	}
+	if suo.mutation.CheckNewAddressBalanceCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Column: setting.FieldCheckNewAddressBalance,
 		})
 	}
 	_spec.Modifiers = suo.modifiers

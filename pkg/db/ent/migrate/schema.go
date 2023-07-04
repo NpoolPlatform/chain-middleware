@@ -369,6 +369,7 @@ var (
 		{Name: "least_transfer_amount", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
 		{Name: "need_memo", Type: field.TypeBool, Nullable: true, Default: false},
 		{Name: "refresh_currency", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "check_new_address_balance", Type: field.TypeBool, Nullable: true, Default: true},
 	}
 	// SettingsTable holds the schema information for the "settings" table.
 	SettingsTable = &schema.Table{

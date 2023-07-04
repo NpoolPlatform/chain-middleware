@@ -42,6 +42,7 @@ func (s *Server) UpdateCoin(ctx context.Context, in *npool.UpdateCoinRequest) (*
 		// TODO: this should be in create from register coin
 		coin1.WithNeedMemo(req.NeedMemo),
 		coin1.WithRefreshCurrency(req.RefreshCurrency),
+		coin1.WithCheckNewAddressBalance(req.CheckNewAddressBalance),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

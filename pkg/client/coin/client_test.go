@@ -55,6 +55,7 @@ var ret = &npool.Coin{
 	FeeCoinUnit:                 unit,
 	FeeCoinENV:                  "main",
 	LeastTransferAmount:         "0.000000000000000000",
+	CheckNewAddressBalance:      true,
 }
 
 var req = &npool.CoinReq{

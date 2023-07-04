@@ -103,6 +103,10 @@ func (Setting) Fields() []ent.Field {
 			Bool("refresh_currency").
 			Optional().
 			Default(false),
+		field.
+			Bool("check_new_address_balance").
+			Optional().
+			Default(true),
 	}
 }
 

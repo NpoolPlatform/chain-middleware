@@ -39,6 +39,7 @@ var ret = &npool.Coin{
 	FeeCoinUnit:                 "BTC1",
 	FeeCoinENV:                  "test",
 	LeastTransferAmount:         "0.000000000000000000",
+	CheckNewAddressBalance:      true,
 }
 
 var req = &npool.CoinReq{
@@ -132,6 +133,7 @@ func update(t *testing.T) {
 		// TODO: this should be in create from register coin
 		WithNeedMemo(req.NeedMemo),
 		WithRefreshCurrency(req.RefreshCurrency),
+		WithCheckNewAddressBalance(req.CheckNewAddressBalance),
 	)
 	assert.Nil(t, err)
 

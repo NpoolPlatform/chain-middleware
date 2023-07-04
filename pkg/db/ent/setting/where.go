@@ -192,6 +192,13 @@ func RefreshCurrency(v bool) predicate.Setting {
 	})
 }
 
+// CheckNewAddressBalance applies equality check predicate on the "check_new_address_balance" field. It's identical to CheckNewAddressBalanceEQ.
+func CheckNewAddressBalance(v bool) predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCheckNewAddressBalance), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v uint32) predicate.Setting {
 	return predicate.Setting(func(s *sql.Selector) {
@@ -1245,6 +1252,34 @@ func RefreshCurrencyIsNil() predicate.Setting {
 func RefreshCurrencyNotNil() predicate.Setting {
 	return predicate.Setting(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldRefreshCurrency)))
+	})
+}
+
+// CheckNewAddressBalanceEQ applies the EQ predicate on the "check_new_address_balance" field.
+func CheckNewAddressBalanceEQ(v bool) predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldCheckNewAddressBalance), v))
+	})
+}
+
+// CheckNewAddressBalanceNEQ applies the NEQ predicate on the "check_new_address_balance" field.
+func CheckNewAddressBalanceNEQ(v bool) predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldCheckNewAddressBalance), v))
+	})
+}
+
+// CheckNewAddressBalanceIsNil applies the IsNil predicate on the "check_new_address_balance" field.
+func CheckNewAddressBalanceIsNil() predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldCheckNewAddressBalance)))
+	})
+}
+
+// CheckNewAddressBalanceNotNil applies the NotNil predicate on the "check_new_address_balance" field.
+func CheckNewAddressBalanceNotNil() predicate.Setting {
+	return predicate.Setting(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldCheckNewAddressBalance)))
 	})
 }
 
