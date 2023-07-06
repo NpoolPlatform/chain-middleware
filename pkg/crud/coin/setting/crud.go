@@ -30,7 +30,7 @@ type Req struct {
 	DeletedAt                   *uint32
 }
 
-func CreateSet(c *ent.SettingCreate, req *Req) *ent.SettingCreate {
+func CreateSet(c *ent.SettingCreate, req *Req) *ent.SettingCreate { //nolint
 	if req.ID != nil {
 		c.SetID(*req.ID)
 	}
