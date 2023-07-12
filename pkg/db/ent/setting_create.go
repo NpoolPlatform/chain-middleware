@@ -248,6 +248,20 @@ func (sc *SettingCreate) SetNillableRefreshCurrency(b *bool) *SettingCreate {
 	return sc
 }
 
+// SetCheckNewAddressBalance sets the "check_new_address_balance" field.
+func (sc *SettingCreate) SetCheckNewAddressBalance(b bool) *SettingCreate {
+	sc.mutation.SetCheckNewAddressBalance(b)
+	return sc
+}
+
+// SetNillableCheckNewAddressBalance sets the "check_new_address_balance" field if the given value is not nil.
+func (sc *SettingCreate) SetNillableCheckNewAddressBalance(b *bool) *SettingCreate {
+	if b != nil {
+		sc.SetCheckNewAddressBalance(*b)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *SettingCreate) SetID(u uuid.UUID) *SettingCreate {
 	sc.mutation.SetID(u)
@@ -419,6 +433,10 @@ func (sc *SettingCreate) defaults() error {
 	if _, ok := sc.mutation.RefreshCurrency(); !ok {
 		v := setting.DefaultRefreshCurrency
 		sc.mutation.SetRefreshCurrency(v)
+	}
+	if _, ok := sc.mutation.CheckNewAddressBalance(); !ok {
+		v := setting.DefaultCheckNewAddressBalance
+		sc.mutation.SetCheckNewAddressBalance(v)
 	}
 	if _, ok := sc.mutation.ID(); !ok {
 		if setting.DefaultID == nil {
@@ -605,6 +623,14 @@ func (sc *SettingCreate) createSpec() (*Setting, *sqlgraph.CreateSpec) {
 			Column: setting.FieldRefreshCurrency,
 		})
 		_node.RefreshCurrency = value
+	}
+	if value, ok := sc.mutation.CheckNewAddressBalance(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeBool,
+			Value:  value,
+			Column: setting.FieldCheckNewAddressBalance,
+		})
+		_node.CheckNewAddressBalance = value
 	}
 	return _node, _spec
 }
@@ -945,6 +971,24 @@ func (u *SettingUpsert) UpdateRefreshCurrency() *SettingUpsert {
 // ClearRefreshCurrency clears the value of the "refresh_currency" field.
 func (u *SettingUpsert) ClearRefreshCurrency() *SettingUpsert {
 	u.SetNull(setting.FieldRefreshCurrency)
+	return u
+}
+
+// SetCheckNewAddressBalance sets the "check_new_address_balance" field.
+func (u *SettingUpsert) SetCheckNewAddressBalance(v bool) *SettingUpsert {
+	u.Set(setting.FieldCheckNewAddressBalance, v)
+	return u
+}
+
+// UpdateCheckNewAddressBalance sets the "check_new_address_balance" field to the value that was provided on create.
+func (u *SettingUpsert) UpdateCheckNewAddressBalance() *SettingUpsert {
+	u.SetExcluded(setting.FieldCheckNewAddressBalance)
+	return u
+}
+
+// ClearCheckNewAddressBalance clears the value of the "check_new_address_balance" field.
+func (u *SettingUpsert) ClearCheckNewAddressBalance() *SettingUpsert {
+	u.SetNull(setting.FieldCheckNewAddressBalance)
 	return u
 }
 
@@ -1331,6 +1375,27 @@ func (u *SettingUpsertOne) UpdateRefreshCurrency() *SettingUpsertOne {
 func (u *SettingUpsertOne) ClearRefreshCurrency() *SettingUpsertOne {
 	return u.Update(func(s *SettingUpsert) {
 		s.ClearRefreshCurrency()
+	})
+}
+
+// SetCheckNewAddressBalance sets the "check_new_address_balance" field.
+func (u *SettingUpsertOne) SetCheckNewAddressBalance(v bool) *SettingUpsertOne {
+	return u.Update(func(s *SettingUpsert) {
+		s.SetCheckNewAddressBalance(v)
+	})
+}
+
+// UpdateCheckNewAddressBalance sets the "check_new_address_balance" field to the value that was provided on create.
+func (u *SettingUpsertOne) UpdateCheckNewAddressBalance() *SettingUpsertOne {
+	return u.Update(func(s *SettingUpsert) {
+		s.UpdateCheckNewAddressBalance()
+	})
+}
+
+// ClearCheckNewAddressBalance clears the value of the "check_new_address_balance" field.
+func (u *SettingUpsertOne) ClearCheckNewAddressBalance() *SettingUpsertOne {
+	return u.Update(func(s *SettingUpsert) {
+		s.ClearCheckNewAddressBalance()
 	})
 }
 
@@ -1883,6 +1948,27 @@ func (u *SettingUpsertBulk) UpdateRefreshCurrency() *SettingUpsertBulk {
 func (u *SettingUpsertBulk) ClearRefreshCurrency() *SettingUpsertBulk {
 	return u.Update(func(s *SettingUpsert) {
 		s.ClearRefreshCurrency()
+	})
+}
+
+// SetCheckNewAddressBalance sets the "check_new_address_balance" field.
+func (u *SettingUpsertBulk) SetCheckNewAddressBalance(v bool) *SettingUpsertBulk {
+	return u.Update(func(s *SettingUpsert) {
+		s.SetCheckNewAddressBalance(v)
+	})
+}
+
+// UpdateCheckNewAddressBalance sets the "check_new_address_balance" field to the value that was provided on create.
+func (u *SettingUpsertBulk) UpdateCheckNewAddressBalance() *SettingUpsertBulk {
+	return u.Update(func(s *SettingUpsert) {
+		s.UpdateCheckNewAddressBalance()
+	})
+}
+
+// ClearCheckNewAddressBalance clears the value of the "check_new_address_balance" field.
+func (u *SettingUpsertBulk) ClearCheckNewAddressBalance() *SettingUpsertBulk {
+	return u.Update(func(s *SettingUpsert) {
+		s.ClearCheckNewAddressBalance()
 	})
 }
 

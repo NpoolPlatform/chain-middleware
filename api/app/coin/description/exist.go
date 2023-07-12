@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-//nolint:lll
 func (s *Server) ExistCoinDescriptionConds(ctx context.Context, in *npool.ExistCoinDescriptionCondsRequest) (*npool.ExistCoinDescriptionCondsResponse, error) {
 	handler, err := description1.NewHandler(
 		ctx,

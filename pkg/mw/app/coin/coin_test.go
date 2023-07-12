@@ -124,6 +124,7 @@ func create(t *testing.T) {
 		ret.FeeCoinTypeID = ret.CoinTypeID
 		ret.DisplayNamesStr = info.DisplayNamesStr
 		ret.SettleTipsStr = info.SettleTipsStr
+		ret.CheckNewAddressBalance = info.CheckNewAddressBalance
 		assert.Equal(t, info, ret)
 	}
 }

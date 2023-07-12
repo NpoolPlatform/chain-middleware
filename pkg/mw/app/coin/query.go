@@ -142,6 +142,7 @@ func (h *queryHandler) queryJoinCoinSetting(s *sql.Selector) {
 			sql.As(t1.C(entsetting.FieldPaymentAccountCollectAmount), "payment_account_collect_amount"),
 			sql.As(t1.C(entsetting.FieldLeastTransferAmount), "least_transfer_amount"),
 			sql.As(t1.C(entsetting.FieldNeedMemo), "need_memo"),
+			sql.As(t1.C(entsetting.FieldCheckNewAddressBalance), "check_new_address_balance"),
 		)
 
 	t2 := sql.Table(entcoinbase.Table)

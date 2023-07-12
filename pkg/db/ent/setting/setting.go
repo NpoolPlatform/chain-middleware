@@ -45,6 +45,8 @@ const (
 	FieldNeedMemo = "need_memo"
 	// FieldRefreshCurrency holds the string denoting the refresh_currency field in the database.
 	FieldRefreshCurrency = "refresh_currency"
+	// FieldCheckNewAddressBalance holds the string denoting the check_new_address_balance field in the database.
+	FieldCheckNewAddressBalance = "check_new_address_balance"
 	// Table holds the table name of the setting in the database.
 	Table = "settings"
 )
@@ -68,6 +70,7 @@ var Columns = []string{
 	FieldLeastTransferAmount,
 	FieldNeedMemo,
 	FieldRefreshCurrency,
+	FieldCheckNewAddressBalance,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -123,6 +126,8 @@ var (
 	DefaultNeedMemo bool
 	// DefaultRefreshCurrency holds the default value on creation for the "refresh_currency" field.
 	DefaultRefreshCurrency bool
+	// DefaultCheckNewAddressBalance holds the default value on creation for the "check_new_address_balance" field.
+	DefaultCheckNewAddressBalance bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )

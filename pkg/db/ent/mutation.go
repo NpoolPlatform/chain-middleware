@@ -14947,6 +14947,7 @@ type SettingMutation struct {
 	least_transfer_amount          *decimal.Decimal
 	need_memo                      *bool
 	refresh_currency               *bool
+	check_new_address_balance      *bool
 	clearedFields                  map[string]struct{}
 	done                           bool
 	oldValue                       func(context.Context) (*Setting, error)
@@ -15862,6 +15863,55 @@ func (m *SettingMutation) ResetRefreshCurrency() {
 	delete(m.clearedFields, setting.FieldRefreshCurrency)
 }
 
+// SetCheckNewAddressBalance sets the "check_new_address_balance" field.
+func (m *SettingMutation) SetCheckNewAddressBalance(b bool) {
+	m.check_new_address_balance = &b
+}
+
+// CheckNewAddressBalance returns the value of the "check_new_address_balance" field in the mutation.
+func (m *SettingMutation) CheckNewAddressBalance() (r bool, exists bool) {
+	v := m.check_new_address_balance
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCheckNewAddressBalance returns the old "check_new_address_balance" field's value of the Setting entity.
+// If the Setting object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *SettingMutation) OldCheckNewAddressBalance(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCheckNewAddressBalance is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCheckNewAddressBalance requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCheckNewAddressBalance: %w", err)
+	}
+	return oldValue.CheckNewAddressBalance, nil
+}
+
+// ClearCheckNewAddressBalance clears the value of the "check_new_address_balance" field.
+func (m *SettingMutation) ClearCheckNewAddressBalance() {
+	m.check_new_address_balance = nil
+	m.clearedFields[setting.FieldCheckNewAddressBalance] = struct{}{}
+}
+
+// CheckNewAddressBalanceCleared returns if the "check_new_address_balance" field was cleared in this mutation.
+func (m *SettingMutation) CheckNewAddressBalanceCleared() bool {
+	_, ok := m.clearedFields[setting.FieldCheckNewAddressBalance]
+	return ok
+}
+
+// ResetCheckNewAddressBalance resets all changes to the "check_new_address_balance" field.
+func (m *SettingMutation) ResetCheckNewAddressBalance() {
+	m.check_new_address_balance = nil
+	delete(m.clearedFields, setting.FieldCheckNewAddressBalance)
+}
+
 // Where appends a list predicates to the SettingMutation builder.
 func (m *SettingMutation) Where(ps ...predicate.Setting) {
 	m.predicates = append(m.predicates, ps...)
@@ -15881,7 +15931,7 @@ func (m *SettingMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SettingMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, setting.FieldCreatedAt)
 	}
@@ -15930,6 +15980,9 @@ func (m *SettingMutation) Fields() []string {
 	if m.refresh_currency != nil {
 		fields = append(fields, setting.FieldRefreshCurrency)
 	}
+	if m.check_new_address_balance != nil {
+		fields = append(fields, setting.FieldCheckNewAddressBalance)
+	}
 	return fields
 }
 
@@ -15970,6 +16023,8 @@ func (m *SettingMutation) Field(name string) (ent.Value, bool) {
 		return m.NeedMemo()
 	case setting.FieldRefreshCurrency:
 		return m.RefreshCurrency()
+	case setting.FieldCheckNewAddressBalance:
+		return m.CheckNewAddressBalance()
 	}
 	return nil, false
 }
@@ -16011,6 +16066,8 @@ func (m *SettingMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldNeedMemo(ctx)
 	case setting.FieldRefreshCurrency:
 		return m.OldRefreshCurrency(ctx)
+	case setting.FieldCheckNewAddressBalance:
+		return m.OldCheckNewAddressBalance(ctx)
 	}
 	return nil, fmt.Errorf("unknown Setting field %s", name)
 }
@@ -16132,6 +16189,13 @@ func (m *SettingMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRefreshCurrency(v)
 		return nil
+	case setting.FieldCheckNewAddressBalance:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCheckNewAddressBalance(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Setting field %s", name)
 }
@@ -16240,6 +16304,9 @@ func (m *SettingMutation) ClearedFields() []string {
 	if m.FieldCleared(setting.FieldRefreshCurrency) {
 		fields = append(fields, setting.FieldRefreshCurrency)
 	}
+	if m.FieldCleared(setting.FieldCheckNewAddressBalance) {
+		fields = append(fields, setting.FieldCheckNewAddressBalance)
+	}
 	return fields
 }
 
@@ -16292,6 +16359,9 @@ func (m *SettingMutation) ClearField(name string) error {
 		return nil
 	case setting.FieldRefreshCurrency:
 		m.ClearRefreshCurrency()
+		return nil
+	case setting.FieldCheckNewAddressBalance:
+		m.ClearCheckNewAddressBalance()
 		return nil
 	}
 	return fmt.Errorf("unknown Setting nullable field %s", name)
@@ -16348,6 +16418,9 @@ func (m *SettingMutation) ResetField(name string) error {
 		return nil
 	case setting.FieldRefreshCurrency:
 		m.ResetRefreshCurrency()
+		return nil
+	case setting.FieldCheckNewAddressBalance:
+		m.ResetCheckNewAddressBalance()
 		return nil
 	}
 	return fmt.Errorf("unknown Setting field %s", name)

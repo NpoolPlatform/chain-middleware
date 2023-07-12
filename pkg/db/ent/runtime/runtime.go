@@ -955,6 +955,10 @@ func init() {
 	settingDescRefreshCurrency := settingFields[13].Descriptor()
 	// setting.DefaultRefreshCurrency holds the default value on creation for the refresh_currency field.
 	setting.DefaultRefreshCurrency = settingDescRefreshCurrency.Default.(bool)
+	// settingDescCheckNewAddressBalance is the schema descriptor for check_new_address_balance field.
+	settingDescCheckNewAddressBalance := settingFields[14].Descriptor()
+	// setting.DefaultCheckNewAddressBalance holds the default value on creation for the check_new_address_balance field.
+	setting.DefaultCheckNewAddressBalance = settingDescCheckNewAddressBalance.Default.(bool)
 	// settingDescID is the schema descriptor for id field.
 	settingDescID := settingFields[0].Descriptor()
 	// setting.DefaultID holds the default value on creation for the id field.
