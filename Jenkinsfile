@@ -340,6 +340,7 @@ pipeline {
             tag=`git describe --abbrev=0 --tags $taglist |grep [0\\|2\\|4\\|6\\|8]$ | head -n1`
             set +e
             docker images | grep chain-middleware | grep $tag
+            rc=$?
             set -e
             if [ 0 -eq $rc ]; then
               TAG=$tag DOCKER_REGISTRY=$DOCKER_REGISTRY make release-docker-images
