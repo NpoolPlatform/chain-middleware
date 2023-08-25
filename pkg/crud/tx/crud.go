@@ -76,6 +76,7 @@ type Conds struct {
 	State      *cruder.Cond
 	Type       *cruder.Cond
 	IDs        *cruder.Cond
+	States     *cruder.Cond
 }
 
 func SetQueryConds(q *ent.TranQuery, conds *Conds) (*ent.TranQuery, error) { //nolint
@@ -171,6 +172,22 @@ func SetQueryConds(q *ent.TranQuery, conds *Conds) (*ent.TranQuery, error) { //n
 		switch conds.IDs.Op {
 		case cruder.IN:
 			q.Where(enttran.IDIn(ids...))
+		default:
+			return nil, fmt.Errorf("invalid tx field")
+		}
+	}
+	if conds.State != nil {
+		states, ok := conds.State.Val.([]basetypes.TxState)
+		if !ok {
+			return nil, fmt.Errorf("invalid txstates")
+		}
+		ss := []string{}
+		for _, state := range states {
+			ss = append(ss, state.String())
+		}
+		switch conds.State.Op {
+		case cruder.IN:
+			q.Where(enttran.StateIn(ss...))
 		default:
 			return nil, fmt.Errorf("invalid tx field")
 		}

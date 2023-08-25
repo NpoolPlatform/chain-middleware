@@ -347,6 +347,16 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				Val: basetypes.TxType(conds.GetType().GetValue()),
 			}
 		}
+		if conds.States != nil {
+			states := []basetypes.TxState{}
+			for _, state := range conds.GetStates().GetValue() {
+				states = append(states, basetypes.TxState(state))
+			}
+			h.Conds.States = &cruder.Cond{
+				Op:  conds.GetState().GetOp(),
+				Val: states,
+			}
+		}
 		return nil
 	}
 }
