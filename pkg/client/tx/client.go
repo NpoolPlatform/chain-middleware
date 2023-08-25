@@ -16,7 +16,7 @@ var timeout = 10 * time.Second
 
 type handler func(context.Context, npool.MiddlewareClient) (cruder.Any, error)
 
-func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
+func do(ctx context.Context, handler handler) (cruder.Any, error) {
 	_ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -33,7 +33,7 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 }
 
 func CreateTx(ctx context.Context, in *npool.TxReq) (*npool.Tx, error) {
-	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.CreateTx(ctx, &npool.CreateTxRequest{
 			Info: in,
 		})
@@ -49,7 +49,7 @@ func CreateTx(ctx context.Context, in *npool.TxReq) (*npool.Tx, error) {
 }
 
 func CreateTxs(ctx context.Context, in []*npool.TxReq) ([]*npool.Tx, error) {
-	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+	infos, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.CreateTxs(ctx, &npool.CreateTxsRequest{
 			Infos: in,
 		})
@@ -65,7 +65,7 @@ func CreateTxs(ctx context.Context, in []*npool.TxReq) ([]*npool.Tx, error) {
 }
 
 func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
-	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetTx(ctx, &npool.GetTxRequest{
 			ID: id,
 		})
@@ -83,7 +83,7 @@ func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 func GetTxs(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Tx, uint32, error) {
 	var total uint32
 
-	infos, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+	infos, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetTxs(ctx, &npool.GetTxsRequest{
 			Conds:  conds,
 			Offset: offset,
@@ -104,7 +104,7 @@ func GetTxs(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*np
 }
 
 func UpdateTx(ctx context.Context, in *npool.TxReq) (*npool.Tx, error) {
-	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.UpdateTx(ctx, &npool.UpdateTxRequest{
 			Info: in,
 		})
@@ -117,4 +117,20 @@ func UpdateTx(ctx context.Context, in *npool.TxReq) (*npool.Tx, error) {
 		return nil, err
 	}
 	return info.(*npool.Tx), nil
+}
+
+func ExistTxConds(ctx context.Context, conds *npool.Conds) (bool, error) {
+	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.ExistTxConds(ctx, &npool.ExistTxCondsRequest{
+			Conds: conds,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Info, nil
+	})
+	if err != nil {
+		return false, err
+	}
+	return info.(bool), nil
 }
