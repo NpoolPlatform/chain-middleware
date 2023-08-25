@@ -176,8 +176,8 @@ func SetQueryConds(q *ent.TranQuery, conds *Conds) (*ent.TranQuery, error) { //n
 			return nil, fmt.Errorf("invalid tx field")
 		}
 	}
-	if conds.State != nil {
-		states, ok := conds.State.Val.([]basetypes.TxState)
+	if conds.States != nil {
+		states, ok := conds.States.Val.([]basetypes.TxState)
 		if !ok {
 			return nil, fmt.Errorf("invalid txstates")
 		}
@@ -185,7 +185,7 @@ func SetQueryConds(q *ent.TranQuery, conds *Conds) (*ent.TranQuery, error) { //n
 		for _, state := range states {
 			ss = append(ss, state.String())
 		}
-		switch conds.State.Op {
+		switch conds.States.Op {
 		case cruder.IN:
 			q.Where(enttran.StateIn(ss...))
 		default:
