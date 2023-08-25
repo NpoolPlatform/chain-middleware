@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) ExistCoin(ctx context.Context) (bool, error) {
-	if h.ID != nil {
+	if h.ID == nil {
 		return false, fmt.Errorf("invalid id")
 	}
 
