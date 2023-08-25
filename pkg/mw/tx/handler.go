@@ -145,7 +145,9 @@ func WithState(state *basetypes.TxState) func(context.Context, *Handler) error {
 		}
 		switch *state {
 		case basetypes.TxState_TxStateCreated:
+		case basetypes.TxState_TxStateCreatedCheck:
 		case basetypes.TxState_TxStateWait:
+		case basetypes.TxState_TxStateWaitCheck:
 		case basetypes.TxState_TxStateTransferring:
 		case basetypes.TxState_TxStateSuccessful:
 		case basetypes.TxState_TxStateFail:
