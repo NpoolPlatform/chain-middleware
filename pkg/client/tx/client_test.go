@@ -103,7 +103,7 @@ func updateTx(t *testing.T) {
 	_, err := UpdateTx(context.Background(), req)
 	assert.NotNil(t, err)
 
-	state = basetypes.TxState_TxStateWaitCheck
+	state = basetypes.TxState_TxStateCreatedCheck
 
 	ret.State = state
 	ret.StateStr = state.String()
