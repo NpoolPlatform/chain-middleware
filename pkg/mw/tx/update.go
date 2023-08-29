@@ -25,11 +25,23 @@ func (h *updateHandler) validateState(info *ent.Tran) error {
 	switch info.State {
 	case basetypes.TxState_TxStateCreated.String():
 		switch *h.State {
+		case basetypes.TxState_TxStateCreatedCheck:
+		default:
+			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
+		}
+	case basetypes.TxState_TxStateCreatedCheck.String():
+		switch *h.State {
 		case basetypes.TxState_TxStateWait:
 		default:
 			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
 		}
 	case basetypes.TxState_TxStateWait.String():
+		switch *h.State {
+		case basetypes.TxState_TxStateWaitCheck:
+		default:
+			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
+		}
+	case basetypes.TxState_TxStateWaitCheck.String():
 		switch *h.State {
 		case basetypes.TxState_TxStateTransferring:
 		default:
