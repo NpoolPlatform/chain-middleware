@@ -44,6 +44,7 @@ func (h *updateHandler) validateState(info *ent.Tran) error {
 	case basetypes.TxState_TxStateWaitCheck.String():
 		switch *h.State {
 		case basetypes.TxState_TxStateTransferring:
+		case basetypes.TxState_TxStateFail:
 		default:
 			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
 		}
