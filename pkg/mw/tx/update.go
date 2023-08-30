@@ -17,6 +17,7 @@ type updateHandler struct {
 	*Handler
 }
 
+//nolint:gocyclo
 func (h *updateHandler) validateState(info *ent.Tran) error {
 	if h.State == nil {
 		return nil
