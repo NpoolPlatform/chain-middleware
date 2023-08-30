@@ -353,7 +353,7 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				states = append(states, basetypes.TxState(state))
 			}
 			h.Conds.States = &cruder.Cond{
-				Op:  conds.GetState().GetOp(),
+				Op:  conds.GetStates().GetOp(),
 				Val: states,
 			}
 		}
