@@ -9,6 +9,7 @@ import (
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	enttran "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 
 	txcrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/tx"
 	entcoinbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
@@ -158,7 +159,8 @@ func (h *Handler) GetTxs(ctx context.Context) ([]*npool.Tx, uint32, error) {
 		handler.queryJoin()
 		handler.stm.
 			Offset(int(h.Offset)).
-			Limit(int(h.Limit))
+			Limit(int(h.Limit)).
+			Order(ent.Desc(enttran.FieldUpdatedAt))
 		return handler.scan(_ctx)
 	})
 	if err != nil {
