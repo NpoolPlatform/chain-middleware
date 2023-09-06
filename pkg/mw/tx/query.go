@@ -9,11 +9,10 @@ import (
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
-	enttran "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
+	enttx "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 
 	txcrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/tx"
 	entcoinbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
-	enttx "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/shopspring/decimal"
@@ -160,7 +159,7 @@ func (h *Handler) GetTxs(ctx context.Context) ([]*npool.Tx, uint32, error) {
 		handler.stm.
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit)).
-			Order(ent.Desc(enttran.FieldUpdatedAt))
+			Order(ent.Desc(enttx.FieldUpdatedAt))
 		return handler.scan(_ctx)
 	})
 	if err != nil {
