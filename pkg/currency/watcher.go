@@ -45,8 +45,8 @@ func Watch(ctx context.Context) {
 	}
 }
 
-func Shutdown() {
+func Shutdown(ctx context.Context) {
 	if w != nil {
-		w.Shutdown()
+		w.Shutdown(ctx)
 	}
 }

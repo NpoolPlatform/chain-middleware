@@ -29,7 +29,7 @@ var runCmd = &cli.Command{
 			watch,
 		)
 
-		currency.Shutdown()
+		currency.Shutdown(c.Context)
 
 		return err
 	},
