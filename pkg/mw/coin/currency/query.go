@@ -18,8 +18,6 @@ import (
 	entcoinextra "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	entcurrency "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 
-	uuid1 "github.com/NpoolPlatform/go-service-framework/pkg/const/uuid"
-
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -142,15 +140,15 @@ func (h *queryHandler) formalize() {
 			info.CreatedAt = uint32(time.Now().Unix())
 			info.UpdatedAt = uint32(time.Now().Unix())
 			info.FeedType = basetypes.CurrencyFeedType_StableUSDHardCode
-			if _, err := uuid.Parse(info.ID); err != nil {
-				info.ID = uuid1.InvalidUUIDStr
-			}
 		}
 		if _, err := decimal.NewFromString(info.MarketValueHigh); err != nil {
 			info.MarketValueHigh = decimal.NewFromInt(0).String()
 		}
 		if _, err := decimal.NewFromString(info.MarketValueLow); err != nil {
 			info.MarketValueLow = decimal.NewFromInt(0).String()
+		}
+		if _, err := uuid.Parse(info.ID); err != nil {
+			info.ID = info.CoinTypeID
 		}
 	}
 }
