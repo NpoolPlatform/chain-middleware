@@ -22,7 +22,7 @@ func refresh(ctx context.Context, fiat bool) {
 var w *watcher.Watcher
 
 func Watch(ctx context.Context) {
-	lockKey := fmt.Sprintf("%v", basetypes.Prefix_PrefixCreateCoinCurrency)
+	lockKey := fmt.Sprintf("%v", basetypes.Prefix_PrefixUpdateCoinCurrency)
 	for {
 		if err := redis2.TryLock(lockKey, 0); err == nil {
 			break
