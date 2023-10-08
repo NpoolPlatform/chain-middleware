@@ -45,6 +45,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			appcoin.FieldCreatedAt:                {Type: field.TypeUint32, Column: appcoin.FieldCreatedAt},
 			appcoin.FieldUpdatedAt:                {Type: field.TypeUint32, Column: appcoin.FieldUpdatedAt},
 			appcoin.FieldDeletedAt:                {Type: field.TypeUint32, Column: appcoin.FieldDeletedAt},
+			appcoin.FieldEntID:                    {Type: field.TypeUUID, Column: appcoin.FieldEntID},
 			appcoin.FieldAppID:                    {Type: field.TypeUUID, Column: appcoin.FieldAppID},
 			appcoin.FieldCoinTypeID:               {Type: field.TypeUUID, Column: appcoin.FieldCoinTypeID},
 			appcoin.FieldName:                     {Type: field.TypeString, Column: appcoin.FieldName},
@@ -490,6 +491,11 @@ func (f *AppCoinFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *AppCoinFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(appcoin.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *AppCoinFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(appcoin.FieldEntID))
 }
 
 // WhereAppID applies the entql [16]byte predicate on the app_id field.

@@ -66,6 +66,20 @@ func (acc *AppCoinCreate) SetNillableDeletedAt(u *uint32) *AppCoinCreate {
 	return acc
 }
 
+// SetEntID sets the "ent_id" field.
+func (acc *AppCoinCreate) SetEntID(u uuid.UUID) *AppCoinCreate {
+	acc.mutation.SetEntID(u)
+	return acc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (acc *AppCoinCreate) SetNillableEntID(u *uuid.UUID) *AppCoinCreate {
+	if u != nil {
+		acc.SetEntID(*u)
+	}
+	return acc
+}
+
 // SetAppID sets the "app_id" field.
 func (acc *AppCoinCreate) SetAppID(u uuid.UUID) *AppCoinCreate {
 	acc.mutation.SetAppID(u)
@@ -354,6 +368,13 @@ func (acc *AppCoinCreate) defaults() error {
 		v := appcoin.DefaultDeletedAt()
 		acc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := acc.mutation.EntID(); !ok {
+		if appcoin.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized appcoin.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := appcoin.DefaultEntID()
+		acc.mutation.SetEntID(v)
+	}
 	if _, ok := acc.mutation.AppID(); !ok {
 		if appcoin.DefaultAppID == nil {
 			return fmt.Errorf("ent: uninitialized appcoin.DefaultAppID (forgotten import ent/runtime?)")
@@ -433,6 +454,9 @@ func (acc *AppCoinCreate) check() error {
 	if _, ok := acc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "AppCoin.deleted_at"`)}
 	}
+	if _, ok := acc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "AppCoin.ent_id"`)}
+	}
 	return nil
 }
 
@@ -493,6 +517,14 @@ func (acc *AppCoinCreate) createSpec() (*AppCoin, *sqlgraph.CreateSpec) {
 			Column: appcoin.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := acc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: appcoin.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := acc.mutation.AppID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -703,6 +735,18 @@ func (u *AppCoinUpsert) UpdateDeletedAt() *AppCoinUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *AppCoinUpsert) AddDeletedAt(v uint32) *AppCoinUpsert {
 	u.Add(appcoin.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *AppCoinUpsert) SetEntID(v uuid.UUID) *AppCoinUpsert {
+	u.Set(appcoin.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *AppCoinUpsert) UpdateEntID() *AppCoinUpsert {
+	u.SetExcluded(appcoin.FieldEntID)
 	return u
 }
 
@@ -1056,6 +1100,20 @@ func (u *AppCoinUpsertOne) AddDeletedAt(v uint32) *AppCoinUpsertOne {
 func (u *AppCoinUpsertOne) UpdateDeletedAt() *AppCoinUpsertOne {
 	return u.Update(func(s *AppCoinUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *AppCoinUpsertOne) SetEntID(v uuid.UUID) *AppCoinUpsertOne {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *AppCoinUpsertOne) UpdateEntID() *AppCoinUpsertOne {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.UpdateEntID()
 	})
 }
 
@@ -1615,6 +1673,20 @@ func (u *AppCoinUpsertBulk) AddDeletedAt(v uint32) *AppCoinUpsertBulk {
 func (u *AppCoinUpsertBulk) UpdateDeletedAt() *AppCoinUpsertBulk {
 	return u.Update(func(s *AppCoinUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *AppCoinUpsertBulk) SetEntID(v uuid.UUID) *AppCoinUpsertBulk {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *AppCoinUpsertBulk) UpdateEntID() *AppCoinUpsertBulk {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.UpdateEntID()
 	})
 }
 

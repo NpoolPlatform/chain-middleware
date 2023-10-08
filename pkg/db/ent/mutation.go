@@ -74,6 +74,7 @@ type AppCoinMutation struct {
 	addupdated_at               *int32
 	deleted_at                  *uint32
 	adddeleted_at               *int32
+	ent_id                      *uuid.UUID
 	app_id                      *uuid.UUID
 	coin_type_id                *uuid.UUID
 	name                        *string
@@ -364,6 +365,42 @@ func (m *AppCoinMutation) AddedDeletedAt() (r int32, exists bool) {
 func (m *AppCoinMutation) ResetDeletedAt() {
 	m.deleted_at = nil
 	m.adddeleted_at = nil
+}
+
+// SetEntID sets the "ent_id" field.
+func (m *AppCoinMutation) SetEntID(u uuid.UUID) {
+	m.ent_id = &u
+}
+
+// EntID returns the value of the "ent_id" field in the mutation.
+func (m *AppCoinMutation) EntID() (r uuid.UUID, exists bool) {
+	v := m.ent_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEntID returns the old "ent_id" field's value of the AppCoin entity.
+// If the AppCoin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AppCoinMutation) OldEntID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEntID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEntID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEntID: %w", err)
+	}
+	return oldValue.EntID, nil
+}
+
+// ResetEntID resets all changes to the "ent_id" field.
+func (m *AppCoinMutation) ResetEntID() {
+	m.ent_id = nil
 }
 
 // SetAppID sets the "app_id" field.
@@ -1043,7 +1080,7 @@ func (m *AppCoinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AppCoinMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, appcoin.FieldCreatedAt)
 	}
@@ -1052,6 +1089,9 @@ func (m *AppCoinMutation) Fields() []string {
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, appcoin.FieldDeletedAt)
+	}
+	if m.ent_id != nil {
+		fields = append(fields, appcoin.FieldEntID)
 	}
 	if m.app_id != nil {
 		fields = append(fields, appcoin.FieldAppID)
@@ -1106,6 +1146,8 @@ func (m *AppCoinMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case appcoin.FieldDeletedAt:
 		return m.DeletedAt()
+	case appcoin.FieldEntID:
+		return m.EntID()
 	case appcoin.FieldAppID:
 		return m.AppID()
 	case appcoin.FieldCoinTypeID:
@@ -1147,6 +1189,8 @@ func (m *AppCoinMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldUpdatedAt(ctx)
 	case appcoin.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
+	case appcoin.FieldEntID:
+		return m.OldEntID(ctx)
 	case appcoin.FieldAppID:
 		return m.OldAppID(ctx)
 	case appcoin.FieldCoinTypeID:
@@ -1202,6 +1246,13 @@ func (m *AppCoinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
+		return nil
+	case appcoin.FieldEntID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEntID(v)
 		return nil
 	case appcoin.FieldAppID:
 		v, ok := value.(uuid.UUID)
@@ -1483,6 +1534,9 @@ func (m *AppCoinMutation) ResetField(name string) error {
 		return nil
 	case appcoin.FieldDeletedAt:
 		m.ResetDeletedAt()
+		return nil
+	case appcoin.FieldEntID:
+		m.ResetEntID()
 		return nil
 	case appcoin.FieldAppID:
 		m.ResetAppID()

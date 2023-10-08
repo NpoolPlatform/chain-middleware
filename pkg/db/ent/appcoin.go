@@ -24,6 +24,8 @@ type AppCoin struct {
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
+	// EntID holds the value of the "ent_id" field.
+	EntID uuid.UUID `json:"ent_id,omitempty"`
 	// AppID holds the value of the "app_id" field.
 	AppID uuid.UUID `json:"app_id,omitempty"`
 	// CoinTypeID holds the value of the "coin_type_id" field.
@@ -67,7 +69,7 @@ func (*AppCoin) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case appcoin.FieldName, appcoin.FieldLogo, appcoin.FieldProductPage:
 			values[i] = new(sql.NullString)
-		case appcoin.FieldID, appcoin.FieldAppID, appcoin.FieldCoinTypeID:
+		case appcoin.FieldID, appcoin.FieldEntID, appcoin.FieldAppID, appcoin.FieldCoinTypeID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type AppCoin", columns[i])
@@ -107,6 +109,12 @@ func (ac *AppCoin) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				ac.DeletedAt = uint32(value.Int64)
+			}
+		case appcoin.FieldEntID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field ent_id", values[i])
+			} else if value != nil {
+				ac.EntID = *value
 			}
 		case appcoin.FieldAppID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -224,6 +232,9 @@ func (ac *AppCoin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", ac.DeletedAt))
+	builder.WriteString(", ")
+	builder.WriteString("ent_id=")
+	builder.WriteString(fmt.Sprintf("%v", ac.EntID))
 	builder.WriteString(", ")
 	builder.WriteString("app_id=")
 	builder.WriteString(fmt.Sprintf("%v", ac.AppID))

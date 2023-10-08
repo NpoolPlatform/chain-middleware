@@ -14,6 +14,7 @@ var (
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "app_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
@@ -33,6 +34,13 @@ var (
 		Name:       "app_coins",
 		Columns:    AppCoinsColumns,
 		PrimaryKey: []*schema.Column{AppCoinsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "appcoin_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{AppCoinsColumns[4]},
+			},
+		},
 	}
 	// ChainBasesColumns holds the columns for the "chain_bases" table.
 	ChainBasesColumns = []*schema.Column{

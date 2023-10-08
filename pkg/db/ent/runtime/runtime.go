@@ -47,6 +47,8 @@ func init() {
 	}
 	appcoinMixinFields0 := appcoinMixin[0].Fields()
 	_ = appcoinMixinFields0
+	appcoinMixinFields1 := appcoinMixin[1].Fields()
+	_ = appcoinMixinFields1
 	appcoinFields := schema.AppCoin{}.Fields()
 	_ = appcoinFields
 	// appcoinDescCreatedAt is the schema descriptor for created_at field.
@@ -63,6 +65,10 @@ func init() {
 	appcoinDescDeletedAt := appcoinMixinFields0[2].Descriptor()
 	// appcoin.DefaultDeletedAt holds the default value on creation for the deleted_at field.
 	appcoin.DefaultDeletedAt = appcoinDescDeletedAt.Default.(func() uint32)
+	// appcoinDescEntID is the schema descriptor for ent_id field.
+	appcoinDescEntID := appcoinMixinFields1[1].Descriptor()
+	// appcoin.DefaultEntID holds the default value on creation for the ent_id field.
+	appcoin.DefaultEntID = appcoinDescEntID.Default.(func() uuid.UUID)
 	// appcoinDescAppID is the schema descriptor for app_id field.
 	appcoinDescAppID := appcoinFields[1].Descriptor()
 	// appcoin.DefaultAppID holds the default value on creation for the app_id field.
