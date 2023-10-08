@@ -12,7 +12,11 @@ import (
 )
 
 type Req struct {
+<<<<<<< HEAD
 	ID                       *uint32
+=======
+	ID                       *int
+>>>>>>> 5da7194 (Add ent id)
 	EntID                    *uuid.UUID
 	AppID                    *uuid.UUID
 	CoinTypeID               *uuid.UUID

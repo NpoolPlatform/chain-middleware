@@ -67,7 +67,11 @@ func (cd *CoinDescription) assignValues(columns []string, values []interface{}) 
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+<<<<<<< HEAD
 			cd.ID = uint32(value.Int64)
+=======
+			cd.ID = int(value.Int64)
+>>>>>>> 5da7194 (Add ent id)
 		case coindescription.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
