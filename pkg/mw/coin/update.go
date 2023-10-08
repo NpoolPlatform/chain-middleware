@@ -21,10 +21,9 @@ type updateHandler struct {
 }
 
 func (h *updateHandler) updateCoinBase(ctx context.Context, tx *ent.Tx) error {
-	if _, err := basecrud.UpdateSet(
+	info, err := basecrud.UpdateSet(
 		tx.CoinBase.UpdateOneID(*h.ID),
 		&basecrud.Req{
-			ID:             h.ID,
 			Name:           h.Name,
 			Logo:           h.Logo,
 			Presale:        h.Presale,
@@ -34,9 +33,11 @@ func (h *updateHandler) updateCoinBase(ctx context.Context, tx *ent.Tx) error {
 			ForPay:         h.ForPay,
 			Disabled:       h.Disabled,
 		},
-	).Save(ctx); err != nil {
+	).Save(ctx)
+	if err != nil {
 		return err
 	}
+	h.EntID = &info.EntID
 	return nil
 }
 
@@ -45,7 +46,7 @@ func (h *updateHandler) updateCoinExtra(ctx context.Context, tx *ent.Tx) error {
 		CoinExtra.
 		Query().
 		Where(
-			entextra.CoinTypeID(*h.ID),
+			entextra.CoinTypeID(*h.EntID),
 		).
 		ForUpdate().
 		Only(ctx)
@@ -59,7 +60,7 @@ func (h *updateHandler) updateCoinExtra(ctx context.Context, tx *ent.Tx) error {
 		if _, err := extracrud.UpdateSet(
 			info.Update(),
 			&extracrud.Req{
-				CoinTypeID: h.ID,
+				CoinTypeID: h.EntID,
 				StableUSD:  h.StableUSD,
 				HomePage:   h.HomePage,
 				Specs:      h.Specs,
@@ -73,7 +74,7 @@ func (h *updateHandler) updateCoinExtra(ctx context.Context, tx *ent.Tx) error {
 	if _, err := extracrud.CreateSet(
 		tx.CoinExtra.Create(),
 		&extracrud.Req{
-			CoinTypeID: h.ID,
+			CoinTypeID: h.EntID,
 			HomePage:   h.HomePage,
 			Specs:      h.Specs,
 		},
@@ -88,7 +89,7 @@ func (h *updateHandler) updateCoinSetting(ctx context.Context, tx *ent.Tx) error
 		Setting.
 		Query().
 		Where(
-			entsetting.CoinTypeID(*h.ID),
+			entsetting.CoinTypeID(*h.EntID),
 		).
 		ForUpdate().
 		Only(ctx)
@@ -102,7 +103,7 @@ func (h *updateHandler) updateCoinSetting(ctx context.Context, tx *ent.Tx) error
 		if _, err := settingcrud.UpdateSet(
 			info.Update(),
 			&settingcrud.Req{
-				CoinTypeID:                  h.ID,
+				CoinTypeID:                  h.EntID,
 				FeeCoinTypeID:               h.FeeCoinTypeID,
 				WithdrawFeeByStableUSD:      h.WithdrawFeeByStableUSD,
 				WithdrawFeeAmount:           h.WithdrawFeeAmount,
@@ -126,7 +127,7 @@ func (h *updateHandler) updateCoinSetting(ctx context.Context, tx *ent.Tx) error
 	if _, err := settingcrud.CreateSet(
 		tx.Setting.Create(),
 		&settingcrud.Req{
-			CoinTypeID:                  h.ID,
+			CoinTypeID:                  h.EntID,
 			FeeCoinTypeID:               h.FeeCoinTypeID,
 			WithdrawFeeByStableUSD:      h.WithdrawFeeByStableUSD,
 			WithdrawFeeAmount:           h.WithdrawFeeAmount,

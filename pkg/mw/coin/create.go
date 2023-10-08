@@ -108,7 +108,7 @@ func (h *createHandler) createNativeCoinBase(ctx context.Context, tx *ent.Tx) er
 		}
 	}
 
-	h.FeeCoinTypeID = &info.ID
+	h.FeeCoinTypeID = &info.EntID
 
 	return nil
 }
@@ -131,14 +131,14 @@ func (h *createHandler) createCoinBase(ctx context.Context, tx *ent.Tx) error {
 		}
 	}
 	if info != nil {
-		h.ID = &info.ID
+		h.EntID = &info.EntID
 		return nil
 	}
 
 	if _, err := basecrud.CreateSet(
 		tx.CoinBase.Create(),
 		&basecrud.Req{
-			ID:             h.ID,
+			EntID:          h.EntID,
 			Name:           h.Name,
 			Logo:           h.Logo,
 			Presale:        h.Presale,
@@ -193,7 +193,7 @@ func (h *createHandler) createCoinExtra(ctx context.Context, tx *ent.Tx) error {
 	stm, err := extracrud.SetQueryConds(
 		tx.CoinExtra.Query(),
 		&extracrud.Conds{
-			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.ID},
+			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.EntID},
 		},
 	)
 	if err != nil {
@@ -213,7 +213,7 @@ func (h *createHandler) createCoinExtra(ctx context.Context, tx *ent.Tx) error {
 	if _, err := extracrud.CreateSet(
 		tx.CoinExtra.Create(),
 		&extracrud.Req{
-			CoinTypeID: h.ID,
+			CoinTypeID: h.EntID,
 			HomePage:   h.HomePage,
 			Specs:      h.Specs,
 		},
@@ -263,7 +263,7 @@ func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error
 	stm, err := settingcrud.SetQueryConds(
 		tx.Setting.Query(),
 		&settingcrud.Conds{
-			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.ID},
+			CoinTypeID: &cruder.Cond{Op: cruder.EQ, Val: *h.EntID},
 		},
 	)
 	if err != nil {
@@ -283,8 +283,8 @@ func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error
 	if _, err := settingcrud.CreateSet(
 		tx.Setting.Create(),
 		&settingcrud.Req{
-			CoinTypeID:                  h.ID,
-			FeeCoinTypeID:               h.ID,
+			CoinTypeID:                  h.EntID,
+			FeeCoinTypeID:               h.FeeCoinTypeID,
 			WithdrawFeeByStableUSD:      h.WithdrawFeeByStableUSD,
 			WithdrawFeeAmount:           h.WithdrawFeeAmount,
 			CollectFeeAmount:            h.CollectFeeAmount,
@@ -329,8 +329,8 @@ func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
 	}()
 
 	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	handler := &createHandler{
