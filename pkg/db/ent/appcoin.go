@@ -17,7 +17,7 @@ import (
 type AppCoin struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt uint32 `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -65,11 +65,11 @@ func (*AppCoin) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(decimal.Decimal)
 		case appcoin.FieldForPay, appcoin.FieldDisabled, appcoin.FieldDisplay:
 			values[i] = new(sql.NullBool)
-		case appcoin.FieldCreatedAt, appcoin.FieldUpdatedAt, appcoin.FieldDeletedAt, appcoin.FieldDisplayIndex:
+		case appcoin.FieldID, appcoin.FieldCreatedAt, appcoin.FieldUpdatedAt, appcoin.FieldDeletedAt, appcoin.FieldDisplayIndex:
 			values[i] = new(sql.NullInt64)
 		case appcoin.FieldName, appcoin.FieldLogo, appcoin.FieldProductPage:
 			values[i] = new(sql.NullString)
-		case appcoin.FieldID, appcoin.FieldEntID, appcoin.FieldAppID, appcoin.FieldCoinTypeID:
+		case appcoin.FieldEntID, appcoin.FieldAppID, appcoin.FieldCoinTypeID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type AppCoin", columns[i])
@@ -87,11 +87,11 @@ func (ac *AppCoin) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case appcoin.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				ac.ID = *value
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			ac.ID = int(value.Int64)
 		case appcoin.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])

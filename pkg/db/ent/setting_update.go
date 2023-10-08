@@ -85,6 +85,20 @@ func (su *SettingUpdate) AddDeletedAt(u int32) *SettingUpdate {
 	return su
 }
 
+// SetEntID sets the "ent_id" field.
+func (su *SettingUpdate) SetEntID(u uuid.UUID) *SettingUpdate {
+	su.mutation.SetEntID(u)
+	return su
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (su *SettingUpdate) SetNillableEntID(u *uuid.UUID) *SettingUpdate {
+	if u != nil {
+		su.SetEntID(*u)
+	}
+	return su
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (su *SettingUpdate) SetCoinTypeID(u uuid.UUID) *SettingUpdate {
 	su.mutation.SetCoinTypeID(u)
@@ -451,7 +465,7 @@ func (su *SettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   setting.Table,
 			Columns: setting.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: setting.FieldID,
 			},
 		},
@@ -503,6 +517,13 @@ func (su *SettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: setting.FieldDeletedAt,
+		})
+	}
+	if value, ok := su.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: setting.FieldEntID,
 		})
 	}
 	if value, ok := su.mutation.CoinTypeID(); ok {
@@ -760,6 +781,20 @@ func (suo *SettingUpdateOne) SetNillableDeletedAt(u *uint32) *SettingUpdateOne {
 // AddDeletedAt adds u to the "deleted_at" field.
 func (suo *SettingUpdateOne) AddDeletedAt(u int32) *SettingUpdateOne {
 	suo.mutation.AddDeletedAt(u)
+	return suo
+}
+
+// SetEntID sets the "ent_id" field.
+func (suo *SettingUpdateOne) SetEntID(u uuid.UUID) *SettingUpdateOne {
+	suo.mutation.SetEntID(u)
+	return suo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (suo *SettingUpdateOne) SetNillableEntID(u *uuid.UUID) *SettingUpdateOne {
+	if u != nil {
+		suo.SetEntID(*u)
+	}
 	return suo
 }
 
@@ -1142,7 +1177,7 @@ func (suo *SettingUpdateOne) sqlSave(ctx context.Context) (_node *Setting, err e
 			Table:   setting.Table,
 			Columns: setting.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: setting.FieldID,
 			},
 		},
@@ -1211,6 +1246,13 @@ func (suo *SettingUpdateOne) sqlSave(ctx context.Context) (_node *Setting, err e
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: setting.FieldDeletedAt,
+		})
+	}
+	if value, ok := suo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: setting.FieldEntID,
 		})
 	}
 	if value, ok := suo.mutation.CoinTypeID(); ok {

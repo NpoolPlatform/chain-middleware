@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -65,6 +64,20 @@ func (fc *FiatCreate) SetNillableDeletedAt(u *uint32) *FiatCreate {
 	return fc
 }
 
+// SetEntID sets the "ent_id" field.
+func (fc *FiatCreate) SetEntID(u uuid.UUID) *FiatCreate {
+	fc.mutation.SetEntID(u)
+	return fc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fc *FiatCreate) SetNillableEntID(u *uuid.UUID) *FiatCreate {
+	if u != nil {
+		fc.SetEntID(*u)
+	}
+	return fc
+}
+
 // SetName sets the "name" field.
 func (fc *FiatCreate) SetName(s string) *FiatCreate {
 	fc.mutation.SetName(s)
@@ -108,16 +121,8 @@ func (fc *FiatCreate) SetNillableUnit(s *string) *FiatCreate {
 }
 
 // SetID sets the "id" field.
-func (fc *FiatCreate) SetID(u uuid.UUID) *FiatCreate {
-	fc.mutation.SetID(u)
-	return fc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (fc *FiatCreate) SetNillableID(u *uuid.UUID) *FiatCreate {
-	if u != nil {
-		fc.SetID(*u)
-	}
+func (fc *FiatCreate) SetID(i int) *FiatCreate {
+	fc.mutation.SetID(i)
 	return fc
 }
 
@@ -221,6 +226,13 @@ func (fc *FiatCreate) defaults() error {
 		v := fiat.DefaultDeletedAt()
 		fc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := fc.mutation.EntID(); !ok {
+		if fiat.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized fiat.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := fiat.DefaultEntID()
+		fc.mutation.SetEntID(v)
+	}
 	if _, ok := fc.mutation.Name(); !ok {
 		v := fiat.DefaultName
 		fc.mutation.SetName(v)
@@ -232,13 +244,6 @@ func (fc *FiatCreate) defaults() error {
 	if _, ok := fc.mutation.Unit(); !ok {
 		v := fiat.DefaultUnit
 		fc.mutation.SetUnit(v)
-	}
-	if _, ok := fc.mutation.ID(); !ok {
-		if fiat.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized fiat.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := fiat.DefaultID()
-		fc.mutation.SetID(v)
 	}
 	return nil
 }
@@ -254,6 +259,9 @@ func (fc *FiatCreate) check() error {
 	if _, ok := fc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "Fiat.deleted_at"`)}
 	}
+	if _, ok := fc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "Fiat.ent_id"`)}
+	}
 	return nil
 }
 
@@ -265,12 +273,9 @@ func (fc *FiatCreate) sqlSave(ctx context.Context) (*Fiat, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -281,7 +286,7 @@ func (fc *FiatCreate) createSpec() (*Fiat, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: fiat.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiat.FieldID,
 			},
 		}
@@ -289,7 +294,7 @@ func (fc *FiatCreate) createSpec() (*Fiat, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = fc.conflict
 	if id, ok := fc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := fc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -314,6 +319,14 @@ func (fc *FiatCreate) createSpec() (*Fiat, *sqlgraph.CreateSpec) {
 			Column: fiat.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := fc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiat.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := fc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -444,6 +457,18 @@ func (u *FiatUpsert) UpdateDeletedAt() *FiatUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *FiatUpsert) AddDeletedAt(v uint32) *FiatUpsert {
 	u.Add(fiat.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *FiatUpsert) SetEntID(v uuid.UUID) *FiatUpsert {
+	u.Set(fiat.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatUpsert) UpdateEntID() *FiatUpsert {
+	u.SetExcluded(fiat.FieldEntID)
 	return u
 }
 
@@ -614,6 +639,20 @@ func (u *FiatUpsertOne) UpdateDeletedAt() *FiatUpsertOne {
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *FiatUpsertOne) SetEntID(v uuid.UUID) *FiatUpsertOne {
+	return u.Update(func(s *FiatUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatUpsertOne) UpdateEntID() *FiatUpsertOne {
+	return u.Update(func(s *FiatUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *FiatUpsertOne) SetName(v string) *FiatUpsertOne {
 	return u.Update(func(s *FiatUpsert) {
@@ -693,12 +732,7 @@ func (u *FiatUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *FiatUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: FiatUpsertOne.ID is not supported by MySQL driver. Use FiatUpsertOne.Exec instead")
-	}
+func (u *FiatUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -707,7 +741,7 @@ func (u *FiatUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *FiatUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *FiatUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -758,6 +792,10 @@ func (fcb *FiatCreateBulk) Save(ctx context.Context) ([]*Fiat, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -953,6 +991,20 @@ func (u *FiatUpsertBulk) AddDeletedAt(v uint32) *FiatUpsertBulk {
 func (u *FiatUpsertBulk) UpdateDeletedAt() *FiatUpsertBulk {
 	return u.Update(func(s *FiatUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *FiatUpsertBulk) SetEntID(v uuid.UUID) *FiatUpsertBulk {
+	return u.Update(func(s *FiatUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatUpsertBulk) UpdateEntID() *FiatUpsertBulk {
+	return u.Update(func(s *FiatUpsert) {
+		s.UpdateEntID()
 	})
 }
 

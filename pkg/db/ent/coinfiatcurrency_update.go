@@ -85,6 +85,20 @@ func (cfcu *CoinFiatCurrencyUpdate) AddDeletedAt(u int32) *CoinFiatCurrencyUpdat
 	return cfcu
 }
 
+// SetEntID sets the "ent_id" field.
+func (cfcu *CoinFiatCurrencyUpdate) SetEntID(u uuid.UUID) *CoinFiatCurrencyUpdate {
+	cfcu.mutation.SetEntID(u)
+	return cfcu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfcu *CoinFiatCurrencyUpdate) SetNillableEntID(u *uuid.UUID) *CoinFiatCurrencyUpdate {
+	if u != nil {
+		cfcu.SetEntID(*u)
+	}
+	return cfcu
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (cfcu *CoinFiatCurrencyUpdate) SetCoinTypeID(u uuid.UUID) *CoinFiatCurrencyUpdate {
 	cfcu.mutation.SetCoinTypeID(u)
@@ -271,7 +285,7 @@ func (cfcu *CoinFiatCurrencyUpdate) sqlSave(ctx context.Context) (n int, err err
 			Table:   coinfiatcurrency.Table,
 			Columns: coinfiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiatcurrency.FieldID,
 			},
 		},
@@ -323,6 +337,13 @@ func (cfcu *CoinFiatCurrencyUpdate) sqlSave(ctx context.Context) (n int, err err
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinfiatcurrency.FieldDeletedAt,
+		})
+	}
+	if value, ok := cfcu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiatcurrency.FieldEntID,
 		})
 	}
 	if value, ok := cfcu.mutation.CoinTypeID(); ok {
@@ -463,6 +484,20 @@ func (cfcuo *CoinFiatCurrencyUpdateOne) SetNillableDeletedAt(u *uint32) *CoinFia
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cfcuo *CoinFiatCurrencyUpdateOne) AddDeletedAt(u int32) *CoinFiatCurrencyUpdateOne {
 	cfcuo.mutation.AddDeletedAt(u)
+	return cfcuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (cfcuo *CoinFiatCurrencyUpdateOne) SetEntID(u uuid.UUID) *CoinFiatCurrencyUpdateOne {
+	cfcuo.mutation.SetEntID(u)
+	return cfcuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfcuo *CoinFiatCurrencyUpdateOne) SetNillableEntID(u *uuid.UUID) *CoinFiatCurrencyUpdateOne {
+	if u != nil {
+		cfcuo.SetEntID(*u)
+	}
 	return cfcuo
 }
 
@@ -665,7 +700,7 @@ func (cfcuo *CoinFiatCurrencyUpdateOne) sqlSave(ctx context.Context) (_node *Coi
 			Table:   coinfiatcurrency.Table,
 			Columns: coinfiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiatcurrency.FieldID,
 			},
 		},
@@ -734,6 +769,13 @@ func (cfcuo *CoinFiatCurrencyUpdateOne) sqlSave(ctx context.Context) (_node *Coi
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinfiatcurrency.FieldDeletedAt,
+		})
+	}
+	if value, ok := cfcuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiatcurrency.FieldEntID,
 		})
 	}
 	if value, ok := cfcuo.mutation.CoinTypeID(); ok {

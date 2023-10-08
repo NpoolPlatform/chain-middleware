@@ -65,6 +65,20 @@ func (cdc *CoinDescriptionCreate) SetNillableDeletedAt(u *uint32) *CoinDescripti
 	return cdc
 }
 
+// SetEntID sets the "ent_id" field.
+func (cdc *CoinDescriptionCreate) SetEntID(u uuid.UUID) *CoinDescriptionCreate {
+	cdc.mutation.SetEntID(u)
+	return cdc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cdc *CoinDescriptionCreate) SetNillableEntID(u *uuid.UUID) *CoinDescriptionCreate {
+	if u != nil {
+		cdc.SetEntID(*u)
+	}
+	return cdc
+}
+
 // SetAppID sets the "app_id" field.
 func (cdc *CoinDescriptionCreate) SetAppID(u uuid.UUID) *CoinDescriptionCreate {
 	cdc.mutation.SetAppID(u)
@@ -249,6 +263,13 @@ func (cdc *CoinDescriptionCreate) defaults() error {
 		v := coindescription.DefaultDeletedAt()
 		cdc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := cdc.mutation.EntID(); !ok {
+		if coindescription.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized coindescription.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := coindescription.DefaultEntID()
+		cdc.mutation.SetEntID(v)
+	}
 	if _, ok := cdc.mutation.AppID(); !ok {
 		if coindescription.DefaultAppID == nil {
 			return fmt.Errorf("ent: uninitialized coindescription.DefaultAppID (forgotten import ent/runtime?)")
@@ -295,6 +316,9 @@ func (cdc *CoinDescriptionCreate) check() error {
 	}
 	if _, ok := cdc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "CoinDescription.deleted_at"`)}
+	}
+	if _, ok := cdc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "CoinDescription.ent_id"`)}
 	}
 	return nil
 }
@@ -356,6 +380,14 @@ func (cdc *CoinDescriptionCreate) createSpec() (*CoinDescription, *sqlgraph.Crea
 			Column: coindescription.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := cdc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coindescription.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := cdc.mutation.AppID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -502,6 +534,18 @@ func (u *CoinDescriptionUpsert) UpdateDeletedAt() *CoinDescriptionUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *CoinDescriptionUpsert) AddDeletedAt(v uint32) *CoinDescriptionUpsert {
 	u.Add(coindescription.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinDescriptionUpsert) SetEntID(v uuid.UUID) *CoinDescriptionUpsert {
+	u.Set(coindescription.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinDescriptionUpsert) UpdateEntID() *CoinDescriptionUpsert {
+	u.SetExcluded(coindescription.FieldEntID)
 	return u
 }
 
@@ -705,6 +749,20 @@ func (u *CoinDescriptionUpsertOne) AddDeletedAt(v uint32) *CoinDescriptionUpsert
 func (u *CoinDescriptionUpsertOne) UpdateDeletedAt() *CoinDescriptionUpsertOne {
 	return u.Update(func(s *CoinDescriptionUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinDescriptionUpsertOne) SetEntID(v uuid.UUID) *CoinDescriptionUpsertOne {
+	return u.Update(func(s *CoinDescriptionUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinDescriptionUpsertOne) UpdateEntID() *CoinDescriptionUpsertOne {
+	return u.Update(func(s *CoinDescriptionUpsert) {
+		s.UpdateEntID()
 	})
 }
 
@@ -1089,6 +1147,20 @@ func (u *CoinDescriptionUpsertBulk) AddDeletedAt(v uint32) *CoinDescriptionUpser
 func (u *CoinDescriptionUpsertBulk) UpdateDeletedAt() *CoinDescriptionUpsertBulk {
 	return u.Update(func(s *CoinDescriptionUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinDescriptionUpsertBulk) SetEntID(v uuid.UUID) *CoinDescriptionUpsertBulk {
+	return u.Update(func(s *CoinDescriptionUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinDescriptionUpsertBulk) UpdateEntID() *CoinDescriptionUpsertBulk {
+	return u.Update(func(s *CoinDescriptionUpsert) {
+		s.UpdateEntID()
 	})
 }
 

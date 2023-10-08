@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -61,6 +60,20 @@ func (fcfc *FiatCurrencyFeedCreate) SetDeletedAt(u uint32) *FiatCurrencyFeedCrea
 func (fcfc *FiatCurrencyFeedCreate) SetNillableDeletedAt(u *uint32) *FiatCurrencyFeedCreate {
 	if u != nil {
 		fcfc.SetDeletedAt(*u)
+	}
+	return fcfc
+}
+
+// SetEntID sets the "ent_id" field.
+func (fcfc *FiatCurrencyFeedCreate) SetEntID(u uuid.UUID) *FiatCurrencyFeedCreate {
+	fcfc.mutation.SetEntID(u)
+	return fcfc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fcfc *FiatCurrencyFeedCreate) SetNillableEntID(u *uuid.UUID) *FiatCurrencyFeedCreate {
+	if u != nil {
+		fcfc.SetEntID(*u)
 	}
 	return fcfc
 }
@@ -122,16 +135,8 @@ func (fcfc *FiatCurrencyFeedCreate) SetNillableDisabled(b *bool) *FiatCurrencyFe
 }
 
 // SetID sets the "id" field.
-func (fcfc *FiatCurrencyFeedCreate) SetID(u uuid.UUID) *FiatCurrencyFeedCreate {
-	fcfc.mutation.SetID(u)
-	return fcfc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (fcfc *FiatCurrencyFeedCreate) SetNillableID(u *uuid.UUID) *FiatCurrencyFeedCreate {
-	if u != nil {
-		fcfc.SetID(*u)
-	}
+func (fcfc *FiatCurrencyFeedCreate) SetID(i int) *FiatCurrencyFeedCreate {
+	fcfc.mutation.SetID(i)
 	return fcfc
 }
 
@@ -235,6 +240,13 @@ func (fcfc *FiatCurrencyFeedCreate) defaults() error {
 		v := fiatcurrencyfeed.DefaultDeletedAt()
 		fcfc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := fcfc.mutation.EntID(); !ok {
+		if fiatcurrencyfeed.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized fiatcurrencyfeed.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := fiatcurrencyfeed.DefaultEntID()
+		fcfc.mutation.SetEntID(v)
+	}
 	if _, ok := fcfc.mutation.FiatID(); !ok {
 		if fiatcurrencyfeed.DefaultFiatID == nil {
 			return fmt.Errorf("ent: uninitialized fiatcurrencyfeed.DefaultFiatID (forgotten import ent/runtime?)")
@@ -254,13 +266,6 @@ func (fcfc *FiatCurrencyFeedCreate) defaults() error {
 		v := fiatcurrencyfeed.DefaultDisabled
 		fcfc.mutation.SetDisabled(v)
 	}
-	if _, ok := fcfc.mutation.ID(); !ok {
-		if fiatcurrencyfeed.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized fiatcurrencyfeed.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := fiatcurrencyfeed.DefaultID()
-		fcfc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -275,6 +280,9 @@ func (fcfc *FiatCurrencyFeedCreate) check() error {
 	if _, ok := fcfc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "FiatCurrencyFeed.deleted_at"`)}
 	}
+	if _, ok := fcfc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "FiatCurrencyFeed.ent_id"`)}
+	}
 	return nil
 }
 
@@ -286,12 +294,9 @@ func (fcfc *FiatCurrencyFeedCreate) sqlSave(ctx context.Context) (*FiatCurrencyF
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -302,7 +307,7 @@ func (fcfc *FiatCurrencyFeedCreate) createSpec() (*FiatCurrencyFeed, *sqlgraph.C
 		_spec = &sqlgraph.CreateSpec{
 			Table: fiatcurrencyfeed.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiatcurrencyfeed.FieldID,
 			},
 		}
@@ -310,7 +315,7 @@ func (fcfc *FiatCurrencyFeedCreate) createSpec() (*FiatCurrencyFeed, *sqlgraph.C
 	_spec.OnConflict = fcfc.conflict
 	if id, ok := fcfc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := fcfc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -335,6 +340,14 @@ func (fcfc *FiatCurrencyFeedCreate) createSpec() (*FiatCurrencyFeed, *sqlgraph.C
 			Column: fiatcurrencyfeed.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := fcfc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiatcurrencyfeed.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := fcfc.mutation.FiatID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -473,6 +486,18 @@ func (u *FiatCurrencyFeedUpsert) UpdateDeletedAt() *FiatCurrencyFeedUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *FiatCurrencyFeedUpsert) AddDeletedAt(v uint32) *FiatCurrencyFeedUpsert {
 	u.Add(fiatcurrencyfeed.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *FiatCurrencyFeedUpsert) SetEntID(v uuid.UUID) *FiatCurrencyFeedUpsert {
+	u.Set(fiatcurrencyfeed.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatCurrencyFeedUpsert) UpdateEntID() *FiatCurrencyFeedUpsert {
+	u.SetExcluded(fiatcurrencyfeed.FieldEntID)
 	return u
 }
 
@@ -661,6 +686,20 @@ func (u *FiatCurrencyFeedUpsertOne) UpdateDeletedAt() *FiatCurrencyFeedUpsertOne
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *FiatCurrencyFeedUpsertOne) SetEntID(v uuid.UUID) *FiatCurrencyFeedUpsertOne {
+	return u.Update(func(s *FiatCurrencyFeedUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatCurrencyFeedUpsertOne) UpdateEntID() *FiatCurrencyFeedUpsertOne {
+	return u.Update(func(s *FiatCurrencyFeedUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetFiatID sets the "fiat_id" field.
 func (u *FiatCurrencyFeedUpsertOne) SetFiatID(v uuid.UUID) *FiatCurrencyFeedUpsertOne {
 	return u.Update(func(s *FiatCurrencyFeedUpsert) {
@@ -761,12 +800,7 @@ func (u *FiatCurrencyFeedUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *FiatCurrencyFeedUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: FiatCurrencyFeedUpsertOne.ID is not supported by MySQL driver. Use FiatCurrencyFeedUpsertOne.Exec instead")
-	}
+func (u *FiatCurrencyFeedUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -775,7 +809,7 @@ func (u *FiatCurrencyFeedUpsertOne) ID(ctx context.Context) (id uuid.UUID, err e
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *FiatCurrencyFeedUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *FiatCurrencyFeedUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -826,6 +860,10 @@ func (fcfcb *FiatCurrencyFeedCreateBulk) Save(ctx context.Context) ([]*FiatCurre
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1021,6 +1059,20 @@ func (u *FiatCurrencyFeedUpsertBulk) AddDeletedAt(v uint32) *FiatCurrencyFeedUps
 func (u *FiatCurrencyFeedUpsertBulk) UpdateDeletedAt() *FiatCurrencyFeedUpsertBulk {
 	return u.Update(func(s *FiatCurrencyFeedUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *FiatCurrencyFeedUpsertBulk) SetEntID(v uuid.UUID) *FiatCurrencyFeedUpsertBulk {
+	return u.Update(func(s *FiatCurrencyFeedUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatCurrencyFeedUpsertBulk) UpdateEntID() *FiatCurrencyFeedUpsertBulk {
+	return u.Update(func(s *FiatCurrencyFeedUpsert) {
+		s.UpdateEntID()
 	})
 }
 

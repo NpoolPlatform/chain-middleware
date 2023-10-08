@@ -128,6 +128,4 @@ var (
 	DefaultDisplayIndex uint32
 	// DefaultMaxAmountPerWithdraw holds the default value on creation for the "max_amount_per_withdraw" field.
 	DefaultMaxAmountPerWithdraw decimal.Decimal
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
 )

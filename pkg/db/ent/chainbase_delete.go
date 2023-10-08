@@ -72,7 +72,7 @@ func (cbd *ChainBaseDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: chainbase.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: chainbase.FieldID,
 			},
 		},

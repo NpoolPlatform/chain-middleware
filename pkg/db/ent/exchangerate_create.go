@@ -66,6 +66,20 @@ func (erc *ExchangeRateCreate) SetNillableDeletedAt(u *uint32) *ExchangeRateCrea
 	return erc
 }
 
+// SetEntID sets the "ent_id" field.
+func (erc *ExchangeRateCreate) SetEntID(u uuid.UUID) *ExchangeRateCreate {
+	erc.mutation.SetEntID(u)
+	return erc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (erc *ExchangeRateCreate) SetNillableEntID(u *uuid.UUID) *ExchangeRateCreate {
+	if u != nil {
+		erc.SetEntID(*u)
+	}
+	return erc
+}
+
 // SetAppID sets the "app_id" field.
 func (erc *ExchangeRateCreate) SetAppID(u uuid.UUID) *ExchangeRateCreate {
 	erc.mutation.SetAppID(u)
@@ -270,6 +284,13 @@ func (erc *ExchangeRateCreate) defaults() error {
 		v := exchangerate.DefaultDeletedAt()
 		erc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := erc.mutation.EntID(); !ok {
+		if exchangerate.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized exchangerate.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := exchangerate.DefaultEntID()
+		erc.mutation.SetEntID(v)
+	}
 	if _, ok := erc.mutation.AppID(); !ok {
 		if exchangerate.DefaultAppID == nil {
 			return fmt.Errorf("ent: uninitialized exchangerate.DefaultAppID (forgotten import ent/runtime?)")
@@ -327,6 +348,9 @@ func (erc *ExchangeRateCreate) check() error {
 	}
 	if _, ok := erc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "ExchangeRate.deleted_at"`)}
+	}
+	if _, ok := erc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "ExchangeRate.ent_id"`)}
 	}
 	return nil
 }
@@ -388,6 +412,14 @@ func (erc *ExchangeRateCreate) createSpec() (*ExchangeRate, *sqlgraph.CreateSpec
 			Column: exchangerate.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := erc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: exchangerate.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := erc.mutation.AppID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -550,6 +582,18 @@ func (u *ExchangeRateUpsert) UpdateDeletedAt() *ExchangeRateUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *ExchangeRateUpsert) AddDeletedAt(v uint32) *ExchangeRateUpsert {
 	u.Add(exchangerate.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ExchangeRateUpsert) SetEntID(v uuid.UUID) *ExchangeRateUpsert {
+	u.Set(exchangerate.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ExchangeRateUpsert) UpdateEntID() *ExchangeRateUpsert {
+	u.SetExcluded(exchangerate.FieldEntID)
 	return u
 }
 
@@ -795,6 +839,20 @@ func (u *ExchangeRateUpsertOne) AddDeletedAt(v uint32) *ExchangeRateUpsertOne {
 func (u *ExchangeRateUpsertOne) UpdateDeletedAt() *ExchangeRateUpsertOne {
 	return u.Update(func(s *ExchangeRateUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ExchangeRateUpsertOne) SetEntID(v uuid.UUID) *ExchangeRateUpsertOne {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ExchangeRateUpsertOne) UpdateEntID() *ExchangeRateUpsertOne {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.UpdateEntID()
 	})
 }
 
@@ -1228,6 +1286,20 @@ func (u *ExchangeRateUpsertBulk) AddDeletedAt(v uint32) *ExchangeRateUpsertBulk 
 func (u *ExchangeRateUpsertBulk) UpdateDeletedAt() *ExchangeRateUpsertBulk {
 	return u.Update(func(s *ExchangeRateUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ExchangeRateUpsertBulk) SetEntID(v uuid.UUID) *ExchangeRateUpsertBulk {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ExchangeRateUpsertBulk) UpdateEntID() *ExchangeRateUpsertBulk {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.UpdateEntID()
 	})
 }
 

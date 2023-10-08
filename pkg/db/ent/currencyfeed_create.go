@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -61,6 +60,20 @@ func (cfc *CurrencyFeedCreate) SetDeletedAt(u uint32) *CurrencyFeedCreate {
 func (cfc *CurrencyFeedCreate) SetNillableDeletedAt(u *uint32) *CurrencyFeedCreate {
 	if u != nil {
 		cfc.SetDeletedAt(*u)
+	}
+	return cfc
+}
+
+// SetEntID sets the "ent_id" field.
+func (cfc *CurrencyFeedCreate) SetEntID(u uuid.UUID) *CurrencyFeedCreate {
+	cfc.mutation.SetEntID(u)
+	return cfc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfc *CurrencyFeedCreate) SetNillableEntID(u *uuid.UUID) *CurrencyFeedCreate {
+	if u != nil {
+		cfc.SetEntID(*u)
 	}
 	return cfc
 }
@@ -122,16 +135,8 @@ func (cfc *CurrencyFeedCreate) SetNillableDisabled(b *bool) *CurrencyFeedCreate 
 }
 
 // SetID sets the "id" field.
-func (cfc *CurrencyFeedCreate) SetID(u uuid.UUID) *CurrencyFeedCreate {
-	cfc.mutation.SetID(u)
-	return cfc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (cfc *CurrencyFeedCreate) SetNillableID(u *uuid.UUID) *CurrencyFeedCreate {
-	if u != nil {
-		cfc.SetID(*u)
-	}
+func (cfc *CurrencyFeedCreate) SetID(i int) *CurrencyFeedCreate {
+	cfc.mutation.SetID(i)
 	return cfc
 }
 
@@ -235,6 +240,13 @@ func (cfc *CurrencyFeedCreate) defaults() error {
 		v := currencyfeed.DefaultDeletedAt()
 		cfc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := cfc.mutation.EntID(); !ok {
+		if currencyfeed.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized currencyfeed.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := currencyfeed.DefaultEntID()
+		cfc.mutation.SetEntID(v)
+	}
 	if _, ok := cfc.mutation.CoinTypeID(); !ok {
 		if currencyfeed.DefaultCoinTypeID == nil {
 			return fmt.Errorf("ent: uninitialized currencyfeed.DefaultCoinTypeID (forgotten import ent/runtime?)")
@@ -254,13 +266,6 @@ func (cfc *CurrencyFeedCreate) defaults() error {
 		v := currencyfeed.DefaultDisabled
 		cfc.mutation.SetDisabled(v)
 	}
-	if _, ok := cfc.mutation.ID(); !ok {
-		if currencyfeed.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized currencyfeed.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := currencyfeed.DefaultID()
-		cfc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -275,6 +280,9 @@ func (cfc *CurrencyFeedCreate) check() error {
 	if _, ok := cfc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "CurrencyFeed.deleted_at"`)}
 	}
+	if _, ok := cfc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "CurrencyFeed.ent_id"`)}
+	}
 	return nil
 }
 
@@ -286,12 +294,9 @@ func (cfc *CurrencyFeedCreate) sqlSave(ctx context.Context) (*CurrencyFeed, erro
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -302,7 +307,7 @@ func (cfc *CurrencyFeedCreate) createSpec() (*CurrencyFeed, *sqlgraph.CreateSpec
 		_spec = &sqlgraph.CreateSpec{
 			Table: currencyfeed.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: currencyfeed.FieldID,
 			},
 		}
@@ -310,7 +315,7 @@ func (cfc *CurrencyFeedCreate) createSpec() (*CurrencyFeed, *sqlgraph.CreateSpec
 	_spec.OnConflict = cfc.conflict
 	if id, ok := cfc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := cfc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -335,6 +340,14 @@ func (cfc *CurrencyFeedCreate) createSpec() (*CurrencyFeed, *sqlgraph.CreateSpec
 			Column: currencyfeed.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := cfc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: currencyfeed.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := cfc.mutation.CoinTypeID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -473,6 +486,18 @@ func (u *CurrencyFeedUpsert) UpdateDeletedAt() *CurrencyFeedUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *CurrencyFeedUpsert) AddDeletedAt(v uint32) *CurrencyFeedUpsert {
 	u.Add(currencyfeed.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CurrencyFeedUpsert) SetEntID(v uuid.UUID) *CurrencyFeedUpsert {
+	u.Set(currencyfeed.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CurrencyFeedUpsert) UpdateEntID() *CurrencyFeedUpsert {
+	u.SetExcluded(currencyfeed.FieldEntID)
 	return u
 }
 
@@ -661,6 +686,20 @@ func (u *CurrencyFeedUpsertOne) UpdateDeletedAt() *CurrencyFeedUpsertOne {
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *CurrencyFeedUpsertOne) SetEntID(v uuid.UUID) *CurrencyFeedUpsertOne {
+	return u.Update(func(s *CurrencyFeedUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CurrencyFeedUpsertOne) UpdateEntID() *CurrencyFeedUpsertOne {
+	return u.Update(func(s *CurrencyFeedUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (u *CurrencyFeedUpsertOne) SetCoinTypeID(v uuid.UUID) *CurrencyFeedUpsertOne {
 	return u.Update(func(s *CurrencyFeedUpsert) {
@@ -761,12 +800,7 @@ func (u *CurrencyFeedUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CurrencyFeedUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: CurrencyFeedUpsertOne.ID is not supported by MySQL driver. Use CurrencyFeedUpsertOne.Exec instead")
-	}
+func (u *CurrencyFeedUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -775,7 +809,7 @@ func (u *CurrencyFeedUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CurrencyFeedUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *CurrencyFeedUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -826,6 +860,10 @@ func (cfcb *CurrencyFeedCreateBulk) Save(ctx context.Context) ([]*CurrencyFeed, 
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1021,6 +1059,20 @@ func (u *CurrencyFeedUpsertBulk) AddDeletedAt(v uint32) *CurrencyFeedUpsertBulk 
 func (u *CurrencyFeedUpsertBulk) UpdateDeletedAt() *CurrencyFeedUpsertBulk {
 	return u.Update(func(s *CurrencyFeedUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CurrencyFeedUpsertBulk) SetEntID(v uuid.UUID) *CurrencyFeedUpsertBulk {
+	return u.Update(func(s *CurrencyFeedUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CurrencyFeedUpsertBulk) UpdateEntID() *CurrencyFeedUpsertBulk {
+	return u.Update(func(s *CurrencyFeedUpsert) {
+		s.UpdateEntID()
 	})
 }
 

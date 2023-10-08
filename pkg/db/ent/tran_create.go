@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -62,6 +61,20 @@ func (tc *TranCreate) SetDeletedAt(u uint32) *TranCreate {
 func (tc *TranCreate) SetNillableDeletedAt(u *uint32) *TranCreate {
 	if u != nil {
 		tc.SetDeletedAt(*u)
+	}
+	return tc
+}
+
+// SetEntID sets the "ent_id" field.
+func (tc *TranCreate) SetEntID(u uuid.UUID) *TranCreate {
+	tc.mutation.SetEntID(u)
+	return tc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (tc *TranCreate) SetNillableEntID(u *uuid.UUID) *TranCreate {
+	if u != nil {
+		tc.SetEntID(*u)
 	}
 	return tc
 }
@@ -193,16 +206,8 @@ func (tc *TranCreate) SetNillableType(s *string) *TranCreate {
 }
 
 // SetID sets the "id" field.
-func (tc *TranCreate) SetID(u uuid.UUID) *TranCreate {
-	tc.mutation.SetID(u)
-	return tc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (tc *TranCreate) SetNillableID(u *uuid.UUID) *TranCreate {
-	if u != nil {
-		tc.SetID(*u)
-	}
+func (tc *TranCreate) SetID(i int) *TranCreate {
+	tc.mutation.SetID(i)
 	return tc
 }
 
@@ -306,6 +311,13 @@ func (tc *TranCreate) defaults() error {
 		v := tran.DefaultDeletedAt()
 		tc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := tc.mutation.EntID(); !ok {
+		if tran.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized tran.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := tran.DefaultEntID()
+		tc.mutation.SetEntID(v)
+	}
 	if _, ok := tc.mutation.CoinTypeID(); !ok {
 		if tran.DefaultCoinTypeID == nil {
 			return fmt.Errorf("ent: uninitialized tran.DefaultCoinTypeID (forgotten import ent/runtime?)")
@@ -351,13 +363,6 @@ func (tc *TranCreate) defaults() error {
 		v := tran.DefaultType
 		tc.mutation.SetType(v)
 	}
-	if _, ok := tc.mutation.ID(); !ok {
-		if tran.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized tran.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := tran.DefaultID()
-		tc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -372,6 +377,9 @@ func (tc *TranCreate) check() error {
 	if _, ok := tc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "Tran.deleted_at"`)}
 	}
+	if _, ok := tc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "Tran.ent_id"`)}
+	}
 	return nil
 }
 
@@ -383,12 +391,9 @@ func (tc *TranCreate) sqlSave(ctx context.Context) (*Tran, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -399,7 +404,7 @@ func (tc *TranCreate) createSpec() (*Tran, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: tran.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: tran.FieldID,
 			},
 		}
@@ -407,7 +412,7 @@ func (tc *TranCreate) createSpec() (*Tran, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = tc.conflict
 	if id, ok := tc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := tc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -432,6 +437,14 @@ func (tc *TranCreate) createSpec() (*Tran, *sqlgraph.CreateSpec) {
 			Column: tran.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := tc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: tran.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := tc.mutation.CoinTypeID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -610,6 +623,18 @@ func (u *TranUpsert) UpdateDeletedAt() *TranUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *TranUpsert) AddDeletedAt(v uint32) *TranUpsert {
 	u.Add(tran.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *TranUpsert) SetEntID(v uuid.UUID) *TranUpsert {
+	u.Set(tran.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *TranUpsert) UpdateEntID() *TranUpsert {
+	u.SetExcluded(tran.FieldEntID)
 	return u
 }
 
@@ -888,6 +913,20 @@ func (u *TranUpsertOne) UpdateDeletedAt() *TranUpsertOne {
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *TranUpsertOne) SetEntID(v uuid.UUID) *TranUpsertOne {
+	return u.Update(func(s *TranUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *TranUpsertOne) UpdateEntID() *TranUpsertOne {
+	return u.Update(func(s *TranUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (u *TranUpsertOne) SetCoinTypeID(v uuid.UUID) *TranUpsertOne {
 	return u.Update(func(s *TranUpsert) {
@@ -1093,12 +1132,7 @@ func (u *TranUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *TranUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: TranUpsertOne.ID is not supported by MySQL driver. Use TranUpsertOne.Exec instead")
-	}
+func (u *TranUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -1107,7 +1141,7 @@ func (u *TranUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *TranUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *TranUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1158,6 +1192,10 @@ func (tcb *TranCreateBulk) Save(ctx context.Context) ([]*Tran, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1353,6 +1391,20 @@ func (u *TranUpsertBulk) AddDeletedAt(v uint32) *TranUpsertBulk {
 func (u *TranUpsertBulk) UpdateDeletedAt() *TranUpsertBulk {
 	return u.Update(func(s *TranUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *TranUpsertBulk) SetEntID(v uuid.UUID) *TranUpsertBulk {
+	return u.Update(func(s *TranUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *TranUpsertBulk) UpdateEntID() *TranUpsertBulk {
+	return u.Update(func(s *TranUpsert) {
+		s.UpdateEntID()
 	})
 }
 

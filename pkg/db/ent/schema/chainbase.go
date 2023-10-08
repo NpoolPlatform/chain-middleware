@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
+	crudermixin "github.com/NpoolPlatform/libent-cruder/pkg/mixin"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 )
 
@@ -15,15 +16,13 @@ type ChainBase struct {
 func (ChainBase) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
+		crudermixin.AutoIDMixin{},
 	}
 }
 
 // Fields of the ChainBase.
 func (ChainBase) Fields() []ent.Field {
 	return []ent.Field{
-		field.
-			Uint32("id").
-			Unique(),
 		field.
 			String("name").
 			Optional().

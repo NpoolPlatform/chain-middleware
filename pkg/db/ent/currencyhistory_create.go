@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -62,6 +61,20 @@ func (chc *CurrencyHistoryCreate) SetDeletedAt(u uint32) *CurrencyHistoryCreate 
 func (chc *CurrencyHistoryCreate) SetNillableDeletedAt(u *uint32) *CurrencyHistoryCreate {
 	if u != nil {
 		chc.SetDeletedAt(*u)
+	}
+	return chc
+}
+
+// SetEntID sets the "ent_id" field.
+func (chc *CurrencyHistoryCreate) SetEntID(u uuid.UUID) *CurrencyHistoryCreate {
+	chc.mutation.SetEntID(u)
+	return chc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (chc *CurrencyHistoryCreate) SetNillableEntID(u *uuid.UUID) *CurrencyHistoryCreate {
+	if u != nil {
+		chc.SetEntID(*u)
 	}
 	return chc
 }
@@ -123,16 +136,8 @@ func (chc *CurrencyHistoryCreate) SetNillableMarketValueLow(d *decimal.Decimal) 
 }
 
 // SetID sets the "id" field.
-func (chc *CurrencyHistoryCreate) SetID(u uuid.UUID) *CurrencyHistoryCreate {
-	chc.mutation.SetID(u)
-	return chc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (chc *CurrencyHistoryCreate) SetNillableID(u *uuid.UUID) *CurrencyHistoryCreate {
-	if u != nil {
-		chc.SetID(*u)
-	}
+func (chc *CurrencyHistoryCreate) SetID(i int) *CurrencyHistoryCreate {
+	chc.mutation.SetID(i)
 	return chc
 }
 
@@ -236,6 +241,13 @@ func (chc *CurrencyHistoryCreate) defaults() error {
 		v := currencyhistory.DefaultDeletedAt()
 		chc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := chc.mutation.EntID(); !ok {
+		if currencyhistory.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized currencyhistory.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := currencyhistory.DefaultEntID()
+		chc.mutation.SetEntID(v)
+	}
 	if _, ok := chc.mutation.CoinTypeID(); !ok {
 		if currencyhistory.DefaultCoinTypeID == nil {
 			return fmt.Errorf("ent: uninitialized currencyhistory.DefaultCoinTypeID (forgotten import ent/runtime?)")
@@ -255,13 +267,6 @@ func (chc *CurrencyHistoryCreate) defaults() error {
 		v := currencyhistory.DefaultMarketValueLow
 		chc.mutation.SetMarketValueLow(v)
 	}
-	if _, ok := chc.mutation.ID(); !ok {
-		if currencyhistory.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized currencyhistory.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := currencyhistory.DefaultID()
-		chc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -276,6 +281,9 @@ func (chc *CurrencyHistoryCreate) check() error {
 	if _, ok := chc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "CurrencyHistory.deleted_at"`)}
 	}
+	if _, ok := chc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "CurrencyHistory.ent_id"`)}
+	}
 	return nil
 }
 
@@ -287,12 +295,9 @@ func (chc *CurrencyHistoryCreate) sqlSave(ctx context.Context) (*CurrencyHistory
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -303,7 +308,7 @@ func (chc *CurrencyHistoryCreate) createSpec() (*CurrencyHistory, *sqlgraph.Crea
 		_spec = &sqlgraph.CreateSpec{
 			Table: currencyhistory.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: currencyhistory.FieldID,
 			},
 		}
@@ -311,7 +316,7 @@ func (chc *CurrencyHistoryCreate) createSpec() (*CurrencyHistory, *sqlgraph.Crea
 	_spec.OnConflict = chc.conflict
 	if id, ok := chc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := chc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -336,6 +341,14 @@ func (chc *CurrencyHistoryCreate) createSpec() (*CurrencyHistory, *sqlgraph.Crea
 			Column: currencyhistory.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := chc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: currencyhistory.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := chc.mutation.CoinTypeID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -474,6 +487,18 @@ func (u *CurrencyHistoryUpsert) UpdateDeletedAt() *CurrencyHistoryUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *CurrencyHistoryUpsert) AddDeletedAt(v uint32) *CurrencyHistoryUpsert {
 	u.Add(currencyhistory.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CurrencyHistoryUpsert) SetEntID(v uuid.UUID) *CurrencyHistoryUpsert {
+	u.Set(currencyhistory.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CurrencyHistoryUpsert) UpdateEntID() *CurrencyHistoryUpsert {
+	u.SetExcluded(currencyhistory.FieldEntID)
 	return u
 }
 
@@ -662,6 +687,20 @@ func (u *CurrencyHistoryUpsertOne) UpdateDeletedAt() *CurrencyHistoryUpsertOne {
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *CurrencyHistoryUpsertOne) SetEntID(v uuid.UUID) *CurrencyHistoryUpsertOne {
+	return u.Update(func(s *CurrencyHistoryUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CurrencyHistoryUpsertOne) UpdateEntID() *CurrencyHistoryUpsertOne {
+	return u.Update(func(s *CurrencyHistoryUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (u *CurrencyHistoryUpsertOne) SetCoinTypeID(v uuid.UUID) *CurrencyHistoryUpsertOne {
 	return u.Update(func(s *CurrencyHistoryUpsert) {
@@ -762,12 +801,7 @@ func (u *CurrencyHistoryUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CurrencyHistoryUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: CurrencyHistoryUpsertOne.ID is not supported by MySQL driver. Use CurrencyHistoryUpsertOne.Exec instead")
-	}
+func (u *CurrencyHistoryUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -776,7 +810,7 @@ func (u *CurrencyHistoryUpsertOne) ID(ctx context.Context) (id uuid.UUID, err er
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CurrencyHistoryUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *CurrencyHistoryUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -827,6 +861,10 @@ func (chcb *CurrencyHistoryCreateBulk) Save(ctx context.Context) ([]*CurrencyHis
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1022,6 +1060,20 @@ func (u *CurrencyHistoryUpsertBulk) AddDeletedAt(v uint32) *CurrencyHistoryUpser
 func (u *CurrencyHistoryUpsertBulk) UpdateDeletedAt() *CurrencyHistoryUpsertBulk {
 	return u.Update(func(s *CurrencyHistoryUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CurrencyHistoryUpsertBulk) SetEntID(v uuid.UUID) *CurrencyHistoryUpsertBulk {
+	return u.Update(func(s *CurrencyHistoryUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CurrencyHistoryUpsertBulk) UpdateEntID() *CurrencyHistoryUpsertBulk {
+	return u.Update(func(s *CurrencyHistoryUpsert) {
+		s.UpdateEntID()
 	})
 }
 

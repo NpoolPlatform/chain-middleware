@@ -4,7 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
-	"github.com/google/uuid"
+	crudermixin "github.com/NpoolPlatform/libent-cruder/pkg/mixin"
 )
 
 // Fiat holds the schema definition for the Fiat entity.
@@ -15,16 +15,13 @@ type Fiat struct {
 func (Fiat) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
+		crudermixin.AutoIDMixin{},
 	}
 }
 
 // Fields of the Fiat.
 func (Fiat) Fields() []ent.Field {
 	return []ent.Field{
-		field.
-			UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Unique(),
 		field.
 			String("name").
 			Optional().

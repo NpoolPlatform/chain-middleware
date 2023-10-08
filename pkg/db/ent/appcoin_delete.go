@@ -72,7 +72,7 @@ func (acd *AppCoinDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: appcoin.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: appcoin.FieldID,
 			},
 		},

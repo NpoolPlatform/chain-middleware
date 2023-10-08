@@ -36,7 +36,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   appcoin.Table,
 			Columns: appcoin.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: appcoin.FieldID,
 			},
 		},
@@ -66,7 +66,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   chainbase.Table,
 			Columns: chainbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: chainbase.FieldID,
 			},
 		},
@@ -75,6 +75,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			chainbase.FieldCreatedAt:  {Type: field.TypeUint32, Column: chainbase.FieldCreatedAt},
 			chainbase.FieldUpdatedAt:  {Type: field.TypeUint32, Column: chainbase.FieldUpdatedAt},
 			chainbase.FieldDeletedAt:  {Type: field.TypeUint32, Column: chainbase.FieldDeletedAt},
+			chainbase.FieldEntID:      {Type: field.TypeUUID, Column: chainbase.FieldEntID},
 			chainbase.FieldName:       {Type: field.TypeString, Column: chainbase.FieldName},
 			chainbase.FieldLogo:       {Type: field.TypeString, Column: chainbase.FieldLogo},
 			chainbase.FieldNativeUnit: {Type: field.TypeString, Column: chainbase.FieldNativeUnit},
@@ -91,7 +92,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinbase.Table,
 			Columns: coinbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: coinbase.FieldID,
 			},
 		},
@@ -100,6 +101,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			coinbase.FieldCreatedAt:      {Type: field.TypeUint32, Column: coinbase.FieldCreatedAt},
 			coinbase.FieldUpdatedAt:      {Type: field.TypeUint32, Column: coinbase.FieldUpdatedAt},
 			coinbase.FieldDeletedAt:      {Type: field.TypeUint32, Column: coinbase.FieldDeletedAt},
+			coinbase.FieldEntID:          {Type: field.TypeUUID, Column: coinbase.FieldEntID},
 			coinbase.FieldName:           {Type: field.TypeString, Column: coinbase.FieldName},
 			coinbase.FieldLogo:           {Type: field.TypeString, Column: coinbase.FieldLogo},
 			coinbase.FieldPresale:        {Type: field.TypeBool, Column: coinbase.FieldPresale},
@@ -124,6 +126,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			coindescription.FieldCreatedAt:  {Type: field.TypeUint32, Column: coindescription.FieldCreatedAt},
 			coindescription.FieldUpdatedAt:  {Type: field.TypeUint32, Column: coindescription.FieldUpdatedAt},
 			coindescription.FieldDeletedAt:  {Type: field.TypeUint32, Column: coindescription.FieldDeletedAt},
+			coindescription.FieldEntID:      {Type: field.TypeUUID, Column: coindescription.FieldEntID},
 			coindescription.FieldAppID:      {Type: field.TypeUUID, Column: coindescription.FieldAppID},
 			coindescription.FieldCoinTypeID: {Type: field.TypeUUID, Column: coindescription.FieldCoinTypeID},
 			coindescription.FieldUsedFor:    {Type: field.TypeString, Column: coindescription.FieldUsedFor},
@@ -136,7 +139,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinextra.Table,
 			Columns: coinextra.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: coinextra.FieldID,
 			},
 		},
@@ -145,6 +148,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			coinextra.FieldCreatedAt:  {Type: field.TypeUint32, Column: coinextra.FieldCreatedAt},
 			coinextra.FieldUpdatedAt:  {Type: field.TypeUint32, Column: coinextra.FieldUpdatedAt},
 			coinextra.FieldDeletedAt:  {Type: field.TypeUint32, Column: coinextra.FieldDeletedAt},
+			coinextra.FieldEntID:      {Type: field.TypeUUID, Column: coinextra.FieldEntID},
 			coinextra.FieldCoinTypeID: {Type: field.TypeUUID, Column: coinextra.FieldCoinTypeID},
 			coinextra.FieldHomePage:   {Type: field.TypeString, Column: coinextra.FieldHomePage},
 			coinextra.FieldSpecs:      {Type: field.TypeString, Column: coinextra.FieldSpecs},
@@ -156,7 +160,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinfiat.Table,
 			Columns: coinfiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiat.FieldID,
 			},
 		},
@@ -165,6 +169,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			coinfiat.FieldCreatedAt:  {Type: field.TypeUint32, Column: coinfiat.FieldCreatedAt},
 			coinfiat.FieldUpdatedAt:  {Type: field.TypeUint32, Column: coinfiat.FieldUpdatedAt},
 			coinfiat.FieldDeletedAt:  {Type: field.TypeUint32, Column: coinfiat.FieldDeletedAt},
+			coinfiat.FieldEntID:      {Type: field.TypeUUID, Column: coinfiat.FieldEntID},
 			coinfiat.FieldCoinTypeID: {Type: field.TypeUUID, Column: coinfiat.FieldCoinTypeID},
 			coinfiat.FieldFiatID:     {Type: field.TypeUUID, Column: coinfiat.FieldFiatID},
 			coinfiat.FieldFeedType:   {Type: field.TypeString, Column: coinfiat.FieldFeedType},
@@ -175,7 +180,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinfiatcurrency.Table,
 			Columns: coinfiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiatcurrency.FieldID,
 			},
 		},
@@ -184,6 +189,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			coinfiatcurrency.FieldCreatedAt:       {Type: field.TypeUint32, Column: coinfiatcurrency.FieldCreatedAt},
 			coinfiatcurrency.FieldUpdatedAt:       {Type: field.TypeUint32, Column: coinfiatcurrency.FieldUpdatedAt},
 			coinfiatcurrency.FieldDeletedAt:       {Type: field.TypeUint32, Column: coinfiatcurrency.FieldDeletedAt},
+			coinfiatcurrency.FieldEntID:           {Type: field.TypeUUID, Column: coinfiatcurrency.FieldEntID},
 			coinfiatcurrency.FieldCoinTypeID:      {Type: field.TypeUUID, Column: coinfiatcurrency.FieldCoinTypeID},
 			coinfiatcurrency.FieldFiatID:          {Type: field.TypeUUID, Column: coinfiatcurrency.FieldFiatID},
 			coinfiatcurrency.FieldFeedType:        {Type: field.TypeString, Column: coinfiatcurrency.FieldFeedType},
@@ -196,7 +202,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinfiatcurrencyhistory.Table,
 			Columns: coinfiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiatcurrencyhistory.FieldID,
 			},
 		},
@@ -205,6 +211,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			coinfiatcurrencyhistory.FieldCreatedAt:       {Type: field.TypeUint32, Column: coinfiatcurrencyhistory.FieldCreatedAt},
 			coinfiatcurrencyhistory.FieldUpdatedAt:       {Type: field.TypeUint32, Column: coinfiatcurrencyhistory.FieldUpdatedAt},
 			coinfiatcurrencyhistory.FieldDeletedAt:       {Type: field.TypeUint32, Column: coinfiatcurrencyhistory.FieldDeletedAt},
+			coinfiatcurrencyhistory.FieldEntID:           {Type: field.TypeUUID, Column: coinfiatcurrencyhistory.FieldEntID},
 			coinfiatcurrencyhistory.FieldCoinTypeID:      {Type: field.TypeUUID, Column: coinfiatcurrencyhistory.FieldCoinTypeID},
 			coinfiatcurrencyhistory.FieldFiatID:          {Type: field.TypeUUID, Column: coinfiatcurrencyhistory.FieldFiatID},
 			coinfiatcurrencyhistory.FieldFeedType:        {Type: field.TypeString, Column: coinfiatcurrencyhistory.FieldFeedType},
@@ -217,7 +224,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   currency.Table,
 			Columns: currency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: currency.FieldID,
 			},
 		},
@@ -226,6 +233,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			currency.FieldCreatedAt:       {Type: field.TypeUint32, Column: currency.FieldCreatedAt},
 			currency.FieldUpdatedAt:       {Type: field.TypeUint32, Column: currency.FieldUpdatedAt},
 			currency.FieldDeletedAt:       {Type: field.TypeUint32, Column: currency.FieldDeletedAt},
+			currency.FieldEntID:           {Type: field.TypeUUID, Column: currency.FieldEntID},
 			currency.FieldCoinTypeID:      {Type: field.TypeUUID, Column: currency.FieldCoinTypeID},
 			currency.FieldFeedType:        {Type: field.TypeString, Column: currency.FieldFeedType},
 			currency.FieldMarketValueHigh: {Type: field.TypeOther, Column: currency.FieldMarketValueHigh},
@@ -237,7 +245,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   currencyfeed.Table,
 			Columns: currencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: currencyfeed.FieldID,
 			},
 		},
@@ -246,6 +254,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			currencyfeed.FieldCreatedAt:    {Type: field.TypeUint32, Column: currencyfeed.FieldCreatedAt},
 			currencyfeed.FieldUpdatedAt:    {Type: field.TypeUint32, Column: currencyfeed.FieldUpdatedAt},
 			currencyfeed.FieldDeletedAt:    {Type: field.TypeUint32, Column: currencyfeed.FieldDeletedAt},
+			currencyfeed.FieldEntID:        {Type: field.TypeUUID, Column: currencyfeed.FieldEntID},
 			currencyfeed.FieldCoinTypeID:   {Type: field.TypeUUID, Column: currencyfeed.FieldCoinTypeID},
 			currencyfeed.FieldFeedType:     {Type: field.TypeString, Column: currencyfeed.FieldFeedType},
 			currencyfeed.FieldFeedCoinName: {Type: field.TypeString, Column: currencyfeed.FieldFeedCoinName},
@@ -257,7 +266,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   currencyhistory.Table,
 			Columns: currencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: currencyhistory.FieldID,
 			},
 		},
@@ -266,6 +275,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			currencyhistory.FieldCreatedAt:       {Type: field.TypeUint32, Column: currencyhistory.FieldCreatedAt},
 			currencyhistory.FieldUpdatedAt:       {Type: field.TypeUint32, Column: currencyhistory.FieldUpdatedAt},
 			currencyhistory.FieldDeletedAt:       {Type: field.TypeUint32, Column: currencyhistory.FieldDeletedAt},
+			currencyhistory.FieldEntID:           {Type: field.TypeUUID, Column: currencyhistory.FieldEntID},
 			currencyhistory.FieldCoinTypeID:      {Type: field.TypeUUID, Column: currencyhistory.FieldCoinTypeID},
 			currencyhistory.FieldFeedType:        {Type: field.TypeString, Column: currencyhistory.FieldFeedType},
 			currencyhistory.FieldMarketValueHigh: {Type: field.TypeOther, Column: currencyhistory.FieldMarketValueHigh},
@@ -286,6 +296,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			exchangerate.FieldCreatedAt:     {Type: field.TypeUint32, Column: exchangerate.FieldCreatedAt},
 			exchangerate.FieldUpdatedAt:     {Type: field.TypeUint32, Column: exchangerate.FieldUpdatedAt},
 			exchangerate.FieldDeletedAt:     {Type: field.TypeUint32, Column: exchangerate.FieldDeletedAt},
+			exchangerate.FieldEntID:         {Type: field.TypeUUID, Column: exchangerate.FieldEntID},
 			exchangerate.FieldAppID:         {Type: field.TypeUUID, Column: exchangerate.FieldAppID},
 			exchangerate.FieldCoinTypeID:    {Type: field.TypeUUID, Column: exchangerate.FieldCoinTypeID},
 			exchangerate.FieldMarketValue:   {Type: field.TypeOther, Column: exchangerate.FieldMarketValue},
@@ -300,7 +311,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiat.Table,
 			Columns: fiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiat.FieldID,
 			},
 		},
@@ -309,6 +320,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			fiat.FieldCreatedAt: {Type: field.TypeUint32, Column: fiat.FieldCreatedAt},
 			fiat.FieldUpdatedAt: {Type: field.TypeUint32, Column: fiat.FieldUpdatedAt},
 			fiat.FieldDeletedAt: {Type: field.TypeUint32, Column: fiat.FieldDeletedAt},
+			fiat.FieldEntID:     {Type: field.TypeUUID, Column: fiat.FieldEntID},
 			fiat.FieldName:      {Type: field.TypeString, Column: fiat.FieldName},
 			fiat.FieldLogo:      {Type: field.TypeString, Column: fiat.FieldLogo},
 			fiat.FieldUnit:      {Type: field.TypeString, Column: fiat.FieldUnit},
@@ -319,7 +331,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiatcurrency.Table,
 			Columns: fiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiatcurrency.FieldID,
 			},
 		},
@@ -328,6 +340,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			fiatcurrency.FieldCreatedAt:       {Type: field.TypeUint32, Column: fiatcurrency.FieldCreatedAt},
 			fiatcurrency.FieldUpdatedAt:       {Type: field.TypeUint32, Column: fiatcurrency.FieldUpdatedAt},
 			fiatcurrency.FieldDeletedAt:       {Type: field.TypeUint32, Column: fiatcurrency.FieldDeletedAt},
+			fiatcurrency.FieldEntID:           {Type: field.TypeUUID, Column: fiatcurrency.FieldEntID},
 			fiatcurrency.FieldFiatID:          {Type: field.TypeUUID, Column: fiatcurrency.FieldFiatID},
 			fiatcurrency.FieldFeedType:        {Type: field.TypeString, Column: fiatcurrency.FieldFeedType},
 			fiatcurrency.FieldMarketValueLow:  {Type: field.TypeOther, Column: fiatcurrency.FieldMarketValueLow},
@@ -339,7 +352,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiatcurrencyfeed.Table,
 			Columns: fiatcurrencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiatcurrencyfeed.FieldID,
 			},
 		},
@@ -348,6 +361,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			fiatcurrencyfeed.FieldCreatedAt:    {Type: field.TypeUint32, Column: fiatcurrencyfeed.FieldCreatedAt},
 			fiatcurrencyfeed.FieldUpdatedAt:    {Type: field.TypeUint32, Column: fiatcurrencyfeed.FieldUpdatedAt},
 			fiatcurrencyfeed.FieldDeletedAt:    {Type: field.TypeUint32, Column: fiatcurrencyfeed.FieldDeletedAt},
+			fiatcurrencyfeed.FieldEntID:        {Type: field.TypeUUID, Column: fiatcurrencyfeed.FieldEntID},
 			fiatcurrencyfeed.FieldFiatID:       {Type: field.TypeUUID, Column: fiatcurrencyfeed.FieldFiatID},
 			fiatcurrencyfeed.FieldFeedType:     {Type: field.TypeString, Column: fiatcurrencyfeed.FieldFeedType},
 			fiatcurrencyfeed.FieldFeedFiatName: {Type: field.TypeString, Column: fiatcurrencyfeed.FieldFeedFiatName},
@@ -359,7 +373,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiatcurrencyhistory.Table,
 			Columns: fiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiatcurrencyhistory.FieldID,
 			},
 		},
@@ -368,6 +382,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			fiatcurrencyhistory.FieldCreatedAt:       {Type: field.TypeUint32, Column: fiatcurrencyhistory.FieldCreatedAt},
 			fiatcurrencyhistory.FieldUpdatedAt:       {Type: field.TypeUint32, Column: fiatcurrencyhistory.FieldUpdatedAt},
 			fiatcurrencyhistory.FieldDeletedAt:       {Type: field.TypeUint32, Column: fiatcurrencyhistory.FieldDeletedAt},
+			fiatcurrencyhistory.FieldEntID:           {Type: field.TypeUUID, Column: fiatcurrencyhistory.FieldEntID},
 			fiatcurrencyhistory.FieldFiatID:          {Type: field.TypeUUID, Column: fiatcurrencyhistory.FieldFiatID},
 			fiatcurrencyhistory.FieldFeedType:        {Type: field.TypeString, Column: fiatcurrencyhistory.FieldFeedType},
 			fiatcurrencyhistory.FieldMarketValueLow:  {Type: field.TypeOther, Column: fiatcurrencyhistory.FieldMarketValueLow},
@@ -379,7 +394,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   setting.Table,
 			Columns: setting.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: setting.FieldID,
 			},
 		},
@@ -388,6 +403,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			setting.FieldCreatedAt:                   {Type: field.TypeUint32, Column: setting.FieldCreatedAt},
 			setting.FieldUpdatedAt:                   {Type: field.TypeUint32, Column: setting.FieldUpdatedAt},
 			setting.FieldDeletedAt:                   {Type: field.TypeUint32, Column: setting.FieldDeletedAt},
+			setting.FieldEntID:                       {Type: field.TypeUUID, Column: setting.FieldEntID},
 			setting.FieldCoinTypeID:                  {Type: field.TypeUUID, Column: setting.FieldCoinTypeID},
 			setting.FieldFeeCoinTypeID:               {Type: field.TypeUUID, Column: setting.FieldFeeCoinTypeID},
 			setting.FieldWithdrawFeeByStableUsd:      {Type: field.TypeBool, Column: setting.FieldWithdrawFeeByStableUsd},
@@ -409,7 +425,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   tran.Table,
 			Columns: tran.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: tran.FieldID,
 			},
 		},
@@ -418,6 +434,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			tran.FieldCreatedAt:     {Type: field.TypeUint32, Column: tran.FieldCreatedAt},
 			tran.FieldUpdatedAt:     {Type: field.TypeUint32, Column: tran.FieldUpdatedAt},
 			tran.FieldDeletedAt:     {Type: field.TypeUint32, Column: tran.FieldDeletedAt},
+			tran.FieldEntID:         {Type: field.TypeUUID, Column: tran.FieldEntID},
 			tran.FieldCoinTypeID:    {Type: field.TypeUUID, Column: tran.FieldCoinTypeID},
 			tran.FieldFromAccountID: {Type: field.TypeUUID, Column: tran.FieldFromAccountID},
 			tran.FieldToAccountID:   {Type: field.TypeUUID, Column: tran.FieldToAccountID},
@@ -473,8 +490,8 @@ func (f *AppCoinFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *AppCoinFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *AppCoinFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(appcoin.FieldID))
 }
 
@@ -598,8 +615,8 @@ func (f *ChainBaseFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql uint32 predicate on the id field.
-func (f *ChainBaseFilter) WhereID(p entql.Uint32P) {
+// WhereID applies the entql int predicate on the id field.
+func (f *ChainBaseFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(chainbase.FieldID))
 }
 
@@ -616,6 +633,11 @@ func (f *ChainBaseFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *ChainBaseFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(chainbase.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *ChainBaseFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(chainbase.FieldEntID))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -698,8 +720,8 @@ func (f *CoinBaseFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *CoinBaseFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CoinBaseFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(coinbase.FieldID))
 }
 
@@ -716,6 +738,11 @@ func (f *CoinBaseFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CoinBaseFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(coinbase.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CoinBaseFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(coinbase.FieldEntID))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -813,6 +840,11 @@ func (f *CoinDescriptionFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(coindescription.FieldDeletedAt))
 }
 
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CoinDescriptionFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(coindescription.FieldEntID))
+}
+
 // WhereAppID applies the entql [16]byte predicate on the app_id field.
 func (f *CoinDescriptionFilter) WhereAppID(p entql.ValueP) {
 	f.Where(p.Field(coindescription.FieldAppID))
@@ -873,8 +905,8 @@ func (f *CoinExtraFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *CoinExtraFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CoinExtraFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(coinextra.FieldID))
 }
 
@@ -891,6 +923,11 @@ func (f *CoinExtraFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CoinExtraFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(coinextra.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CoinExtraFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(coinextra.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -948,8 +985,8 @@ func (f *CoinFiatFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql uint32 predicate on the id field.
-func (f *CoinFiatFilter) WhereID(p entql.Uint32P) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CoinFiatFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(coinfiat.FieldID))
 }
 
@@ -966,6 +1003,11 @@ func (f *CoinFiatFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CoinFiatFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(coinfiat.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CoinFiatFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(coinfiat.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -1018,8 +1060,8 @@ func (f *CoinFiatCurrencyFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql uint32 predicate on the id field.
-func (f *CoinFiatCurrencyFilter) WhereID(p entql.Uint32P) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CoinFiatCurrencyFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(coinfiatcurrency.FieldID))
 }
 
@@ -1036,6 +1078,11 @@ func (f *CoinFiatCurrencyFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CoinFiatCurrencyFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(coinfiatcurrency.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CoinFiatCurrencyFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(coinfiatcurrency.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -1098,8 +1145,8 @@ func (f *CoinFiatCurrencyHistoryFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql uint32 predicate on the id field.
-func (f *CoinFiatCurrencyHistoryFilter) WhereID(p entql.Uint32P) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CoinFiatCurrencyHistoryFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(coinfiatcurrencyhistory.FieldID))
 }
 
@@ -1116,6 +1163,11 @@ func (f *CoinFiatCurrencyHistoryFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CoinFiatCurrencyHistoryFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(coinfiatcurrencyhistory.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CoinFiatCurrencyHistoryFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(coinfiatcurrencyhistory.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -1178,8 +1230,8 @@ func (f *CurrencyFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *CurrencyFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CurrencyFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(currency.FieldID))
 }
 
@@ -1196,6 +1248,11 @@ func (f *CurrencyFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CurrencyFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(currency.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CurrencyFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(currency.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -1253,8 +1310,8 @@ func (f *CurrencyFeedFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *CurrencyFeedFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CurrencyFeedFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(currencyfeed.FieldID))
 }
 
@@ -1271,6 +1328,11 @@ func (f *CurrencyFeedFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CurrencyFeedFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(currencyfeed.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CurrencyFeedFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(currencyfeed.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -1328,8 +1390,8 @@ func (f *CurrencyHistoryFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *CurrencyHistoryFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CurrencyHistoryFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(currencyhistory.FieldID))
 }
 
@@ -1346,6 +1408,11 @@ func (f *CurrencyHistoryFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *CurrencyHistoryFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(currencyhistory.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *CurrencyHistoryFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(currencyhistory.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -1423,6 +1490,11 @@ func (f *ExchangeRateFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(exchangerate.FieldDeletedAt))
 }
 
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *ExchangeRateFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(exchangerate.FieldEntID))
+}
+
 // WhereAppID applies the entql [16]byte predicate on the app_id field.
 func (f *ExchangeRateFilter) WhereAppID(p entql.ValueP) {
 	f.Where(p.Field(exchangerate.FieldAppID))
@@ -1493,8 +1565,8 @@ func (f *FiatFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *FiatFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *FiatFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(fiat.FieldID))
 }
 
@@ -1511,6 +1583,11 @@ func (f *FiatFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *FiatFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(fiat.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *FiatFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(fiat.FieldEntID))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -1563,8 +1640,8 @@ func (f *FiatCurrencyFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *FiatCurrencyFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *FiatCurrencyFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(fiatcurrency.FieldID))
 }
 
@@ -1581,6 +1658,11 @@ func (f *FiatCurrencyFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *FiatCurrencyFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(fiatcurrency.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *FiatCurrencyFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(fiatcurrency.FieldEntID))
 }
 
 // WhereFiatID applies the entql [16]byte predicate on the fiat_id field.
@@ -1638,8 +1720,8 @@ func (f *FiatCurrencyFeedFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *FiatCurrencyFeedFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *FiatCurrencyFeedFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(fiatcurrencyfeed.FieldID))
 }
 
@@ -1656,6 +1738,11 @@ func (f *FiatCurrencyFeedFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *FiatCurrencyFeedFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(fiatcurrencyfeed.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *FiatCurrencyFeedFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(fiatcurrencyfeed.FieldEntID))
 }
 
 // WhereFiatID applies the entql [16]byte predicate on the fiat_id field.
@@ -1713,8 +1800,8 @@ func (f *FiatCurrencyHistoryFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *FiatCurrencyHistoryFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *FiatCurrencyHistoryFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(fiatcurrencyhistory.FieldID))
 }
 
@@ -1731,6 +1818,11 @@ func (f *FiatCurrencyHistoryFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *FiatCurrencyHistoryFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(fiatcurrencyhistory.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *FiatCurrencyHistoryFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(fiatcurrencyhistory.FieldEntID))
 }
 
 // WhereFiatID applies the entql [16]byte predicate on the fiat_id field.
@@ -1788,8 +1880,8 @@ func (f *SettingFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *SettingFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *SettingFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(setting.FieldID))
 }
 
@@ -1806,6 +1898,11 @@ func (f *SettingFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *SettingFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(setting.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *SettingFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(setting.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.
@@ -1913,8 +2010,8 @@ func (f *TranFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *TranFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *TranFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(tran.FieldID))
 }
 
@@ -1931,6 +2028,11 @@ func (f *TranFilter) WhereUpdatedAt(p entql.Uint32P) {
 // WhereDeletedAt applies the entql uint32 predicate on the deleted_at field.
 func (f *TranFilter) WhereDeletedAt(p entql.Uint32P) {
 	f.Where(p.Field(tran.FieldDeletedAt))
+}
+
+// WhereEntID applies the entql [16]byte predicate on the ent_id field.
+func (f *TranFilter) WhereEntID(p entql.ValueP) {
+	f.Where(p.Field(tran.FieldEntID))
 }
 
 // WhereCoinTypeID applies the entql [16]byte predicate on the coin_type_id field.

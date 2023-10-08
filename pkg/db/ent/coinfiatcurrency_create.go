@@ -65,6 +65,20 @@ func (cfcc *CoinFiatCurrencyCreate) SetNillableDeletedAt(u *uint32) *CoinFiatCur
 	return cfcc
 }
 
+// SetEntID sets the "ent_id" field.
+func (cfcc *CoinFiatCurrencyCreate) SetEntID(u uuid.UUID) *CoinFiatCurrencyCreate {
+	cfcc.mutation.SetEntID(u)
+	return cfcc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfcc *CoinFiatCurrencyCreate) SetNillableEntID(u *uuid.UUID) *CoinFiatCurrencyCreate {
+	if u != nil {
+		cfcc.SetEntID(*u)
+	}
+	return cfcc
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (cfcc *CoinFiatCurrencyCreate) SetCoinTypeID(u uuid.UUID) *CoinFiatCurrencyCreate {
 	cfcc.mutation.SetCoinTypeID(u)
@@ -136,8 +150,8 @@ func (cfcc *CoinFiatCurrencyCreate) SetNillableMarketValueHigh(d *decimal.Decima
 }
 
 // SetID sets the "id" field.
-func (cfcc *CoinFiatCurrencyCreate) SetID(u uint32) *CoinFiatCurrencyCreate {
-	cfcc.mutation.SetID(u)
+func (cfcc *CoinFiatCurrencyCreate) SetID(i int) *CoinFiatCurrencyCreate {
+	cfcc.mutation.SetID(i)
 	return cfcc
 }
 
@@ -241,6 +255,13 @@ func (cfcc *CoinFiatCurrencyCreate) defaults() error {
 		v := coinfiatcurrency.DefaultDeletedAt()
 		cfcc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := cfcc.mutation.EntID(); !ok {
+		if coinfiatcurrency.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized coinfiatcurrency.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := coinfiatcurrency.DefaultEntID()
+		cfcc.mutation.SetEntID(v)
+	}
 	if _, ok := cfcc.mutation.CoinTypeID(); !ok {
 		if coinfiatcurrency.DefaultCoinTypeID == nil {
 			return fmt.Errorf("ent: uninitialized coinfiatcurrency.DefaultCoinTypeID (forgotten import ent/runtime?)")
@@ -281,6 +302,9 @@ func (cfcc *CoinFiatCurrencyCreate) check() error {
 	if _, ok := cfcc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "CoinFiatCurrency.deleted_at"`)}
 	}
+	if _, ok := cfcc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "CoinFiatCurrency.ent_id"`)}
+	}
 	return nil
 }
 
@@ -294,7 +318,7 @@ func (cfcc *CoinFiatCurrencyCreate) sqlSave(ctx context.Context) (*CoinFiatCurre
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = uint32(id)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -305,7 +329,7 @@ func (cfcc *CoinFiatCurrencyCreate) createSpec() (*CoinFiatCurrency, *sqlgraph.C
 		_spec = &sqlgraph.CreateSpec{
 			Table: coinfiatcurrency.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiatcurrency.FieldID,
 			},
 		}
@@ -338,6 +362,14 @@ func (cfcc *CoinFiatCurrencyCreate) createSpec() (*CoinFiatCurrency, *sqlgraph.C
 			Column: coinfiatcurrency.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := cfcc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiatcurrency.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := cfcc.mutation.CoinTypeID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -484,6 +516,18 @@ func (u *CoinFiatCurrencyUpsert) UpdateDeletedAt() *CoinFiatCurrencyUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *CoinFiatCurrencyUpsert) AddDeletedAt(v uint32) *CoinFiatCurrencyUpsert {
 	u.Add(coinfiatcurrency.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinFiatCurrencyUpsert) SetEntID(v uuid.UUID) *CoinFiatCurrencyUpsert {
+	u.Set(coinfiatcurrency.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinFiatCurrencyUpsert) UpdateEntID() *CoinFiatCurrencyUpsert {
+	u.SetExcluded(coinfiatcurrency.FieldEntID)
 	return u
 }
 
@@ -690,6 +734,20 @@ func (u *CoinFiatCurrencyUpsertOne) UpdateDeletedAt() *CoinFiatCurrencyUpsertOne
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *CoinFiatCurrencyUpsertOne) SetEntID(v uuid.UUID) *CoinFiatCurrencyUpsertOne {
+	return u.Update(func(s *CoinFiatCurrencyUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinFiatCurrencyUpsertOne) UpdateEntID() *CoinFiatCurrencyUpsertOne {
+	return u.Update(func(s *CoinFiatCurrencyUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (u *CoinFiatCurrencyUpsertOne) SetCoinTypeID(v uuid.UUID) *CoinFiatCurrencyUpsertOne {
 	return u.Update(func(s *CoinFiatCurrencyUpsert) {
@@ -811,7 +869,7 @@ func (u *CoinFiatCurrencyUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CoinFiatCurrencyUpsertOne) ID(ctx context.Context) (id uint32, err error) {
+func (u *CoinFiatCurrencyUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -820,7 +878,7 @@ func (u *CoinFiatCurrencyUpsertOne) ID(ctx context.Context) (id uint32, err erro
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CoinFiatCurrencyUpsertOne) IDX(ctx context.Context) uint32 {
+func (u *CoinFiatCurrencyUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -873,7 +931,7 @@ func (cfccb *CoinFiatCurrencyCreateBulk) Save(ctx context.Context) ([]*CoinFiatC
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = uint32(id)
+					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil
@@ -1070,6 +1128,20 @@ func (u *CoinFiatCurrencyUpsertBulk) AddDeletedAt(v uint32) *CoinFiatCurrencyUps
 func (u *CoinFiatCurrencyUpsertBulk) UpdateDeletedAt() *CoinFiatCurrencyUpsertBulk {
 	return u.Update(func(s *CoinFiatCurrencyUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinFiatCurrencyUpsertBulk) SetEntID(v uuid.UUID) *CoinFiatCurrencyUpsertBulk {
+	return u.Update(func(s *CoinFiatCurrencyUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinFiatCurrencyUpsertBulk) UpdateEntID() *CoinFiatCurrencyUpsertBulk {
+	return u.Update(func(s *CoinFiatCurrencyUpsert) {
+		s.UpdateEntID()
 	})
 }
 

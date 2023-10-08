@@ -15,13 +15,15 @@ import (
 type CoinFiat struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uint32 `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt uint32 `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
+	// EntID holds the value of the "ent_id" field.
+	EntID uuid.UUID `json:"ent_id,omitempty"`
 	// CoinTypeID holds the value of the "coin_type_id" field.
 	CoinTypeID uuid.UUID `json:"coin_type_id,omitempty"`
 	// FiatID holds the value of the "fiat_id" field.
@@ -39,7 +41,7 @@ func (*CoinFiat) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case coinfiat.FieldFeedType:
 			values[i] = new(sql.NullString)
-		case coinfiat.FieldCoinTypeID, coinfiat.FieldFiatID:
+		case coinfiat.FieldEntID, coinfiat.FieldCoinTypeID, coinfiat.FieldFiatID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CoinFiat", columns[i])
@@ -61,7 +63,7 @@ func (cf *CoinFiat) assignValues(columns []string, values []interface{}) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			cf.ID = uint32(value.Int64)
+			cf.ID = int(value.Int64)
 		case coinfiat.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -79,6 +81,12 @@ func (cf *CoinFiat) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				cf.DeletedAt = uint32(value.Int64)
+			}
+		case coinfiat.FieldEntID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field ent_id", values[i])
+			} else if value != nil {
+				cf.EntID = *value
 			}
 		case coinfiat.FieldCoinTypeID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -134,6 +142,9 @@ func (cf *CoinFiat) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", cf.DeletedAt))
+	builder.WriteString(", ")
+	builder.WriteString("ent_id=")
+	builder.WriteString(fmt.Sprintf("%v", cf.EntID))
 	builder.WriteString(", ")
 	builder.WriteString("coin_type_id=")
 	builder.WriteString(fmt.Sprintf("%v", cf.CoinTypeID))

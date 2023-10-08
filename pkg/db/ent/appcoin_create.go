@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -255,16 +254,8 @@ func (acc *AppCoinCreate) SetNillableMaxAmountPerWithdraw(d *decimal.Decimal) *A
 }
 
 // SetID sets the "id" field.
-func (acc *AppCoinCreate) SetID(u uuid.UUID) *AppCoinCreate {
-	acc.mutation.SetID(u)
-	return acc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (acc *AppCoinCreate) SetNillableID(u *uuid.UUID) *AppCoinCreate {
-	if u != nil {
-		acc.SetID(*u)
-	}
+func (acc *AppCoinCreate) SetID(i int) *AppCoinCreate {
+	acc.mutation.SetID(i)
 	return acc
 }
 
@@ -433,13 +424,6 @@ func (acc *AppCoinCreate) defaults() error {
 		v := appcoin.DefaultMaxAmountPerWithdraw
 		acc.mutation.SetMaxAmountPerWithdraw(v)
 	}
-	if _, ok := acc.mutation.ID(); !ok {
-		if appcoin.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized appcoin.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := appcoin.DefaultID()
-		acc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -468,12 +452,9 @@ func (acc *AppCoinCreate) sqlSave(ctx context.Context) (*AppCoin, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -484,7 +465,7 @@ func (acc *AppCoinCreate) createSpec() (*AppCoin, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: appcoin.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: appcoin.FieldID,
 			},
 		}
@@ -492,7 +473,7 @@ func (acc *AppCoinCreate) createSpec() (*AppCoin, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = acc.conflict
 	if id, ok := acc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := acc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -1413,12 +1394,7 @@ func (u *AppCoinUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *AppCoinUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: AppCoinUpsertOne.ID is not supported by MySQL driver. Use AppCoinUpsertOne.Exec instead")
-	}
+func (u *AppCoinUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -1427,7 +1403,7 @@ func (u *AppCoinUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *AppCoinUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *AppCoinUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1478,6 +1454,10 @@ func (accb *AppCoinCreateBulk) Save(ctx context.Context) ([]*AppCoin, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

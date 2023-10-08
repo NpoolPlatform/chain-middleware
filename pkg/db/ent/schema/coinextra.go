@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
+	crudermixin "github.com/NpoolPlatform/libent-cruder/pkg/mixin"
 	"github.com/google/uuid"
 )
 
@@ -15,16 +16,13 @@ type CoinExtra struct {
 func (CoinExtra) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
+		crudermixin.AutoIDMixin{},
 	}
 }
 
 // Fields of the CoinExtra.
 func (CoinExtra) Fields() []ent.Field {
 	return []ent.Field{
-		field.
-			UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Unique(),
 		field.
 			UUID("coin_type_id", uuid.UUID{}).
 			Optional().

@@ -84,6 +84,20 @@ func (cdu *CoinDescriptionUpdate) AddDeletedAt(u int32) *CoinDescriptionUpdate {
 	return cdu
 }
 
+// SetEntID sets the "ent_id" field.
+func (cdu *CoinDescriptionUpdate) SetEntID(u uuid.UUID) *CoinDescriptionUpdate {
+	cdu.mutation.SetEntID(u)
+	return cdu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cdu *CoinDescriptionUpdate) SetNillableEntID(u *uuid.UUID) *CoinDescriptionUpdate {
+	if u != nil {
+		cdu.SetEntID(*u)
+	}
+	return cdu
+}
+
 // SetAppID sets the "app_id" field.
 func (cdu *CoinDescriptionUpdate) SetAppID(u uuid.UUID) *CoinDescriptionUpdate {
 	cdu.mutation.SetAppID(u)
@@ -324,6 +338,13 @@ func (cdu *CoinDescriptionUpdate) sqlSave(ctx context.Context) (n int, err error
 			Column: coindescription.FieldDeletedAt,
 		})
 	}
+	if value, ok := cdu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coindescription.FieldEntID,
+		})
+	}
 	if value, ok := cdu.mutation.AppID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUUID,
@@ -462,6 +483,20 @@ func (cduo *CoinDescriptionUpdateOne) SetNillableDeletedAt(u *uint32) *CoinDescr
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cduo *CoinDescriptionUpdateOne) AddDeletedAt(u int32) *CoinDescriptionUpdateOne {
 	cduo.mutation.AddDeletedAt(u)
+	return cduo
+}
+
+// SetEntID sets the "ent_id" field.
+func (cduo *CoinDescriptionUpdateOne) SetEntID(u uuid.UUID) *CoinDescriptionUpdateOne {
+	cduo.mutation.SetEntID(u)
+	return cduo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cduo *CoinDescriptionUpdateOne) SetNillableEntID(u *uuid.UUID) *CoinDescriptionUpdateOne {
+	if u != nil {
+		cduo.SetEntID(*u)
+	}
 	return cduo
 }
 
@@ -733,6 +768,13 @@ func (cduo *CoinDescriptionUpdateOne) sqlSave(ctx context.Context) (_node *CoinD
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coindescription.FieldDeletedAt,
+		})
+	}
+	if value, ok := cduo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coindescription.FieldEntID,
 		})
 	}
 	if value, ok := cduo.mutation.AppID(); ok {

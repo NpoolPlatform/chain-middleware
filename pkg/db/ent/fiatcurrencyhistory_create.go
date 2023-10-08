@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -62,6 +61,20 @@ func (fchc *FiatCurrencyHistoryCreate) SetDeletedAt(u uint32) *FiatCurrencyHisto
 func (fchc *FiatCurrencyHistoryCreate) SetNillableDeletedAt(u *uint32) *FiatCurrencyHistoryCreate {
 	if u != nil {
 		fchc.SetDeletedAt(*u)
+	}
+	return fchc
+}
+
+// SetEntID sets the "ent_id" field.
+func (fchc *FiatCurrencyHistoryCreate) SetEntID(u uuid.UUID) *FiatCurrencyHistoryCreate {
+	fchc.mutation.SetEntID(u)
+	return fchc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fchc *FiatCurrencyHistoryCreate) SetNillableEntID(u *uuid.UUID) *FiatCurrencyHistoryCreate {
+	if u != nil {
+		fchc.SetEntID(*u)
 	}
 	return fchc
 }
@@ -123,16 +136,8 @@ func (fchc *FiatCurrencyHistoryCreate) SetNillableMarketValueHigh(d *decimal.Dec
 }
 
 // SetID sets the "id" field.
-func (fchc *FiatCurrencyHistoryCreate) SetID(u uuid.UUID) *FiatCurrencyHistoryCreate {
-	fchc.mutation.SetID(u)
-	return fchc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (fchc *FiatCurrencyHistoryCreate) SetNillableID(u *uuid.UUID) *FiatCurrencyHistoryCreate {
-	if u != nil {
-		fchc.SetID(*u)
-	}
+func (fchc *FiatCurrencyHistoryCreate) SetID(i int) *FiatCurrencyHistoryCreate {
+	fchc.mutation.SetID(i)
 	return fchc
 }
 
@@ -236,6 +241,13 @@ func (fchc *FiatCurrencyHistoryCreate) defaults() error {
 		v := fiatcurrencyhistory.DefaultDeletedAt()
 		fchc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := fchc.mutation.EntID(); !ok {
+		if fiatcurrencyhistory.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized fiatcurrencyhistory.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := fiatcurrencyhistory.DefaultEntID()
+		fchc.mutation.SetEntID(v)
+	}
 	if _, ok := fchc.mutation.FiatID(); !ok {
 		if fiatcurrencyhistory.DefaultFiatID == nil {
 			return fmt.Errorf("ent: uninitialized fiatcurrencyhistory.DefaultFiatID (forgotten import ent/runtime?)")
@@ -255,13 +267,6 @@ func (fchc *FiatCurrencyHistoryCreate) defaults() error {
 		v := fiatcurrencyhistory.DefaultMarketValueHigh
 		fchc.mutation.SetMarketValueHigh(v)
 	}
-	if _, ok := fchc.mutation.ID(); !ok {
-		if fiatcurrencyhistory.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized fiatcurrencyhistory.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := fiatcurrencyhistory.DefaultID()
-		fchc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -276,6 +281,9 @@ func (fchc *FiatCurrencyHistoryCreate) check() error {
 	if _, ok := fchc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "FiatCurrencyHistory.deleted_at"`)}
 	}
+	if _, ok := fchc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "FiatCurrencyHistory.ent_id"`)}
+	}
 	return nil
 }
 
@@ -287,12 +295,9 @@ func (fchc *FiatCurrencyHistoryCreate) sqlSave(ctx context.Context) (*FiatCurren
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -303,7 +308,7 @@ func (fchc *FiatCurrencyHistoryCreate) createSpec() (*FiatCurrencyHistory, *sqlg
 		_spec = &sqlgraph.CreateSpec{
 			Table: fiatcurrencyhistory.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiatcurrencyhistory.FieldID,
 			},
 		}
@@ -311,7 +316,7 @@ func (fchc *FiatCurrencyHistoryCreate) createSpec() (*FiatCurrencyHistory, *sqlg
 	_spec.OnConflict = fchc.conflict
 	if id, ok := fchc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := fchc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -336,6 +341,14 @@ func (fchc *FiatCurrencyHistoryCreate) createSpec() (*FiatCurrencyHistory, *sqlg
 			Column: fiatcurrencyhistory.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := fchc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiatcurrencyhistory.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := fchc.mutation.FiatID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -474,6 +487,18 @@ func (u *FiatCurrencyHistoryUpsert) UpdateDeletedAt() *FiatCurrencyHistoryUpsert
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *FiatCurrencyHistoryUpsert) AddDeletedAt(v uint32) *FiatCurrencyHistoryUpsert {
 	u.Add(fiatcurrencyhistory.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *FiatCurrencyHistoryUpsert) SetEntID(v uuid.UUID) *FiatCurrencyHistoryUpsert {
+	u.Set(fiatcurrencyhistory.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatCurrencyHistoryUpsert) UpdateEntID() *FiatCurrencyHistoryUpsert {
+	u.SetExcluded(fiatcurrencyhistory.FieldEntID)
 	return u
 }
 
@@ -662,6 +687,20 @@ func (u *FiatCurrencyHistoryUpsertOne) UpdateDeletedAt() *FiatCurrencyHistoryUps
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *FiatCurrencyHistoryUpsertOne) SetEntID(v uuid.UUID) *FiatCurrencyHistoryUpsertOne {
+	return u.Update(func(s *FiatCurrencyHistoryUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatCurrencyHistoryUpsertOne) UpdateEntID() *FiatCurrencyHistoryUpsertOne {
+	return u.Update(func(s *FiatCurrencyHistoryUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetFiatID sets the "fiat_id" field.
 func (u *FiatCurrencyHistoryUpsertOne) SetFiatID(v uuid.UUID) *FiatCurrencyHistoryUpsertOne {
 	return u.Update(func(s *FiatCurrencyHistoryUpsert) {
@@ -762,12 +801,7 @@ func (u *FiatCurrencyHistoryUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *FiatCurrencyHistoryUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: FiatCurrencyHistoryUpsertOne.ID is not supported by MySQL driver. Use FiatCurrencyHistoryUpsertOne.Exec instead")
-	}
+func (u *FiatCurrencyHistoryUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -776,7 +810,7 @@ func (u *FiatCurrencyHistoryUpsertOne) ID(ctx context.Context) (id uuid.UUID, er
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *FiatCurrencyHistoryUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *FiatCurrencyHistoryUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -827,6 +861,10 @@ func (fchcb *FiatCurrencyHistoryCreateBulk) Save(ctx context.Context) ([]*FiatCu
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1022,6 +1060,20 @@ func (u *FiatCurrencyHistoryUpsertBulk) AddDeletedAt(v uint32) *FiatCurrencyHist
 func (u *FiatCurrencyHistoryUpsertBulk) UpdateDeletedAt() *FiatCurrencyHistoryUpsertBulk {
 	return u.Update(func(s *FiatCurrencyHistoryUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *FiatCurrencyHistoryUpsertBulk) SetEntID(v uuid.UUID) *FiatCurrencyHistoryUpsertBulk {
+	return u.Update(func(s *FiatCurrencyHistoryUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *FiatCurrencyHistoryUpsertBulk) UpdateEntID() *FiatCurrencyHistoryUpsertBulk {
+	return u.Update(func(s *FiatCurrencyHistoryUpsert) {
+		s.UpdateEntID()
 	})
 }
 

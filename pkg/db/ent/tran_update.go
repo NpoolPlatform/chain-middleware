@@ -85,6 +85,20 @@ func (tu *TranUpdate) AddDeletedAt(u int32) *TranUpdate {
 	return tu
 }
 
+// SetEntID sets the "ent_id" field.
+func (tu *TranUpdate) SetEntID(u uuid.UUID) *TranUpdate {
+	tu.mutation.SetEntID(u)
+	return tu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (tu *TranUpdate) SetNillableEntID(u *uuid.UUID) *TranUpdate {
+	if u != nil {
+		tu.SetEntID(*u)
+	}
+	return tu
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (tu *TranUpdate) SetCoinTypeID(u uuid.UUID) *TranUpdate {
 	tu.mutation.SetCoinTypeID(u)
@@ -351,7 +365,7 @@ func (tu *TranUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   tran.Table,
 			Columns: tran.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: tran.FieldID,
 			},
 		},
@@ -403,6 +417,13 @@ func (tu *TranUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: tran.FieldDeletedAt,
+		})
+	}
+	if value, ok := tu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: tran.FieldEntID,
 		})
 	}
 	if value, ok := tu.mutation.CoinTypeID(); ok {
@@ -595,6 +616,20 @@ func (tuo *TranUpdateOne) SetNillableDeletedAt(u *uint32) *TranUpdateOne {
 // AddDeletedAt adds u to the "deleted_at" field.
 func (tuo *TranUpdateOne) AddDeletedAt(u int32) *TranUpdateOne {
 	tuo.mutation.AddDeletedAt(u)
+	return tuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (tuo *TranUpdateOne) SetEntID(u uuid.UUID) *TranUpdateOne {
+	tuo.mutation.SetEntID(u)
+	return tuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (tuo *TranUpdateOne) SetNillableEntID(u *uuid.UUID) *TranUpdateOne {
+	if u != nil {
+		tuo.SetEntID(*u)
+	}
 	return tuo
 }
 
@@ -877,7 +912,7 @@ func (tuo *TranUpdateOne) sqlSave(ctx context.Context) (_node *Tran, err error) 
 			Table:   tran.Table,
 			Columns: tran.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: tran.FieldID,
 			},
 		},
@@ -946,6 +981,13 @@ func (tuo *TranUpdateOne) sqlSave(ctx context.Context) (_node *Tran, err error) 
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: tran.FieldDeletedAt,
+		})
+	}
+	if value, ok := tuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: tran.FieldEntID,
 		})
 	}
 	if value, ok := tuo.mutation.CoinTypeID(); ok {

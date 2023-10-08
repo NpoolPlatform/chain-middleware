@@ -84,6 +84,20 @@ func (cfu *CoinFiatUpdate) AddDeletedAt(u int32) *CoinFiatUpdate {
 	return cfu
 }
 
+// SetEntID sets the "ent_id" field.
+func (cfu *CoinFiatUpdate) SetEntID(u uuid.UUID) *CoinFiatUpdate {
+	cfu.mutation.SetEntID(u)
+	return cfu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfu *CoinFiatUpdate) SetNillableEntID(u *uuid.UUID) *CoinFiatUpdate {
+	if u != nil {
+		cfu.SetEntID(*u)
+	}
+	return cfu
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (cfu *CoinFiatUpdate) SetCoinTypeID(u uuid.UUID) *CoinFiatUpdate {
 	cfu.mutation.SetCoinTypeID(u)
@@ -230,7 +244,7 @@ func (cfu *CoinFiatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coinfiat.Table,
 			Columns: coinfiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiat.FieldID,
 			},
 		},
@@ -282,6 +296,13 @@ func (cfu *CoinFiatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinfiat.FieldDeletedAt,
+		})
+	}
+	if value, ok := cfu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiat.FieldEntID,
 		})
 	}
 	if value, ok := cfu.mutation.CoinTypeID(); ok {
@@ -396,6 +417,20 @@ func (cfuo *CoinFiatUpdateOne) SetNillableDeletedAt(u *uint32) *CoinFiatUpdateOn
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cfuo *CoinFiatUpdateOne) AddDeletedAt(u int32) *CoinFiatUpdateOne {
 	cfuo.mutation.AddDeletedAt(u)
+	return cfuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (cfuo *CoinFiatUpdateOne) SetEntID(u uuid.UUID) *CoinFiatUpdateOne {
+	cfuo.mutation.SetEntID(u)
+	return cfuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfuo *CoinFiatUpdateOne) SetNillableEntID(u *uuid.UUID) *CoinFiatUpdateOne {
+	if u != nil {
+		cfuo.SetEntID(*u)
+	}
 	return cfuo
 }
 
@@ -558,7 +593,7 @@ func (cfuo *CoinFiatUpdateOne) sqlSave(ctx context.Context) (_node *CoinFiat, er
 			Table:   coinfiat.Table,
 			Columns: coinfiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint32,
+				Type:   field.TypeInt,
 				Column: coinfiat.FieldID,
 			},
 		},
@@ -627,6 +662,13 @@ func (cfuo *CoinFiatUpdateOne) sqlSave(ctx context.Context) (_node *CoinFiat, er
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinfiat.FieldDeletedAt,
+		})
+	}
+	if value, ok := cfuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiat.FieldEntID,
 		})
 	}
 	if value, ok := cfuo.mutation.CoinTypeID(); ok {

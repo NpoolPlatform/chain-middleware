@@ -18,6 +18,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
+	// FieldEntID holds the string denoting the ent_id field in the database.
+	FieldEntID = "ent_id"
 	// FieldCoinTypeID holds the string denoting the coin_type_id field in the database.
 	FieldCoinTypeID = "coin_type_id"
 	// FieldHomePage holds the string denoting the home_page field in the database.
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
+	FieldEntID,
 	FieldCoinTypeID,
 	FieldHomePage,
 	FieldSpecs,
@@ -69,6 +72,8 @@ var (
 	UpdateDefaultUpdatedAt func() uint32
 	// DefaultDeletedAt holds the default value on creation for the "deleted_at" field.
 	DefaultDeletedAt func() uint32
+	// DefaultEntID holds the default value on creation for the "ent_id" field.
+	DefaultEntID func() uuid.UUID
 	// DefaultCoinTypeID holds the default value on creation for the "coin_type_id" field.
 	DefaultCoinTypeID func() uuid.UUID
 	// DefaultHomePage holds the default value on creation for the "home_page" field.
@@ -77,6 +82,4 @@ var (
 	DefaultSpecs string
 	// DefaultStableUsd holds the default value on creation for the "stable_usd" field.
 	DefaultStableUsd bool
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
 )

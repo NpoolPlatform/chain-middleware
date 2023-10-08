@@ -9,28 +9,28 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id uuid.UUID) predicate.Fiat {
+func ID(id int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id uuid.UUID) predicate.Fiat {
+func IDEQ(id int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldID), id))
 	})
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id uuid.UUID) predicate.Fiat {
+func IDNEQ(id int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldID), id))
 	})
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...uuid.UUID) predicate.Fiat {
+func IDIn(ids ...int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		v := make([]interface{}, len(ids))
 		for i := range v {
@@ -41,7 +41,7 @@ func IDIn(ids ...uuid.UUID) predicate.Fiat {
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...uuid.UUID) predicate.Fiat {
+func IDNotIn(ids ...int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		v := make([]interface{}, len(ids))
 		for i := range v {
@@ -52,28 +52,28 @@ func IDNotIn(ids ...uuid.UUID) predicate.Fiat {
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id uuid.UUID) predicate.Fiat {
+func IDGT(id int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldID), id))
 	})
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id uuid.UUID) predicate.Fiat {
+func IDGTE(id int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldID), id))
 	})
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id uuid.UUID) predicate.Fiat {
+func IDLT(id int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldID), id))
 	})
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id uuid.UUID) predicate.Fiat {
+func IDLTE(id int) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldID), id))
 	})
@@ -97,6 +97,13 @@ func UpdatedAt(v uint32) predicate.Fiat {
 func DeletedAt(v uint32) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldDeletedAt), v))
+	})
+}
+
+// EntID applies equality check predicate on the "ent_id" field. It's identical to EntIDEQ.
+func EntID(v uuid.UUID) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEntID), v))
 	})
 }
 
@@ -310,6 +317,70 @@ func DeletedAtLT(v uint32) predicate.Fiat {
 func DeletedAtLTE(v uint32) predicate.Fiat {
 	return predicate.Fiat(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldDeletedAt), v))
+	})
+}
+
+// EntIDEQ applies the EQ predicate on the "ent_id" field.
+func EntIDEQ(v uuid.UUID) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEntID), v))
+	})
+}
+
+// EntIDNEQ applies the NEQ predicate on the "ent_id" field.
+func EntIDNEQ(v uuid.UUID) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldEntID), v))
+	})
+}
+
+// EntIDIn applies the In predicate on the "ent_id" field.
+func EntIDIn(vs ...uuid.UUID) predicate.Fiat {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldEntID), v...))
+	})
+}
+
+// EntIDNotIn applies the NotIn predicate on the "ent_id" field.
+func EntIDNotIn(vs ...uuid.UUID) predicate.Fiat {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldEntID), v...))
+	})
+}
+
+// EntIDGT applies the GT predicate on the "ent_id" field.
+func EntIDGT(v uuid.UUID) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldEntID), v))
+	})
+}
+
+// EntIDGTE applies the GTE predicate on the "ent_id" field.
+func EntIDGTE(v uuid.UUID) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldEntID), v))
+	})
+}
+
+// EntIDLT applies the LT predicate on the "ent_id" field.
+func EntIDLT(v uuid.UUID) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldEntID), v))
+	})
+}
+
+// EntIDLTE applies the LTE predicate on the "ent_id" field.
+func EntIDLTE(v uuid.UUID) predicate.Fiat {
+	return predicate.Fiat(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldEntID), v))
 	})
 }
 

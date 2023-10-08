@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
+	crudermixin "github.com/NpoolPlatform/libent-cruder/pkg/mixin"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
@@ -19,16 +20,13 @@ type FiatCurrencyHistory struct {
 func (FiatCurrencyHistory) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
+		crudermixin.AutoIDMixin{},
 	}
 }
 
 // Fields of the FiatCurrencyHistory.
 func (FiatCurrencyHistory) Fields() []ent.Field {
 	return []ent.Field{
-		field.
-			UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Unique(),
 		field.
 			UUID("fiat_id", uuid.UUID{}).
 			Optional().

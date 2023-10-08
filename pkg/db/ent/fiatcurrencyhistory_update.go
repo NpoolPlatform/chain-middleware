@@ -85,6 +85,20 @@ func (fchu *FiatCurrencyHistoryUpdate) AddDeletedAt(u int32) *FiatCurrencyHistor
 	return fchu
 }
 
+// SetEntID sets the "ent_id" field.
+func (fchu *FiatCurrencyHistoryUpdate) SetEntID(u uuid.UUID) *FiatCurrencyHistoryUpdate {
+	fchu.mutation.SetEntID(u)
+	return fchu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fchu *FiatCurrencyHistoryUpdate) SetNillableEntID(u *uuid.UUID) *FiatCurrencyHistoryUpdate {
+	if u != nil {
+		fchu.SetEntID(*u)
+	}
+	return fchu
+}
+
 // SetFiatID sets the "fiat_id" field.
 func (fchu *FiatCurrencyHistoryUpdate) SetFiatID(u uuid.UUID) *FiatCurrencyHistoryUpdate {
 	fchu.mutation.SetFiatID(u)
@@ -251,7 +265,7 @@ func (fchu *FiatCurrencyHistoryUpdate) sqlSave(ctx context.Context) (n int, err 
 			Table:   fiatcurrencyhistory.Table,
 			Columns: fiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiatcurrencyhistory.FieldID,
 			},
 		},
@@ -303,6 +317,13 @@ func (fchu *FiatCurrencyHistoryUpdate) sqlSave(ctx context.Context) (n int, err 
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: fiatcurrencyhistory.FieldDeletedAt,
+		})
+	}
+	if value, ok := fchu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiatcurrencyhistory.FieldEntID,
 		})
 	}
 	if value, ok := fchu.mutation.FiatID(); ok {
@@ -430,6 +451,20 @@ func (fchuo *FiatCurrencyHistoryUpdateOne) SetNillableDeletedAt(u *uint32) *Fiat
 // AddDeletedAt adds u to the "deleted_at" field.
 func (fchuo *FiatCurrencyHistoryUpdateOne) AddDeletedAt(u int32) *FiatCurrencyHistoryUpdateOne {
 	fchuo.mutation.AddDeletedAt(u)
+	return fchuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (fchuo *FiatCurrencyHistoryUpdateOne) SetEntID(u uuid.UUID) *FiatCurrencyHistoryUpdateOne {
+	fchuo.mutation.SetEntID(u)
+	return fchuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fchuo *FiatCurrencyHistoryUpdateOne) SetNillableEntID(u *uuid.UUID) *FiatCurrencyHistoryUpdateOne {
+	if u != nil {
+		fchuo.SetEntID(*u)
+	}
 	return fchuo
 }
 
@@ -612,7 +647,7 @@ func (fchuo *FiatCurrencyHistoryUpdateOne) sqlSave(ctx context.Context) (_node *
 			Table:   fiatcurrencyhistory.Table,
 			Columns: fiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiatcurrencyhistory.FieldID,
 			},
 		},
@@ -681,6 +716,13 @@ func (fchuo *FiatCurrencyHistoryUpdateOne) sqlSave(ctx context.Context) (_node *
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: fiatcurrencyhistory.FieldDeletedAt,
+		})
+	}
+	if value, ok := fchuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiatcurrencyhistory.FieldEntID,
 		})
 	}
 	if value, ok := fchuo.mutation.FiatID(); ok {

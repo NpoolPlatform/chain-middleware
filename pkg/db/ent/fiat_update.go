@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // FiatUpdate is the builder for updating Fiat entities.
@@ -80,6 +81,20 @@ func (fu *FiatUpdate) SetNillableDeletedAt(u *uint32) *FiatUpdate {
 // AddDeletedAt adds u to the "deleted_at" field.
 func (fu *FiatUpdate) AddDeletedAt(u int32) *FiatUpdate {
 	fu.mutation.AddDeletedAt(u)
+	return fu
+}
+
+// SetEntID sets the "ent_id" field.
+func (fu *FiatUpdate) SetEntID(u uuid.UUID) *FiatUpdate {
+	fu.mutation.SetEntID(u)
+	return fu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fu *FiatUpdate) SetNillableEntID(u *uuid.UUID) *FiatUpdate {
+	if u != nil {
+		fu.SetEntID(*u)
+	}
 	return fu
 }
 
@@ -229,7 +244,7 @@ func (fu *FiatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   fiat.Table,
 			Columns: fiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiat.FieldID,
 			},
 		},
@@ -281,6 +296,13 @@ func (fu *FiatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: fiat.FieldDeletedAt,
+		})
+	}
+	if value, ok := fu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiat.FieldEntID,
 		})
 	}
 	if value, ok := fu.mutation.Name(); ok {
@@ -395,6 +417,20 @@ func (fuo *FiatUpdateOne) SetNillableDeletedAt(u *uint32) *FiatUpdateOne {
 // AddDeletedAt adds u to the "deleted_at" field.
 func (fuo *FiatUpdateOne) AddDeletedAt(u int32) *FiatUpdateOne {
 	fuo.mutation.AddDeletedAt(u)
+	return fuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (fuo *FiatUpdateOne) SetEntID(u uuid.UUID) *FiatUpdateOne {
+	fuo.mutation.SetEntID(u)
+	return fuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fuo *FiatUpdateOne) SetNillableEntID(u *uuid.UUID) *FiatUpdateOne {
+	if u != nil {
+		fuo.SetEntID(*u)
+	}
 	return fuo
 }
 
@@ -557,7 +593,7 @@ func (fuo *FiatUpdateOne) sqlSave(ctx context.Context) (_node *Fiat, err error) 
 			Table:   fiat.Table,
 			Columns: fiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: fiat.FieldID,
 			},
 		},
@@ -626,6 +662,13 @@ func (fuo *FiatUpdateOne) sqlSave(ctx context.Context) (_node *Fiat, err error) 
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: fiat.FieldDeletedAt,
+		})
+	}
+	if value, ok := fuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiat.FieldEntID,
 		})
 	}
 	if value, ok := fuo.mutation.Name(); ok {

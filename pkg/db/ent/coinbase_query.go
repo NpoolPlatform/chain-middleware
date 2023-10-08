@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // CoinBaseQuery is the builder for querying CoinBase entities.
@@ -87,8 +86,8 @@ func (cbq *CoinBaseQuery) FirstX(ctx context.Context) *CoinBase {
 
 // FirstID returns the first CoinBase ID from the query.
 // Returns a *NotFoundError when no CoinBase ID was found.
-func (cbq *CoinBaseQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (cbq *CoinBaseQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = cbq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -100,7 +99,7 @@ func (cbq *CoinBaseQuery) FirstID(ctx context.Context) (id uuid.UUID, err error)
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cbq *CoinBaseQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (cbq *CoinBaseQuery) FirstIDX(ctx context.Context) int {
 	id, err := cbq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -138,8 +137,8 @@ func (cbq *CoinBaseQuery) OnlyX(ctx context.Context) *CoinBase {
 // OnlyID is like Only, but returns the only CoinBase ID in the query.
 // Returns a *NotSingularError when more than one CoinBase ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cbq *CoinBaseQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (cbq *CoinBaseQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = cbq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -155,7 +154,7 @@ func (cbq *CoinBaseQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cbq *CoinBaseQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (cbq *CoinBaseQuery) OnlyIDX(ctx context.Context) int {
 	id, err := cbq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -181,8 +180,8 @@ func (cbq *CoinBaseQuery) AllX(ctx context.Context) []*CoinBase {
 }
 
 // IDs executes the query and returns a list of CoinBase IDs.
-func (cbq *CoinBaseQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (cbq *CoinBaseQuery) IDs(ctx context.Context) ([]int, error) {
+	var ids []int
 	if err := cbq.Select(coinbase.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -190,7 +189,7 @@ func (cbq *CoinBaseQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cbq *CoinBaseQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (cbq *CoinBaseQuery) IDsX(ctx context.Context) []int {
 	ids, err := cbq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,7 +376,7 @@ func (cbq *CoinBaseQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   coinbase.Table,
 			Columns: coinbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: coinbase.FieldID,
 			},
 		},
