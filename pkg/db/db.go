@@ -17,11 +17,15 @@ import (
 )
 
 func client() (*ent.Client, error) {
+	fmt.Printf("1\n")
 	conn, err := mysql.GetConn()
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("2\n")
 	drv := entsql.OpenDB(dialect.MySQL, conn)
+	fmt.Printf("3\n")
+	defer fmt.Printf("4\n")
 	return ent.NewClient(ent.Driver(drv)), nil
 }
 
