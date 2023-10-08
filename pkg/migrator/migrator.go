@@ -73,7 +73,7 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
-func tables(ctx context.Context, dbName string) ([]string, error) {
+func tables(ctx context.Context, dbName string, tx *sql.Tx) ([]string, error) {
 	tables := []string{}
 	rows, err := tx.QueryContext(
 		ctx,
@@ -83,11 +83,17 @@ func tables(ctx context.Context, dbName string) ([]string, error) {
 		return nil, err
 	}
 	for rows.Next() {
-		if err := rows.Scan(&tables); err != nil {
-			return err
+		table := []byte{}
+		if err := rows.Scan(&table); err != nil {
+			return nil, err
 		}
+		tables = append(tables, string(table))
 	}
-	return nil
+	logger.Sugar().Infow(
+		"tables",
+		"Tables", tables,
+	)
+	return tables, nil
 }
 
 func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
@@ -97,8 +103,37 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		"table", table,
 	)
 
-	rc := 0
+	_type := []byte{}
 	rows, err := tx.QueryContext(
+		ctx,
+		fmt.Sprintf("select data_type from information_schema.columns where table_name='%v' and column_name='id' and table_schema='%v'", table, dbName),
+	)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		if err := rows.Scan(&_type); err != nil {
+			return err
+		}
+	}
+	if strings.Contains(string(_type), "int") {
+		logger.Sugar().Infow(
+			"migrateEntID",
+			"db", dbName,
+			"table", table,
+			"State", "Migrated",
+		)
+		_, err = tx.ExecContext(
+			ctx,
+			fmt.Sprintf("alter table %v.%v change id id int unsigned not null auto_increment", dbName, table),
+		)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	rc := 0
+	rows, err = tx.QueryContext(
 		ctx,
 		fmt.Sprintf("select 1 from information_schema.columns where table_schema='%v' and table_name='%v' and column_name='ent_id'", dbName, table),
 	)
@@ -111,28 +146,6 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		}
 	}
 	if rc != 0 {
-		return nil
-	}
-	_type := ""
-	rows, err = tx.QueryContext(
-		ctx,
-		fmt.Sprintf("select data_type from information_schema.columns where table_name='%v' and column_name='id' and table_schema='%v'", table, dbName),
-	)
-	if err != nil {
-		return err
-	}
-	for rows.Next() {
-		if err := rows.Scan(&_type); err != nil {
-			return err
-		}
-	}
-	if strings.Contains(_type, "int") {
-		logger.Sugar().Infow(
-			"migrateEntID",
-			"db", dbName,
-			"table", table,
-			"State", "Migrated",
-		)
 		return nil
 	}
 	logger.Sugar().Infow(
@@ -197,13 +210,17 @@ func Migrate(ctx context.Context) error {
 		return err
 	}
 
-	_tables, err := tables(ctx, "chain_manager")
+	dbname := config.GetStringValueWithNameSpace(servicename.ServiceDomain, keyDBName)
+	_tables, err := tables(ctx, dbname, tx)
 	if err != nil {
 		return err
 	}
 
-	for _, table := range tables {
-		if err = migrateEntID(ctx, table, tx); err != nil {
+	for _, table := range _tables {
+		if table != "app_coins" && table != "coin_fiats" {
+			continue
+		}
+		if err = migrateEntID(ctx, dbname, table, tx); err != nil {
 			_ = tx.Rollback()
 			return err
 		}
