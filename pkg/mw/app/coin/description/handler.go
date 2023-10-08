@@ -14,7 +14,7 @@ import (
 )
 
 type Handler struct {
-	ID         *uint32
+	ID         *int
 	EntID      *uuid.UUID
 	AppID      *uuid.UUID
 	CoinTypeID *uuid.UUID
@@ -36,23 +36,43 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if u == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
+		}
+		_u := int(*u)
+		h.ID = &_u
+		return nil
+	}
+}
+
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
-		h.ID = &_id
+		h.EntID = &_id
 		return nil
 	}
 }
 
-func WithAppID(id *string) func(context.Context, *Handler) error {
+func WithAppID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid appid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -64,9 +84,12 @@ func WithAppID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
+func WithCoinTypeID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid cointypeid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -78,9 +101,12 @@ func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithUsedFor(usedFor *basetypes.UsedFor) func(context.Context, *Handler) error {
+func WithUsedFor(usedFor *basetypes.UsedFor, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if usedFor == nil {
+			if must {
+				return fmt.Errorf("invalid usedfor")
+			}
 			return nil
 		}
 		switch *usedFor {
@@ -93,9 +119,12 @@ func WithUsedFor(usedFor *basetypes.UsedFor) func(context.Context, *Handler) err
 	}
 }
 
-func WithTitle(title *string) func(context.Context, *Handler) error {
+func WithTitle(title *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if title == nil {
+			if must {
+				return fmt.Errorf("invalid title")
+			}
 			return nil
 		}
 		if *title == "" {
@@ -106,9 +135,12 @@ func WithTitle(title *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithMessage(message *string) func(context.Context, *Handler) error {
+func WithMessage(message *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if message == nil {
+			if must {
+				return fmt.Errorf("invalid message")
+			}
 			return nil
 		}
 		if *message == "" {
@@ -122,13 +154,13 @@ func WithMessage(message *string) func(context.Context, *Handler) error {
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &descriptioncrud.Conds{}
-		if conds.ID != nil {
-			id, err := uuid.Parse(conds.GetID().GetValue())
+		if conds.EntID != nil {
+			id, err := uuid.Parse(conds.GetEntID().GetValue())
 			if err != nil {
 				return err
 			}
-			h.Conds.ID = &cruder.Cond{
-				Op:  conds.GetID().GetOp(),
+			h.Conds.EntID = &cruder.Cond{
+				Op:  conds.GetEntID().GetOp(),
 				Val: id,
 			}
 		}

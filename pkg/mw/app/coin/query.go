@@ -50,18 +50,17 @@ func (h *queryHandler) selectAppCoin(stm *ent.AppCoinQuery) {
 }
 
 func (h *queryHandler) queryAppCoin(cli *ent.Client) error {
-	if h.ID == nil {
+	if h.ID == nil && h.EntID == nil {
 		return fmt.Errorf("invalid id")
 	}
-
-	h.selectAppCoin(
-		cli.AppCoin.
-			Query().
-			Where(
-				entappcoin.ID(*h.ID),
-				entappcoin.DeletedAt(0),
-			),
-	)
+	stm := cli.AppCoin.Query().Where(entappcoin.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entappcoin.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entappcoin.EntID(*h.EntID))
+	}
+	h.selectAppCoin(stm)
 	return nil
 }
 

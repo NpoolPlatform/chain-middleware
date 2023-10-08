@@ -27,6 +27,7 @@ type queryHandler struct {
 func (h *queryHandler) selectCoinDescription(stm *ent.CoinDescriptionQuery) {
 	h.stm = stm.Select(
 		entdescription.FieldID,
+		entdescription.FieldEntID,
 		entdescription.FieldAppID,
 		entdescription.FieldCoinTypeID,
 		entdescription.FieldUsedFor,
@@ -38,13 +39,17 @@ func (h *queryHandler) selectCoinDescription(stm *ent.CoinDescriptionQuery) {
 }
 
 func (h *queryHandler) queryCoinDescription(cli *ent.Client) error {
-	h.selectCoinDescription(
-		cli.CoinDescription.
-			Query().
-			Where(
-				entdescription.ID(*h.ID),
-			),
-	)
+	if h.ID == nil || h.EntID == nil {
+		return fmt.Errorf("invalid id")
+	}
+	stm := cli.CoinDescription.Query().Where(entdescription.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entdescription.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entdescription.EntID(*h.EntID))
+	}
+	h.selectCoinDescription(stm)
 	return nil
 }
 
