@@ -12,7 +12,8 @@ import (
 )
 
 type Req struct {
-	ID            *uuid.UUID
+	ID            *int
+	EntID         *uuid.UUID
 	AppID         *uuid.UUID
 	CoinTypeID    *uuid.UUID
 	MarketValue   *decimal.Decimal
@@ -25,6 +26,9 @@ type Req struct {
 func CreateSet(c *ent.ExchangeRateCreate, req *Req) *ent.ExchangeRateCreate {
 	if req.ID != nil {
 		c.SetID(*req.ID)
+	}
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.AppID != nil {
 		c.SetAppID(*req.AppID)
@@ -84,20 +88,20 @@ func UpdateSet(u *ent.ExchangeRateUpdateOne, req *Req) *ent.ExchangeRateUpdateOn
 }
 
 type Conds struct {
-	ID         *cruder.Cond
+	EntID      *cruder.Cond
 	AppID      *cruder.Cond
 	CoinTypeID *cruder.Cond
 }
 
 func SetQueryConds(q *ent.ExchangeRateQuery, conds *Conds) (*ent.ExchangeRateQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entexrate.ID(id))
+			q.Where(entexrate.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid exrate field")
 		}

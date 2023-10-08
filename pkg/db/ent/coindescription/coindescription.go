@@ -87,6 +87,4 @@ var (
 	DefaultTitle string
 	// DefaultMessage holds the default value on creation for the "message" field.
 	DefaultMessage string
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
 )

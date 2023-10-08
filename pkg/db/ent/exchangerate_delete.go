@@ -72,7 +72,7 @@ func (erd *ExchangeRateDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: exchangerate.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: exchangerate.FieldID,
 			},
 		},

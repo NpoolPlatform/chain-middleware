@@ -13,7 +13,7 @@ import (
 )
 
 type Req struct {
-	ID            *uuid.UUID
+	EntID         *uuid.UUID
 	CoinTypeID    *uuid.UUID
 	FromAccountID *uuid.UUID
 	ToAccountID   *uuid.UUID
@@ -26,8 +26,8 @@ type Req struct {
 }
 
 func CreateSet(c *ent.TranCreate, req *Req) *ent.TranCreate {
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.CoinTypeID != nil {
 		c.SetCoinTypeID(*req.CoinTypeID)
@@ -69,25 +69,25 @@ func UpdateSet(u *ent.TranUpdateOne, req *Req) (*ent.TranUpdateOne, error) {
 }
 
 type Conds struct {
-	ID         *cruder.Cond
+	EntID      *cruder.Cond
 	CoinTypeID *cruder.Cond
 	AccountID  *cruder.Cond
 	AccountIDs *cruder.Cond
 	State      *cruder.Cond
 	Type       *cruder.Cond
-	IDs        *cruder.Cond
+	EntIDs     *cruder.Cond
 	States     *cruder.Cond
 }
 
 func SetQueryConds(q *ent.TranQuery, conds *Conds) (*ent.TranQuery, error) { //nolint
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(enttran.ID(id))
+			q.Where(enttran.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid tx field")
 		}
@@ -164,14 +164,14 @@ func SetQueryConds(q *ent.TranQuery, conds *Conds) (*ent.TranQuery, error) { //n
 			return nil, fmt.Errorf("invalid tx field")
 		}
 	}
-	if conds.IDs != nil {
-		ids, ok := conds.IDs.Val.([]uuid.UUID)
+	if conds.EntIDs != nil {
+		ids, ok := conds.EntIDs.Val.([]uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid ids")
+			return nil, fmt.Errorf("invalid entids")
 		}
-		switch conds.IDs.Op {
+		switch conds.EntIDs.Op {
 		case cruder.IN:
-			q.Where(enttran.IDIn(ids...))
+			q.Where(enttran.EntIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid tx field")
 		}

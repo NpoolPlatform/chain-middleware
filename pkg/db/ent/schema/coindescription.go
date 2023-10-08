@@ -25,10 +25,6 @@ func (CoinDescription) Mixin() []ent.Mixin {
 func (CoinDescription) Fields() []ent.Field {
 	return []ent.Field{
 		field.
-			UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Unique(),
-		field.
 			UUID("app_id", uuid.UUID{}).
 			Optional().
 			Default(uuid.New),

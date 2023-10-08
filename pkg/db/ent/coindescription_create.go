@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -150,16 +149,8 @@ func (cdc *CoinDescriptionCreate) SetNillableMessage(s *string) *CoinDescription
 }
 
 // SetID sets the "id" field.
-func (cdc *CoinDescriptionCreate) SetID(u uuid.UUID) *CoinDescriptionCreate {
-	cdc.mutation.SetID(u)
-	return cdc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (cdc *CoinDescriptionCreate) SetNillableID(u *uuid.UUID) *CoinDescriptionCreate {
-	if u != nil {
-		cdc.SetID(*u)
-	}
+func (cdc *CoinDescriptionCreate) SetID(i int) *CoinDescriptionCreate {
+	cdc.mutation.SetID(i)
 	return cdc
 }
 
@@ -296,13 +287,6 @@ func (cdc *CoinDescriptionCreate) defaults() error {
 		v := coindescription.DefaultMessage
 		cdc.mutation.SetMessage(v)
 	}
-	if _, ok := cdc.mutation.ID(); !ok {
-		if coindescription.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized coindescription.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := coindescription.DefaultID()
-		cdc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -331,12 +315,9 @@ func (cdc *CoinDescriptionCreate) sqlSave(ctx context.Context) (*CoinDescription
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -347,7 +328,7 @@ func (cdc *CoinDescriptionCreate) createSpec() (*CoinDescription, *sqlgraph.Crea
 		_spec = &sqlgraph.CreateSpec{
 			Table: coindescription.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: coindescription.FieldID,
 			},
 		}
@@ -355,7 +336,7 @@ func (cdc *CoinDescriptionCreate) createSpec() (*CoinDescription, *sqlgraph.Crea
 	_spec.OnConflict = cdc.conflict
 	if id, ok := cdc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := cdc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -887,12 +868,7 @@ func (u *CoinDescriptionUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CoinDescriptionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: CoinDescriptionUpsertOne.ID is not supported by MySQL driver. Use CoinDescriptionUpsertOne.Exec instead")
-	}
+func (u *CoinDescriptionUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -901,7 +877,7 @@ func (u *CoinDescriptionUpsertOne) ID(ctx context.Context) (id uuid.UUID, err er
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CoinDescriptionUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *CoinDescriptionUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -952,6 +928,10 @@ func (cdcb *CoinDescriptionCreateBulk) Save(ctx context.Context) ([]*CoinDescrip
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

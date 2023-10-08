@@ -11,7 +11,7 @@ import (
 )
 
 type Req struct {
-	ID         *uuid.UUID
+	EntID      *uuid.UUID
 	CoinTypeID *uuid.UUID
 	HomePage   *string
 	Specs      *string
@@ -20,8 +20,8 @@ type Req struct {
 }
 
 func CreateSet(c *ent.CoinExtraCreate, req *Req) *ent.CoinExtraCreate {
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.CoinTypeID != nil {
 		c.SetCoinTypeID(*req.CoinTypeID)
@@ -55,21 +55,21 @@ func UpdateSet(u *ent.CoinExtraUpdateOne, req *Req) *ent.CoinExtraUpdateOne {
 }
 
 type Conds struct {
-	ID         *cruder.Cond
+	EntID      *cruder.Cond
 	CoinTypeID *cruder.Cond
 	StableUSD  *cruder.Cond
 }
 
 func SetQueryConds(q *ent.CoinExtraQuery, conds *Conds) (*ent.CoinExtraQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
 			q.Where(
-				entcoinextra.ID(id),
+				entcoinextra.EntID(id),
 			)
 		default:
 			return nil, fmt.Errorf("invalid coinextra field")

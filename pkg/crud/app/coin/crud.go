@@ -12,7 +12,8 @@ import (
 )
 
 type Req struct {
-	ID                       *uuid.UUID
+	ID                       *int
+	EntID                    *uuid.UUID
 	AppID                    *uuid.UUID
 	CoinTypeID               *uuid.UUID
 	Name                     *string
@@ -32,6 +33,9 @@ type Req struct {
 func CreateSet(c *ent.AppCoinCreate, req *Req) *ent.AppCoinCreate {
 	if req.ID != nil {
 		c.SetID(*req.ID)
+	}
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.AppID != nil {
 		c.SetAppID(*req.AppID)
@@ -118,24 +122,37 @@ func UpdateSet(u *ent.AppCoinUpdateOne, req *Req) *ent.AppCoinUpdateOne {
 
 type Conds struct {
 	ID          *cruder.Cond
+	EntID       *cruder.Cond
 	AppID       *cruder.Cond
 	CoinTypeID  *cruder.Cond
 	ForPay      *cruder.Cond
 	Disabled    *cruder.Cond
-	IDs         *cruder.Cond
+	EntIDs      *cruder.Cond
 	CoinTypeIDs *cruder.Cond
 }
 
 //nolint
 func SetQueryConds(q *ent.AppCoinQuery, conds *Conds) (*ent.AppCoinQuery, error) {
 	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+		id, ok := conds.ID.Val.(int)
 		if !ok {
 			return nil, fmt.Errorf("invalid id")
 		}
 		switch conds.ID.Op {
 		case cruder.EQ:
 			q.Where(entappcoin.ID(id))
+		default:
+			return nil, fmt.Errorf("invalid appcoin field")
+		}
+	}
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid entid")
+		}
+		switch conds.EntID.Op {
+		case cruder.EQ:
+			q.Where(entappcoin.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid appcoin field")
 		}
@@ -188,14 +205,14 @@ func SetQueryConds(q *ent.AppCoinQuery, conds *Conds) (*ent.AppCoinQuery, error)
 			return nil, fmt.Errorf("invalid appcoin field")
 		}
 	}
-	if conds.IDs != nil {
-		ids, ok := conds.IDs.Val.([]uuid.UUID)
+	if conds.EntIDs != nil {
+		ids, ok := conds.EntIDs.Val.([]uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid ids")
+			return nil, fmt.Errorf("invalid entids")
 		}
-		switch conds.IDs.Op {
+		switch conds.EntIDs.Op {
 		case cruder.IN:
-			q.Where(entappcoin.IDIn(ids...))
+			q.Where(entappcoin.EntIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid appcoin field")
 		}

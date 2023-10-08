@@ -292,29 +292,25 @@ func init() {
 	// coindescription.DefaultEntID holds the default value on creation for the ent_id field.
 	coindescription.DefaultEntID = coindescriptionDescEntID.Default.(func() uuid.UUID)
 	// coindescriptionDescAppID is the schema descriptor for app_id field.
-	coindescriptionDescAppID := coindescriptionFields[1].Descriptor()
+	coindescriptionDescAppID := coindescriptionFields[0].Descriptor()
 	// coindescription.DefaultAppID holds the default value on creation for the app_id field.
 	coindescription.DefaultAppID = coindescriptionDescAppID.Default.(func() uuid.UUID)
 	// coindescriptionDescCoinTypeID is the schema descriptor for coin_type_id field.
-	coindescriptionDescCoinTypeID := coindescriptionFields[2].Descriptor()
+	coindescriptionDescCoinTypeID := coindescriptionFields[1].Descriptor()
 	// coindescription.DefaultCoinTypeID holds the default value on creation for the coin_type_id field.
 	coindescription.DefaultCoinTypeID = coindescriptionDescCoinTypeID.Default.(func() uuid.UUID)
 	// coindescriptionDescUsedFor is the schema descriptor for used_for field.
-	coindescriptionDescUsedFor := coindescriptionFields[3].Descriptor()
+	coindescriptionDescUsedFor := coindescriptionFields[2].Descriptor()
 	// coindescription.DefaultUsedFor holds the default value on creation for the used_for field.
 	coindescription.DefaultUsedFor = coindescriptionDescUsedFor.Default.(string)
 	// coindescriptionDescTitle is the schema descriptor for title field.
-	coindescriptionDescTitle := coindescriptionFields[4].Descriptor()
+	coindescriptionDescTitle := coindescriptionFields[3].Descriptor()
 	// coindescription.DefaultTitle holds the default value on creation for the title field.
 	coindescription.DefaultTitle = coindescriptionDescTitle.Default.(string)
 	// coindescriptionDescMessage is the schema descriptor for message field.
-	coindescriptionDescMessage := coindescriptionFields[5].Descriptor()
+	coindescriptionDescMessage := coindescriptionFields[4].Descriptor()
 	// coindescription.DefaultMessage holds the default value on creation for the message field.
 	coindescription.DefaultMessage = coindescriptionDescMessage.Default.(string)
-	// coindescriptionDescID is the schema descriptor for id field.
-	coindescriptionDescID := coindescriptionFields[0].Descriptor()
-	// coindescription.DefaultID holds the default value on creation for the id field.
-	coindescription.DefaultID = coindescriptionDescID.Default.(func() uuid.UUID)
 	coinextraMixin := schema.CoinExtra{}.Mixin()
 	coinextra.Policy = privacy.NewPolicies(coinextraMixin[0], schema.CoinExtra{})
 	coinextra.Hooks[0] = func(next ent.Mutator) ent.Mutator {
@@ -704,37 +700,33 @@ func init() {
 	// exchangerate.DefaultEntID holds the default value on creation for the ent_id field.
 	exchangerate.DefaultEntID = exchangerateDescEntID.Default.(func() uuid.UUID)
 	// exchangerateDescAppID is the schema descriptor for app_id field.
-	exchangerateDescAppID := exchangerateFields[1].Descriptor()
+	exchangerateDescAppID := exchangerateFields[0].Descriptor()
 	// exchangerate.DefaultAppID holds the default value on creation for the app_id field.
 	exchangerate.DefaultAppID = exchangerateDescAppID.Default.(func() uuid.UUID)
 	// exchangerateDescCoinTypeID is the schema descriptor for coin_type_id field.
-	exchangerateDescCoinTypeID := exchangerateFields[2].Descriptor()
+	exchangerateDescCoinTypeID := exchangerateFields[1].Descriptor()
 	// exchangerate.DefaultCoinTypeID holds the default value on creation for the coin_type_id field.
 	exchangerate.DefaultCoinTypeID = exchangerateDescCoinTypeID.Default.(func() uuid.UUID)
 	// exchangerateDescMarketValue is the schema descriptor for market_value field.
-	exchangerateDescMarketValue := exchangerateFields[3].Descriptor()
+	exchangerateDescMarketValue := exchangerateFields[2].Descriptor()
 	// exchangerate.DefaultMarketValue holds the default value on creation for the market_value field.
 	exchangerate.DefaultMarketValue = exchangerateDescMarketValue.Default.(decimal.Decimal)
 	// exchangerateDescSettleValue is the schema descriptor for settle_value field.
-	exchangerateDescSettleValue := exchangerateFields[4].Descriptor()
+	exchangerateDescSettleValue := exchangerateFields[3].Descriptor()
 	// exchangerate.DefaultSettleValue holds the default value on creation for the settle_value field.
 	exchangerate.DefaultSettleValue = exchangerateDescSettleValue.Default.(decimal.Decimal)
 	// exchangerateDescSettlePercent is the schema descriptor for settle_percent field.
-	exchangerateDescSettlePercent := exchangerateFields[5].Descriptor()
+	exchangerateDescSettlePercent := exchangerateFields[4].Descriptor()
 	// exchangerate.DefaultSettlePercent holds the default value on creation for the settle_percent field.
 	exchangerate.DefaultSettlePercent = exchangerateDescSettlePercent.Default.(uint32)
 	// exchangerateDescSettleTips is the schema descriptor for settle_tips field.
-	exchangerateDescSettleTips := exchangerateFields[6].Descriptor()
+	exchangerateDescSettleTips := exchangerateFields[5].Descriptor()
 	// exchangerate.DefaultSettleTips holds the default value on creation for the settle_tips field.
 	exchangerate.DefaultSettleTips = exchangerateDescSettleTips.Default.([]string)
 	// exchangerateDescSetter is the schema descriptor for setter field.
-	exchangerateDescSetter := exchangerateFields[7].Descriptor()
+	exchangerateDescSetter := exchangerateFields[6].Descriptor()
 	// exchangerate.DefaultSetter holds the default value on creation for the setter field.
 	exchangerate.DefaultSetter = exchangerateDescSetter.Default.(func() uuid.UUID)
-	// exchangerateDescID is the schema descriptor for id field.
-	exchangerateDescID := exchangerateFields[0].Descriptor()
-	// exchangerate.DefaultID holds the default value on creation for the id field.
-	exchangerate.DefaultID = exchangerateDescID.Default.(func() uuid.UUID)
 	fiatMixin := schema.Fiat{}.Mixin()
 	fiat.Policy = privacy.NewPolicies(fiatMixin[0], schema.Fiat{})
 	fiat.Hooks[0] = func(next ent.Mutator) ent.Mutator {

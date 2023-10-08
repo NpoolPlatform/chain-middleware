@@ -4077,7 +4077,7 @@ type CoinDescriptionMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *uuid.UUID
+	id            *int
 	created_at    *uint32
 	addcreated_at *int32
 	updated_at    *uint32
@@ -4116,7 +4116,7 @@ func newCoinDescriptionMutation(c config, op Op, opts ...coindescriptionOption) 
 }
 
 // withCoinDescriptionID sets the ID field of the mutation.
-func withCoinDescriptionID(id uuid.UUID) coindescriptionOption {
+func withCoinDescriptionID(id int) coindescriptionOption {
 	return func(m *CoinDescriptionMutation) {
 		var (
 			err   error
@@ -4168,13 +4168,13 @@ func (m CoinDescriptionMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of CoinDescription entities.
-func (m *CoinDescriptionMutation) SetID(id uuid.UUID) {
+func (m *CoinDescriptionMutation) SetID(id int) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CoinDescriptionMutation) ID() (id uuid.UUID, exists bool) {
+func (m *CoinDescriptionMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -4185,12 +4185,12 @@ func (m *CoinDescriptionMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *CoinDescriptionMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *CoinDescriptionMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuid.UUID{id}, nil
+			return []int{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -11231,7 +11231,7 @@ type ExchangeRateMutation struct {
 	config
 	op                Op
 	typ               string
-	id                *uuid.UUID
+	id                *int
 	created_at        *uint32
 	addcreated_at     *int32
 	updated_at        *uint32
@@ -11273,7 +11273,7 @@ func newExchangeRateMutation(c config, op Op, opts ...exchangerateOption) *Excha
 }
 
 // withExchangeRateID sets the ID field of the mutation.
-func withExchangeRateID(id uuid.UUID) exchangerateOption {
+func withExchangeRateID(id int) exchangerateOption {
 	return func(m *ExchangeRateMutation) {
 		var (
 			err   error
@@ -11325,13 +11325,13 @@ func (m ExchangeRateMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of ExchangeRate entities.
-func (m *ExchangeRateMutation) SetID(id uuid.UUID) {
+func (m *ExchangeRateMutation) SetID(id int) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ExchangeRateMutation) ID() (id uuid.UUID, exists bool) {
+func (m *ExchangeRateMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -11342,12 +11342,12 @@ func (m *ExchangeRateMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ExchangeRateMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *ExchangeRateMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuid.UUID{id}, nil
+			return []int{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):

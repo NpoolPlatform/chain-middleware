@@ -117,7 +117,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coindescription.Table,
 			Columns: coindescription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: coindescription.FieldID,
 			},
 		},
@@ -287,7 +287,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   exchangerate.Table,
 			Columns: exchangerate.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: exchangerate.FieldID,
 			},
 		},
@@ -820,8 +820,8 @@ func (f *CoinDescriptionFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *CoinDescriptionFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *CoinDescriptionFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(coindescription.FieldID))
 }
 
@@ -1470,8 +1470,8 @@ func (f *ExchangeRateFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *ExchangeRateFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql int predicate on the id field.
+func (f *ExchangeRateFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(exchangerate.FieldID))
 }
 

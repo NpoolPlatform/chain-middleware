@@ -12,7 +12,7 @@ import (
 )
 
 type Req struct {
-	ID             *uuid.UUID
+	EntID          *uuid.UUID
 	Name           *string
 	Logo           *string
 	Presale        *bool
@@ -25,8 +25,8 @@ type Req struct {
 }
 
 func CreateSet(c *ent.CoinBaseCreate, req *Req) *ent.CoinBaseCreate {
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.Name != nil {
 		c.SetName(*req.Name)
@@ -79,8 +79,8 @@ func UpdateSet(u *ent.CoinBaseUpdateOne, req *Req) *ent.CoinBaseUpdateOne {
 }
 
 type Conds struct {
-	ID       *cruder.Cond
-	IDs      *cruder.Cond
+	EntID    *cruder.Cond
+	EntIDs   *cruder.Cond
 	Name     *cruder.Cond
 	Unit     *cruder.Cond
 	ENV      *cruder.Cond
@@ -92,26 +92,26 @@ type Conds struct {
 
 // nolint:funlen,gocyclo
 func SetQueryConds(q *ent.CoinBaseQuery, conds *Conds) (*ent.CoinBaseQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entcoinbase.ID(id))
+			q.Where(entcoinbase.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid coinbase field")
 		}
 	}
-	if conds.IDs != nil {
-		ids, ok := conds.IDs.Val.([]uuid.UUID)
+	if conds.EntIDs != nil {
+		ids, ok := conds.EntIDs.Val.([]uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid ids")
+			return nil, fmt.Errorf("invalid entids")
 		}
-		switch conds.IDs.Op {
+		switch conds.EntIDs.Op {
 		case cruder.IN:
-			q.Where(entcoinbase.IDIn(ids...))
+			q.Where(entcoinbase.EntIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid coinbase field")
 		}

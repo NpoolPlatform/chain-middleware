@@ -39,7 +39,7 @@ func UpdateSet(u *ent.CoinFiatUpdateOne, req *Req) *ent.CoinFiatUpdateOne {
 }
 
 type Conds struct {
-	ID          *cruder.Cond
+	EntID       *cruder.Cond
 	CoinTypeID  *cruder.Cond
 	CoinTypeIDs *cruder.Cond
 	FiatID      *cruder.Cond

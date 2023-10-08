@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -171,16 +170,8 @@ func (erc *ExchangeRateCreate) SetNillableSetter(u *uuid.UUID) *ExchangeRateCrea
 }
 
 // SetID sets the "id" field.
-func (erc *ExchangeRateCreate) SetID(u uuid.UUID) *ExchangeRateCreate {
-	erc.mutation.SetID(u)
-	return erc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (erc *ExchangeRateCreate) SetNillableID(u *uuid.UUID) *ExchangeRateCreate {
-	if u != nil {
-		erc.SetID(*u)
-	}
+func (erc *ExchangeRateCreate) SetID(i int) *ExchangeRateCreate {
+	erc.mutation.SetID(i)
 	return erc
 }
 
@@ -328,13 +319,6 @@ func (erc *ExchangeRateCreate) defaults() error {
 		v := exchangerate.DefaultSetter()
 		erc.mutation.SetSetter(v)
 	}
-	if _, ok := erc.mutation.ID(); !ok {
-		if exchangerate.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized exchangerate.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := exchangerate.DefaultID()
-		erc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -363,12 +347,9 @@ func (erc *ExchangeRateCreate) sqlSave(ctx context.Context) (*ExchangeRate, erro
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int(id)
 	}
 	return _node, nil
 }
@@ -379,7 +360,7 @@ func (erc *ExchangeRateCreate) createSpec() (*ExchangeRate, *sqlgraph.CreateSpec
 		_spec = &sqlgraph.CreateSpec{
 			Table: exchangerate.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeInt,
 				Column: exchangerate.FieldID,
 			},
 		}
@@ -387,7 +368,7 @@ func (erc *ExchangeRateCreate) createSpec() (*ExchangeRate, *sqlgraph.CreateSpec
 	_spec.OnConflict = erc.conflict
 	if id, ok := erc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := erc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -1026,12 +1007,7 @@ func (u *ExchangeRateUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: ExchangeRateUpsertOne.ID is not supported by MySQL driver. Use ExchangeRateUpsertOne.Exec instead")
-	}
+func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id int, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -1040,7 +1016,7 @@ func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *ExchangeRateUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *ExchangeRateUpsertOne) IDX(ctx context.Context) int {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1091,6 +1067,10 @@ func (ercb *ExchangeRateCreateBulk) Save(ctx context.Context) ([]*ExchangeRate, 
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

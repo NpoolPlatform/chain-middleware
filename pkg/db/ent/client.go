@@ -9,7 +9,6 @@ import (
 	"log"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/migrate"
-	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/appcoin"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
@@ -556,7 +555,7 @@ func (c *CoinDescriptionClient) UpdateOne(cd *CoinDescription) *CoinDescriptionU
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CoinDescriptionClient) UpdateOneID(id uuid.UUID) *CoinDescriptionUpdateOne {
+func (c *CoinDescriptionClient) UpdateOneID(id int) *CoinDescriptionUpdateOne {
 	mutation := newCoinDescriptionMutation(c.config, OpUpdateOne, withCoinDescriptionID(id))
 	return &CoinDescriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -573,7 +572,7 @@ func (c *CoinDescriptionClient) DeleteOne(cd *CoinDescription) *CoinDescriptionD
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CoinDescriptionClient) DeleteOneID(id uuid.UUID) *CoinDescriptionDeleteOne {
+func (c *CoinDescriptionClient) DeleteOneID(id int) *CoinDescriptionDeleteOne {
 	builder := c.Delete().Where(coindescription.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -588,12 +587,12 @@ func (c *CoinDescriptionClient) Query() *CoinDescriptionQuery {
 }
 
 // Get returns a CoinDescription entity by its id.
-func (c *CoinDescriptionClient) Get(ctx context.Context, id uuid.UUID) (*CoinDescription, error) {
+func (c *CoinDescriptionClient) Get(ctx context.Context, id int) (*CoinDescription, error) {
 	return c.Query().Where(coindescription.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CoinDescriptionClient) GetX(ctx context.Context, id uuid.UUID) *CoinDescription {
+func (c *CoinDescriptionClient) GetX(ctx context.Context, id int) *CoinDescription {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1284,7 +1283,7 @@ func (c *ExchangeRateClient) UpdateOne(er *ExchangeRate) *ExchangeRateUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ExchangeRateClient) UpdateOneID(id uuid.UUID) *ExchangeRateUpdateOne {
+func (c *ExchangeRateClient) UpdateOneID(id int) *ExchangeRateUpdateOne {
 	mutation := newExchangeRateMutation(c.config, OpUpdateOne, withExchangeRateID(id))
 	return &ExchangeRateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1301,7 +1300,7 @@ func (c *ExchangeRateClient) DeleteOne(er *ExchangeRate) *ExchangeRateDeleteOne 
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *ExchangeRateClient) DeleteOneID(id uuid.UUID) *ExchangeRateDeleteOne {
+func (c *ExchangeRateClient) DeleteOneID(id int) *ExchangeRateDeleteOne {
 	builder := c.Delete().Where(exchangerate.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1316,12 +1315,12 @@ func (c *ExchangeRateClient) Query() *ExchangeRateQuery {
 }
 
 // Get returns a ExchangeRate entity by its id.
-func (c *ExchangeRateClient) Get(ctx context.Context, id uuid.UUID) (*ExchangeRate, error) {
+func (c *ExchangeRateClient) Get(ctx context.Context, id int) (*ExchangeRate, error) {
 	return c.Query().Where(exchangerate.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ExchangeRateClient) GetX(ctx context.Context, id uuid.UUID) *ExchangeRate {
+func (c *ExchangeRateClient) GetX(ctx context.Context, id int) *ExchangeRate {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

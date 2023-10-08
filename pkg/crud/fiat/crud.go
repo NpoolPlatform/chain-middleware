@@ -11,15 +11,15 @@ import (
 )
 
 type Req struct {
-	ID   *uuid.UUID
-	Name *string
-	Logo *string
-	Unit *string
+	EntID *uuid.UUID
+	Name  *string
+	Logo  *string
+	Unit  *string
 }
 
 func CreateSet(c *ent.FiatCreate, req *Req) *ent.FiatCreate {
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.Name != nil {
 		c.SetName(*req.Name)
@@ -47,33 +47,33 @@ func UpdateSet(u *ent.FiatUpdateOne, req *Req) *ent.FiatUpdateOne {
 }
 
 type Conds struct {
-	ID   *cruder.Cond
-	IDs  *cruder.Cond
-	Name *cruder.Cond
-	Unit *cruder.Cond
+	EntID  *cruder.Cond
+	EntIDs *cruder.Cond
+	Name   *cruder.Cond
+	Unit   *cruder.Cond
 }
 
 func SetQueryConds(q *ent.FiatQuery, conds *Conds) (*ent.FiatQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entfiat.ID(id))
+			q.Where(entfiat.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid fiat field")
 		}
 	}
-	if conds.IDs != nil {
-		ids, ok := conds.IDs.Val.([]uuid.UUID)
+	if conds.EntIDs != nil {
+		ids, ok := conds.EntIDs.Val.([]uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid ids")
+			return nil, fmt.Errorf("invalid entids")
 		}
-		switch conds.IDs.Op {
+		switch conds.EntIDs.Op {
 		case cruder.IN:
-			q.Where(entfiat.IDIn(ids...))
+			q.Where(entfiat.EntIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid fiat field")
 		}

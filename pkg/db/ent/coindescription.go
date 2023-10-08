@@ -15,7 +15,7 @@ import (
 type CoinDescription struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID int `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt uint32 `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -41,11 +41,11 @@ func (*CoinDescription) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case coindescription.FieldCreatedAt, coindescription.FieldUpdatedAt, coindescription.FieldDeletedAt:
+		case coindescription.FieldID, coindescription.FieldCreatedAt, coindescription.FieldUpdatedAt, coindescription.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
 		case coindescription.FieldUsedFor, coindescription.FieldTitle, coindescription.FieldMessage:
 			values[i] = new(sql.NullString)
-		case coindescription.FieldID, coindescription.FieldEntID, coindescription.FieldAppID, coindescription.FieldCoinTypeID:
+		case coindescription.FieldEntID, coindescription.FieldAppID, coindescription.FieldCoinTypeID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CoinDescription", columns[i])
@@ -63,11 +63,11 @@ func (cd *CoinDescription) assignValues(columns []string, values []interface{}) 
 	for i := range columns {
 		switch columns[i] {
 		case coindescription.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				cd.ID = *value
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			cd.ID = int(value.Int64)
 		case coindescription.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
