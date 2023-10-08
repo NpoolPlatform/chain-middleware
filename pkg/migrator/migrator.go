@@ -147,6 +147,13 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		}
 	}
 	if rc != 0 {
+		_, err = tx.ExecContext(
+			ctx,
+			fmt.Sprintf("alter table %v.%v change column ent_id ent_id char(36) unique", dbName, table),
+		)
+		if err != nil {
+			return err
+		}
 		rows, err := tx.QueryContext(
 			ctx,
 			fmt.Sprintf("select id from %v.%v where ent_id=''", dbName, table),
@@ -176,7 +183,7 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 	)
 	_, err = tx.ExecContext(
 		ctx,
-		fmt.Sprintf("alter table %v.%v change column id ent_id char(36)", dbName, table),
+		fmt.Sprintf("alter table %v.%v change column id ent_id char(36) unique", dbName, table),
 	)
 	if err != nil {
 		return err
