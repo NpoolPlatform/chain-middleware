@@ -47,7 +47,7 @@ func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) {
 
 func (h *queryHandler) queryCoinBase(ctx context.Context, cli *ent.Client) error {
 	_stm1, err := currencycrud.SetQueryConds(cli.Currency.Query(), &currencycrud.Conds{
-		ID: &cruder.Cond{Op: cruder.EQ, Val: *h.ID},
+		EntID: &cruder.Cond{Op: cruder.EQ, Val: *h.EntID},
 	})
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (h *queryHandler) queryCoinBase(ctx context.Context, cli *ent.Client) error
 	}
 
 	_stm2, err := coincrud.SetQueryConds(cli.CoinBase.Query(), &coincrud.Conds{
-		ID: &cruder.Cond{Op: cruder.EQ, Val: _info1.CoinTypeID},
+		EntID: &cruder.Cond{Op: cruder.EQ, Val: _info1.CoinTypeID},
 	})
 	if err != nil {
 		return err
@@ -70,8 +70,8 @@ func (h *queryHandler) queryCoinBase(ctx context.Context, cli *ent.Client) error
 
 func (h *queryHandler) queryCoinBases(ctx context.Context, cli *ent.Client) error {
 	stm, err := coincrud.SetQueryConds(cli.CoinBase.Query(), &coincrud.Conds{
-		ID:  h.Conds.CoinTypeID,
-		IDs: h.Conds.CoinTypeIDs,
+		EntID:  h.Conds.CoinTypeID,
+		EntIDs: h.Conds.CoinTypeIDs,
 	})
 	if err != nil {
 		return err
@@ -147,8 +147,8 @@ func (h *queryHandler) formalize() {
 		if _, err := decimal.NewFromString(info.MarketValueLow); err != nil {
 			info.MarketValueLow = decimal.NewFromInt(0).String()
 		}
-		if _, err := uuid.Parse(info.ID); err != nil {
-			info.ID = info.CoinTypeID
+		if _, err := uuid.Parse(info.EntID); err != nil {
+			info.EntID = info.CoinTypeID
 		}
 	}
 }
