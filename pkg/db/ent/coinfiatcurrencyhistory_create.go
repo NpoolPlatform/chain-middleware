@@ -150,8 +150,8 @@ func (cfchc *CoinFiatCurrencyHistoryCreate) SetNillableMarketValueHigh(d *decima
 }
 
 // SetID sets the "id" field.
-func (cfchc *CoinFiatCurrencyHistoryCreate) SetID(i int) *CoinFiatCurrencyHistoryCreate {
-	cfchc.mutation.SetID(i)
+func (cfchc *CoinFiatCurrencyHistoryCreate) SetID(u uint32) *CoinFiatCurrencyHistoryCreate {
+	cfchc.mutation.SetID(u)
 	return cfchc
 }
 
@@ -318,7 +318,7 @@ func (cfchc *CoinFiatCurrencyHistoryCreate) sqlSave(ctx context.Context) (*CoinF
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -329,7 +329,7 @@ func (cfchc *CoinFiatCurrencyHistoryCreate) createSpec() (*CoinFiatCurrencyHisto
 		_spec = &sqlgraph.CreateSpec{
 			Table: coinfiatcurrencyhistory.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiatcurrencyhistory.FieldID,
 			},
 		}
@@ -869,7 +869,7 @@ func (u *CoinFiatCurrencyHistoryUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CoinFiatCurrencyHistoryUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *CoinFiatCurrencyHistoryUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -878,7 +878,7 @@ func (u *CoinFiatCurrencyHistoryUpsertOne) ID(ctx context.Context) (id int, err 
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CoinFiatCurrencyHistoryUpsertOne) IDX(ctx context.Context) int {
+func (u *CoinFiatCurrencyHistoryUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -931,7 +931,7 @@ func (cfchcb *CoinFiatCurrencyHistoryCreateBulk) Save(ctx context.Context) ([]*C
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

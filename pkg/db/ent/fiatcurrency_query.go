@@ -86,8 +86,8 @@ func (fcq *FiatCurrencyQuery) FirstX(ctx context.Context) *FiatCurrency {
 
 // FirstID returns the first FiatCurrency ID from the query.
 // Returns a *NotFoundError when no FiatCurrency ID was found.
-func (fcq *FiatCurrencyQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (fcq *FiatCurrencyQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = fcq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (fcq *FiatCurrencyQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (fcq *FiatCurrencyQuery) FirstIDX(ctx context.Context) int {
+func (fcq *FiatCurrencyQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := fcq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -137,8 +137,8 @@ func (fcq *FiatCurrencyQuery) OnlyX(ctx context.Context) *FiatCurrency {
 // OnlyID is like Only, but returns the only FiatCurrency ID in the query.
 // Returns a *NotSingularError when more than one FiatCurrency ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (fcq *FiatCurrencyQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (fcq *FiatCurrencyQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = fcq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -154,7 +154,7 @@ func (fcq *FiatCurrencyQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (fcq *FiatCurrencyQuery) OnlyIDX(ctx context.Context) int {
+func (fcq *FiatCurrencyQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := fcq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,8 +180,8 @@ func (fcq *FiatCurrencyQuery) AllX(ctx context.Context) []*FiatCurrency {
 }
 
 // IDs executes the query and returns a list of FiatCurrency IDs.
-func (fcq *FiatCurrencyQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (fcq *FiatCurrencyQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := fcq.Select(fiatcurrency.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (fcq *FiatCurrencyQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (fcq *FiatCurrencyQuery) IDsX(ctx context.Context) []int {
+func (fcq *FiatCurrencyQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := fcq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -376,7 +376,7 @@ func (fcq *FiatCurrencyQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   fiatcurrency.Table,
 			Columns: fiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrency.FieldID,
 			},
 		},

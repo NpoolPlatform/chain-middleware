@@ -12,7 +12,7 @@ import (
 )
 
 type Req struct {
-	ID            *int
+	ID            *uint32
 	EntID         *uuid.UUID
 	AppID         *uuid.UUID
 	CoinTypeID    *uuid.UUID

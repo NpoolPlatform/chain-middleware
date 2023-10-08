@@ -170,8 +170,8 @@ func (erc *ExchangeRateCreate) SetNillableSetter(u *uuid.UUID) *ExchangeRateCrea
 }
 
 // SetID sets the "id" field.
-func (erc *ExchangeRateCreate) SetID(i int) *ExchangeRateCreate {
-	erc.mutation.SetID(i)
+func (erc *ExchangeRateCreate) SetID(u uint32) *ExchangeRateCreate {
+	erc.mutation.SetID(u)
 	return erc
 }
 
@@ -349,7 +349,7 @@ func (erc *ExchangeRateCreate) sqlSave(ctx context.Context) (*ExchangeRate, erro
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -360,7 +360,7 @@ func (erc *ExchangeRateCreate) createSpec() (*ExchangeRate, *sqlgraph.CreateSpec
 		_spec = &sqlgraph.CreateSpec{
 			Table: exchangerate.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		}
@@ -1007,7 +1007,7 @@ func (u *ExchangeRateUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -1016,7 +1016,7 @@ func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *ExchangeRateUpsertOne) IDX(ctx context.Context) int {
+func (u *ExchangeRateUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1069,7 +1069,7 @@ func (ercb *ExchangeRateCreateBulk) Save(ctx context.Context) ([]*ExchangeRate, 
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

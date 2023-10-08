@@ -12,7 +12,7 @@ import (
 )
 
 type Req struct {
-	ID                       *int
+	ID                       *uint32
 	EntID                    *uuid.UUID
 	AppID                    *uuid.UUID
 	CoinTypeID               *uuid.UUID
@@ -134,7 +134,7 @@ type Conds struct {
 //nolint
 func SetQueryConds(q *ent.AppCoinQuery, conds *Conds) (*ent.AppCoinQuery, error) {
 	if conds.ID != nil {
-		id, ok := conds.ID.Val.(int)
+		id, ok := conds.ID.Val.(uint32)
 		if !ok {
 			return nil, fmt.Errorf("invalid id")
 		}

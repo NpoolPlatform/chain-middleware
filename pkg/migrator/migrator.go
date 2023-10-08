@@ -256,10 +256,10 @@ func Migrate(ctx context.Context) error {
 	var conn *sql.DB
 	var tx *sql.Tx
 
-	logger.Sugar().Infow("Migrate order", "Start", "...")
+	logger.Sugar().Infow("Migrate", "Start", "...")
 	defer func(err *error) {
 		_ = redis2.Unlock(lockKey())
-		logger.Sugar().Infow("Migrate order", "Done", "...", "error", *err)
+		logger.Sugar().Infow("Migrate", "Done", "...", "error", *err)
 	}(&err)
 
 	err = redis2.TryLock(lockKey(), 0)
@@ -271,7 +271,11 @@ func Migrate(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			logger.Sugar().Errorw("Close", "Error", err)
+		}
+	}()
 
 	tx, err = conn.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
 	if err != nil {

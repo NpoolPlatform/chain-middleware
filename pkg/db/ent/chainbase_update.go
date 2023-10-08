@@ -371,7 +371,7 @@ func (cbu *ChainBaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   chainbase.Table,
 			Columns: chainbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: chainbase.FieldID,
 			},
 		},
@@ -932,7 +932,7 @@ func (cbuo *ChainBaseUpdateOne) sqlSave(ctx context.Context) (_node *ChainBase, 
 			Table:   chainbase.Table,
 			Columns: chainbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: chainbase.FieldID,
 			},
 		},

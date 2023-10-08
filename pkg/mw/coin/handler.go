@@ -15,7 +15,7 @@ import (
 )
 
 type Handler struct {
-	ID                          *int
+	ID                          *uint32
 	EntID                       *uuid.UUID
 	Name                        *string
 	Logo                        *string
@@ -72,7 +72,7 @@ func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		_u := int(*u)
+		_u := uint32(*u)
 		h.ID = &_u
 		return nil
 	}

@@ -135,8 +135,8 @@ func (cec *CoinExtraCreate) SetNillableStableUsd(b *bool) *CoinExtraCreate {
 }
 
 // SetID sets the "id" field.
-func (cec *CoinExtraCreate) SetID(i int) *CoinExtraCreate {
-	cec.mutation.SetID(i)
+func (cec *CoinExtraCreate) SetID(u uint32) *CoinExtraCreate {
+	cec.mutation.SetID(u)
 	return cec
 }
 
@@ -296,7 +296,7 @@ func (cec *CoinExtraCreate) sqlSave(ctx context.Context) (*CoinExtra, error) {
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -307,7 +307,7 @@ func (cec *CoinExtraCreate) createSpec() (*CoinExtra, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: coinextra.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinextra.FieldID,
 			},
 		}
@@ -800,7 +800,7 @@ func (u *CoinExtraUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CoinExtraUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *CoinExtraUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -809,7 +809,7 @@ func (u *CoinExtraUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CoinExtraUpsertOne) IDX(ctx context.Context) int {
+func (u *CoinExtraUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -862,7 +862,7 @@ func (cecb *CoinExtraCreateBulk) Save(ctx context.Context) ([]*CoinExtra, error)
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

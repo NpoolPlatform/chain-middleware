@@ -265,7 +265,7 @@ func (fchu *FiatCurrencyHistoryUpdate) sqlSave(ctx context.Context) (n int, err 
 			Table:   fiatcurrencyhistory.Table,
 			Columns: fiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrencyhistory.FieldID,
 			},
 		},
@@ -647,7 +647,7 @@ func (fchuo *FiatCurrencyHistoryUpdateOne) sqlSave(ctx context.Context) (_node *
 			Table:   fiatcurrencyhistory.Table,
 			Columns: fiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrencyhistory.FieldID,
 			},
 		},

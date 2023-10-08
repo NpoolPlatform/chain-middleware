@@ -136,8 +136,8 @@ func (chc *CurrencyHistoryCreate) SetNillableMarketValueLow(d *decimal.Decimal) 
 }
 
 // SetID sets the "id" field.
-func (chc *CurrencyHistoryCreate) SetID(i int) *CurrencyHistoryCreate {
-	chc.mutation.SetID(i)
+func (chc *CurrencyHistoryCreate) SetID(u uint32) *CurrencyHistoryCreate {
+	chc.mutation.SetID(u)
 	return chc
 }
 
@@ -297,7 +297,7 @@ func (chc *CurrencyHistoryCreate) sqlSave(ctx context.Context) (*CurrencyHistory
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -308,7 +308,7 @@ func (chc *CurrencyHistoryCreate) createSpec() (*CurrencyHistory, *sqlgraph.Crea
 		_spec = &sqlgraph.CreateSpec{
 			Table: currencyhistory.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currencyhistory.FieldID,
 			},
 		}
@@ -801,7 +801,7 @@ func (u *CurrencyHistoryUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CurrencyHistoryUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *CurrencyHistoryUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -810,7 +810,7 @@ func (u *CurrencyHistoryUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CurrencyHistoryUpsertOne) IDX(ctx context.Context) int {
+func (u *CurrencyHistoryUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -863,7 +863,7 @@ func (chcb *CurrencyHistoryCreateBulk) Save(ctx context.Context) ([]*CurrencyHis
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

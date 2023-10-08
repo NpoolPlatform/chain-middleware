@@ -86,8 +86,8 @@ func (sq *SettingQuery) FirstX(ctx context.Context) *Setting {
 
 // FirstID returns the first Setting ID from the query.
 // Returns a *NotFoundError when no Setting ID was found.
-func (sq *SettingQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *SettingQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = sq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (sq *SettingQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *SettingQuery) FirstIDX(ctx context.Context) int {
+func (sq *SettingQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -137,8 +137,8 @@ func (sq *SettingQuery) OnlyX(ctx context.Context) *Setting {
 // OnlyID is like Only, but returns the only Setting ID in the query.
 // Returns a *NotSingularError when more than one Setting ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *SettingQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (sq *SettingQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = sq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -154,7 +154,7 @@ func (sq *SettingQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *SettingQuery) OnlyIDX(ctx context.Context) int {
+func (sq *SettingQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,8 +180,8 @@ func (sq *SettingQuery) AllX(ctx context.Context) []*Setting {
 }
 
 // IDs executes the query and returns a list of Setting IDs.
-func (sq *SettingQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (sq *SettingQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := sq.Select(setting.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (sq *SettingQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *SettingQuery) IDsX(ctx context.Context) []int {
+func (sq *SettingQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -376,7 +376,7 @@ func (sq *SettingQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   setting.Table,
 			Columns: setting.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: setting.FieldID,
 			},
 		},

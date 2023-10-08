@@ -285,7 +285,7 @@ func (cfchu *CoinFiatCurrencyHistoryUpdate) sqlSave(ctx context.Context) (n int,
 			Table:   coinfiatcurrencyhistory.Table,
 			Columns: coinfiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiatcurrencyhistory.FieldID,
 			},
 		},
@@ -700,7 +700,7 @@ func (cfchuo *CoinFiatCurrencyHistoryUpdateOne) sqlSave(ctx context.Context) (_n
 			Table:   coinfiatcurrencyhistory.Table,
 			Columns: coinfiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiatcurrencyhistory.FieldID,
 			},
 		},

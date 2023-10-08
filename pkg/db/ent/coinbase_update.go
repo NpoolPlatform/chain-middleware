@@ -345,7 +345,7 @@ func (cbu *CoinBaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coinbase.Table,
 			Columns: coinbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinbase.FieldID,
 			},
 		},
@@ -859,7 +859,7 @@ func (cbuo *CoinBaseUpdateOne) sqlSave(ctx context.Context) (_node *CoinBase, er
 			Table:   coinbase.Table,
 			Columns: coinbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinbase.FieldID,
 			},
 		},

@@ -365,7 +365,7 @@ func (tu *TranUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   tran.Table,
 			Columns: tran.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: tran.FieldID,
 			},
 		},
@@ -912,7 +912,7 @@ func (tuo *TranUpdateOne) sqlSave(ctx context.Context) (_node *Tran, err error) 
 			Table:   tran.Table,
 			Columns: tran.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: tran.FieldID,
 			},
 		},

@@ -264,7 +264,7 @@ func (ceu *CoinExtraUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coinextra.Table,
 			Columns: coinextra.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinextra.FieldID,
 			},
 		},
@@ -646,7 +646,7 @@ func (ceuo *CoinExtraUpdateOne) sqlSave(ctx context.Context) (_node *CoinExtra, 
 			Table:   coinextra.Table,
 			Columns: coinextra.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinextra.FieldID,
 			},
 		},

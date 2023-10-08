@@ -324,7 +324,7 @@ func (eru *ExchangeRateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   exchangerate.Table,
 			Columns: exchangerate.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		},
@@ -811,7 +811,7 @@ func (eruo *ExchangeRateUpdateOne) sqlSave(ctx context.Context) (_node *Exchange
 			Table:   exchangerate.Table,
 			Columns: exchangerate.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		},

@@ -264,7 +264,7 @@ func (cfu *CurrencyFeedUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   currencyfeed.Table,
 			Columns: currencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currencyfeed.FieldID,
 			},
 		},
@@ -646,7 +646,7 @@ func (cfuo *CurrencyFeedUpdateOne) sqlSave(ctx context.Context) (_node *Currency
 			Table:   currencyfeed.Table,
 			Columns: currencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currencyfeed.FieldID,
 			},
 		},

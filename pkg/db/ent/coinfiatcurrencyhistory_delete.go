@@ -72,7 +72,7 @@ func (cfchd *CoinFiatCurrencyHistoryDelete) sqlExec(ctx context.Context) (int, e
 		Node: &sqlgraph.NodeSpec{
 			Table: coinfiatcurrencyhistory.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiatcurrencyhistory.FieldID,
 			},
 		},

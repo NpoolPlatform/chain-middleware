@@ -284,7 +284,7 @@ func (cdu *CoinDescriptionUpdate) sqlSave(ctx context.Context) (n int, err error
 			Table:   coindescription.Table,
 			Columns: coindescription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coindescription.FieldID,
 			},
 		},
@@ -699,7 +699,7 @@ func (cduo *CoinDescriptionUpdateOne) sqlSave(ctx context.Context) (_node *CoinD
 			Table:   coindescription.Table,
 			Columns: coindescription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coindescription.FieldID,
 			},
 		},

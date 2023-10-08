@@ -276,8 +276,8 @@ func (sc *SettingCreate) SetNillableCheckNewAddressBalance(b *bool) *SettingCrea
 }
 
 // SetID sets the "id" field.
-func (sc *SettingCreate) SetID(i int) *SettingCreate {
-	sc.mutation.SetID(i)
+func (sc *SettingCreate) SetID(u uint32) *SettingCreate {
+	sc.mutation.SetID(u)
 	return sc
 }
 
@@ -480,7 +480,7 @@ func (sc *SettingCreate) sqlSave(ctx context.Context) (*Setting, error) {
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -491,7 +491,7 @@ func (sc *SettingCreate) createSpec() (*Setting, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: setting.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: setting.FieldID,
 			},
 		}
@@ -1454,7 +1454,7 @@ func (u *SettingUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *SettingUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *SettingUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -1463,7 +1463,7 @@ func (u *SettingUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *SettingUpsertOne) IDX(ctx context.Context) int {
+func (u *SettingUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1516,7 +1516,7 @@ func (scb *SettingCreateBulk) Save(ctx context.Context) ([]*Setting, error) {
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

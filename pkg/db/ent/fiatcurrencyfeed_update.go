@@ -264,7 +264,7 @@ func (fcfu *FiatCurrencyFeedUpdate) sqlSave(ctx context.Context) (n int, err err
 			Table:   fiatcurrencyfeed.Table,
 			Columns: fiatcurrencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrencyfeed.FieldID,
 			},
 		},
@@ -646,7 +646,7 @@ func (fcfuo *FiatCurrencyFeedUpdateOne) sqlSave(ctx context.Context) (_node *Fia
 			Table:   fiatcurrencyfeed.Table,
 			Columns: fiatcurrencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrencyfeed.FieldID,
 			},
 		},

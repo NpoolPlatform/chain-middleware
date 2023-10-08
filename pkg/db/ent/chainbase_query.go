@@ -86,8 +86,8 @@ func (cbq *ChainBaseQuery) FirstX(ctx context.Context) *ChainBase {
 
 // FirstID returns the first ChainBase ID from the query.
 // Returns a *NotFoundError when no ChainBase ID was found.
-func (cbq *ChainBaseQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cbq *ChainBaseQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cbq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (cbq *ChainBaseQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cbq *ChainBaseQuery) FirstIDX(ctx context.Context) int {
+func (cbq *ChainBaseQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := cbq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -137,8 +137,8 @@ func (cbq *ChainBaseQuery) OnlyX(ctx context.Context) *ChainBase {
 // OnlyID is like Only, but returns the only ChainBase ID in the query.
 // Returns a *NotSingularError when more than one ChainBase ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cbq *ChainBaseQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cbq *ChainBaseQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cbq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -154,7 +154,7 @@ func (cbq *ChainBaseQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cbq *ChainBaseQuery) OnlyIDX(ctx context.Context) int {
+func (cbq *ChainBaseQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := cbq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,8 +180,8 @@ func (cbq *ChainBaseQuery) AllX(ctx context.Context) []*ChainBase {
 }
 
 // IDs executes the query and returns a list of ChainBase IDs.
-func (cbq *ChainBaseQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (cbq *ChainBaseQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := cbq.Select(chainbase.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (cbq *ChainBaseQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cbq *ChainBaseQuery) IDsX(ctx context.Context) []int {
+func (cbq *ChainBaseQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := cbq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -376,7 +376,7 @@ func (cbq *ChainBaseQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   chainbase.Table,
 			Columns: chainbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: chainbase.FieldID,
 			},
 		},

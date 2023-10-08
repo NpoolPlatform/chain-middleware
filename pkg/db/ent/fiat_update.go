@@ -244,7 +244,7 @@ func (fu *FiatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   fiat.Table,
 			Columns: fiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiat.FieldID,
 			},
 		},
@@ -593,7 +593,7 @@ func (fuo *FiatUpdateOne) sqlSave(ctx context.Context) (_node *Fiat, err error) 
 			Table:   fiat.Table,
 			Columns: fiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiat.FieldID,
 			},
 		},

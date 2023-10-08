@@ -36,7 +36,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   appcoin.Table,
 			Columns: appcoin.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: appcoin.FieldID,
 			},
 		},
@@ -66,7 +66,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   chainbase.Table,
 			Columns: chainbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: chainbase.FieldID,
 			},
 		},
@@ -92,7 +92,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinbase.Table,
 			Columns: coinbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinbase.FieldID,
 			},
 		},
@@ -117,7 +117,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coindescription.Table,
 			Columns: coindescription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coindescription.FieldID,
 			},
 		},
@@ -139,7 +139,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinextra.Table,
 			Columns: coinextra.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinextra.FieldID,
 			},
 		},
@@ -160,7 +160,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinfiat.Table,
 			Columns: coinfiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiat.FieldID,
 			},
 		},
@@ -180,7 +180,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinfiatcurrency.Table,
 			Columns: coinfiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiatcurrency.FieldID,
 			},
 		},
@@ -202,7 +202,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   coinfiatcurrencyhistory.Table,
 			Columns: coinfiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiatcurrencyhistory.FieldID,
 			},
 		},
@@ -224,7 +224,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   currency.Table,
 			Columns: currency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currency.FieldID,
 			},
 		},
@@ -245,7 +245,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   currencyfeed.Table,
 			Columns: currencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currencyfeed.FieldID,
 			},
 		},
@@ -266,7 +266,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   currencyhistory.Table,
 			Columns: currencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currencyhistory.FieldID,
 			},
 		},
@@ -287,7 +287,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   exchangerate.Table,
 			Columns: exchangerate.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		},
@@ -311,7 +311,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiat.Table,
 			Columns: fiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiat.FieldID,
 			},
 		},
@@ -331,7 +331,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiatcurrency.Table,
 			Columns: fiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrency.FieldID,
 			},
 		},
@@ -352,7 +352,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiatcurrencyfeed.Table,
 			Columns: fiatcurrencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrencyfeed.FieldID,
 			},
 		},
@@ -373,7 +373,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   fiatcurrencyhistory.Table,
 			Columns: fiatcurrencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: fiatcurrencyhistory.FieldID,
 			},
 		},
@@ -394,7 +394,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   setting.Table,
 			Columns: setting.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: setting.FieldID,
 			},
 		},
@@ -425,7 +425,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   tran.Table,
 			Columns: tran.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: tran.FieldID,
 			},
 		},
@@ -490,8 +490,8 @@ func (f *AppCoinFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *AppCoinFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *AppCoinFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(appcoin.FieldID))
 }
 
@@ -615,8 +615,8 @@ func (f *ChainBaseFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *ChainBaseFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *ChainBaseFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(chainbase.FieldID))
 }
 
@@ -720,8 +720,8 @@ func (f *CoinBaseFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CoinBaseFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CoinBaseFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(coinbase.FieldID))
 }
 
@@ -820,8 +820,8 @@ func (f *CoinDescriptionFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CoinDescriptionFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CoinDescriptionFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(coindescription.FieldID))
 }
 
@@ -905,8 +905,8 @@ func (f *CoinExtraFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CoinExtraFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CoinExtraFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(coinextra.FieldID))
 }
 
@@ -985,8 +985,8 @@ func (f *CoinFiatFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CoinFiatFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CoinFiatFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(coinfiat.FieldID))
 }
 
@@ -1060,8 +1060,8 @@ func (f *CoinFiatCurrencyFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CoinFiatCurrencyFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CoinFiatCurrencyFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(coinfiatcurrency.FieldID))
 }
 
@@ -1145,8 +1145,8 @@ func (f *CoinFiatCurrencyHistoryFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CoinFiatCurrencyHistoryFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CoinFiatCurrencyHistoryFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(coinfiatcurrencyhistory.FieldID))
 }
 
@@ -1230,8 +1230,8 @@ func (f *CurrencyFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CurrencyFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CurrencyFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(currency.FieldID))
 }
 
@@ -1310,8 +1310,8 @@ func (f *CurrencyFeedFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CurrencyFeedFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CurrencyFeedFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(currencyfeed.FieldID))
 }
 
@@ -1390,8 +1390,8 @@ func (f *CurrencyHistoryFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *CurrencyHistoryFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *CurrencyHistoryFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(currencyhistory.FieldID))
 }
 
@@ -1470,8 +1470,8 @@ func (f *ExchangeRateFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *ExchangeRateFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *ExchangeRateFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(exchangerate.FieldID))
 }
 
@@ -1565,8 +1565,8 @@ func (f *FiatFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *FiatFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *FiatFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(fiat.FieldID))
 }
 
@@ -1640,8 +1640,8 @@ func (f *FiatCurrencyFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *FiatCurrencyFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *FiatCurrencyFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(fiatcurrency.FieldID))
 }
 
@@ -1720,8 +1720,8 @@ func (f *FiatCurrencyFeedFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *FiatCurrencyFeedFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *FiatCurrencyFeedFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(fiatcurrencyfeed.FieldID))
 }
 
@@ -1800,8 +1800,8 @@ func (f *FiatCurrencyHistoryFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *FiatCurrencyHistoryFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *FiatCurrencyHistoryFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(fiatcurrencyhistory.FieldID))
 }
 
@@ -1880,8 +1880,8 @@ func (f *SettingFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *SettingFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *SettingFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(setting.FieldID))
 }
 
@@ -2010,8 +2010,8 @@ func (f *TranFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql int predicate on the id field.
-func (f *TranFilter) WhereID(p entql.IntP) {
+// WhereID applies the entql uint32 predicate on the id field.
+func (f *TranFilter) WhereID(p entql.Uint32P) {
 	f.Where(p.Field(tran.FieldID))
 }
 

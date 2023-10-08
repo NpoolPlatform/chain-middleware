@@ -86,8 +86,8 @@ func (ceq *CoinExtraQuery) FirstX(ctx context.Context) *CoinExtra {
 
 // FirstID returns the first CoinExtra ID from the query.
 // Returns a *NotFoundError when no CoinExtra ID was found.
-func (ceq *CoinExtraQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (ceq *CoinExtraQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = ceq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (ceq *CoinExtraQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (ceq *CoinExtraQuery) FirstIDX(ctx context.Context) int {
+func (ceq *CoinExtraQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := ceq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -137,8 +137,8 @@ func (ceq *CoinExtraQuery) OnlyX(ctx context.Context) *CoinExtra {
 // OnlyID is like Only, but returns the only CoinExtra ID in the query.
 // Returns a *NotSingularError when more than one CoinExtra ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (ceq *CoinExtraQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (ceq *CoinExtraQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = ceq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -154,7 +154,7 @@ func (ceq *CoinExtraQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (ceq *CoinExtraQuery) OnlyIDX(ctx context.Context) int {
+func (ceq *CoinExtraQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := ceq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,8 +180,8 @@ func (ceq *CoinExtraQuery) AllX(ctx context.Context) []*CoinExtra {
 }
 
 // IDs executes the query and returns a list of CoinExtra IDs.
-func (ceq *CoinExtraQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (ceq *CoinExtraQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := ceq.Select(coinextra.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (ceq *CoinExtraQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (ceq *CoinExtraQuery) IDsX(ctx context.Context) []int {
+func (ceq *CoinExtraQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := ceq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -376,7 +376,7 @@ func (ceq *CoinExtraQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   coinextra.Table,
 			Columns: coinextra.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinextra.FieldID,
 			},
 		},

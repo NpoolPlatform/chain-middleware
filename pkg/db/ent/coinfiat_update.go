@@ -244,7 +244,7 @@ func (cfu *CoinFiatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coinfiat.Table,
 			Columns: coinfiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiat.FieldID,
 			},
 		},
@@ -593,7 +593,7 @@ func (cfuo *CoinFiatUpdateOne) sqlSave(ctx context.Context) (_node *CoinFiat, er
 			Table:   coinfiat.Table,
 			Columns: coinfiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiat.FieldID,
 			},
 		},

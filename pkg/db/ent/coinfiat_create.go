@@ -121,8 +121,8 @@ func (cfc *CoinFiatCreate) SetNillableFeedType(s *string) *CoinFiatCreate {
 }
 
 // SetID sets the "id" field.
-func (cfc *CoinFiatCreate) SetID(i int) *CoinFiatCreate {
-	cfc.mutation.SetID(i)
+func (cfc *CoinFiatCreate) SetID(u uint32) *CoinFiatCreate {
+	cfc.mutation.SetID(u)
 	return cfc
 }
 
@@ -281,7 +281,7 @@ func (cfc *CoinFiatCreate) sqlSave(ctx context.Context) (*CoinFiat, error) {
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -292,7 +292,7 @@ func (cfc *CoinFiatCreate) createSpec() (*CoinFiat, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: coinfiat.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: coinfiat.FieldID,
 			},
 		}
@@ -738,7 +738,7 @@ func (u *CoinFiatUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CoinFiatUpsertOne) ID(ctx context.Context) (id int, err error) {
+func (u *CoinFiatUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -747,7 +747,7 @@ func (u *CoinFiatUpsertOne) ID(ctx context.Context) (id int, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CoinFiatUpsertOne) IDX(ctx context.Context) int {
+func (u *CoinFiatUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -800,7 +800,7 @@ func (cfcb *CoinFiatCreateBulk) Save(ctx context.Context) ([]*CoinFiat, error) {
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = uint32(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

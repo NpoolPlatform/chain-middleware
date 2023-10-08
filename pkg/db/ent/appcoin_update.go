@@ -444,7 +444,7 @@ func (acu *AppCoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   appcoin.Table,
 			Columns: appcoin.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: appcoin.FieldID,
 			},
 		},
@@ -1129,7 +1129,7 @@ func (acuo *AppCoinUpdateOne) sqlSave(ctx context.Context) (_node *AppCoin, err 
 			Table:   appcoin.Table,
 			Columns: appcoin.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: appcoin.FieldID,
 			},
 		},

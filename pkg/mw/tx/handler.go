@@ -15,7 +15,7 @@ import (
 )
 
 type Handler struct {
-	ID            *int
+	ID            *uint32
 	EntID         *uuid.UUID
 	CoinTypeID    *uuid.UUID
 	FromAccountID *uuid.UUID
@@ -50,8 +50,7 @@ func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		_u := int(*u)
-		h.ID = &_u
+		h.ID = u
 		return nil
 	}
 }

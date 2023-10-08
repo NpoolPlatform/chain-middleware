@@ -265,7 +265,7 @@ func (chu *CurrencyHistoryUpdate) sqlSave(ctx context.Context) (n int, err error
 			Table:   currencyhistory.Table,
 			Columns: currencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currencyhistory.FieldID,
 			},
 		},
@@ -647,7 +647,7 @@ func (chuo *CurrencyHistoryUpdateOne) sqlSave(ctx context.Context) (_node *Curre
 			Table:   currencyhistory.Table,
 			Columns: currencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: currencyhistory.FieldID,
 			},
 		},

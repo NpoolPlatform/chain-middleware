@@ -86,8 +86,8 @@ func (acq *AppCoinQuery) FirstX(ctx context.Context) *AppCoin {
 
 // FirstID returns the first AppCoin ID from the query.
 // Returns a *NotFoundError when no AppCoin ID was found.
-func (acq *AppCoinQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (acq *AppCoinQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = acq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (acq *AppCoinQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (acq *AppCoinQuery) FirstIDX(ctx context.Context) int {
+func (acq *AppCoinQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := acq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -137,8 +137,8 @@ func (acq *AppCoinQuery) OnlyX(ctx context.Context) *AppCoin {
 // OnlyID is like Only, but returns the only AppCoin ID in the query.
 // Returns a *NotSingularError when more than one AppCoin ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (acq *AppCoinQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (acq *AppCoinQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = acq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -154,7 +154,7 @@ func (acq *AppCoinQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (acq *AppCoinQuery) OnlyIDX(ctx context.Context) int {
+func (acq *AppCoinQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := acq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,8 +180,8 @@ func (acq *AppCoinQuery) AllX(ctx context.Context) []*AppCoin {
 }
 
 // IDs executes the query and returns a list of AppCoin IDs.
-func (acq *AppCoinQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (acq *AppCoinQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := acq.Select(appcoin.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (acq *AppCoinQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (acq *AppCoinQuery) IDsX(ctx context.Context) []int {
+func (acq *AppCoinQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := acq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -376,7 +376,7 @@ func (acq *AppCoinQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   appcoin.Table,
 			Columns: appcoin.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUint32,
 				Column: appcoin.FieldID,
 			},
 		},
