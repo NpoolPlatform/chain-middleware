@@ -14,6 +14,8 @@ import (
 	constant "github.com/NpoolPlatform/go-service-framework/pkg/mysql/const"
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -130,7 +132,6 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		if err != nil {
 			return err
 		}
-		return nil
 	}
 	rc := 0
 	rows, err = tx.QueryContext(
@@ -146,6 +147,25 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		}
 	}
 	if rc != 0 {
+		rows, err := tx.QueryContext(
+			ctx,
+			fmt.Sprintf("select id from %v.%v where ent_id=''", dbName, table),
+		)
+		if err != nil {
+			return err
+		}
+		for rows.Next() {
+			var id uint32
+			if err := rows.Scan(&id); err != nil {
+				return err
+			}
+			if _, err := tx.ExecContext(
+				ctx,
+				fmt.Sprintf("update %v.%v set ent_id='%v' where id=%v", dbName, table, uuid.New(), id),
+			); err != nil {
+				return err
+			}
+		}
 		return nil
 	}
 	logger.Sugar().Infow(
@@ -217,9 +237,6 @@ func Migrate(ctx context.Context) error {
 	}
 
 	for _, table := range _tables {
-		if table != "app_coins" && table != "coin_fiats" {
-			continue
-		}
 		if err = migrateEntID(ctx, dbname, table, tx); err != nil {
 			_ = tx.Rollback()
 			return err
