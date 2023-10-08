@@ -15,7 +15,8 @@ import (
 )
 
 type Handler struct {
-	ID            *uuid.UUID
+	ID            *int
+	EntID         *uuid.UUID
 	CoinTypeID    *uuid.UUID
 	FromAccountID *uuid.UUID
 	ToAccountID   *uuid.UUID
@@ -41,23 +42,43 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if u == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
+		}
+		_u := int(*u)
+		h.ID = &_u
+		return nil
+	}
+}
+
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
-		h.ID = &_id
+		h.EntID = &_id
 		return nil
 	}
 }
 
-func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
+func WithCoinTypeID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid cointypeid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -69,9 +90,12 @@ func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithFromAccountID(id *string) func(context.Context, *Handler) error {
+func WithFromAccountID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid fromaccountid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -83,9 +107,12 @@ func WithFromAccountID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithToAccountID(id *string) func(context.Context, *Handler) error {
+func WithToAccountID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid toaccountid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -97,9 +124,12 @@ func WithToAccountID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithAmount(amount *string) func(context.Context, *Handler) error {
+func WithAmount(amount *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if amount == nil {
+			if must {
+				return fmt.Errorf("invalid amount")
+			}
 			return nil
 		}
 		_amount, err := decimal.NewFromString(*amount)
@@ -111,9 +141,12 @@ func WithAmount(amount *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithFeeAmount(amount *string) func(context.Context, *Handler) error {
+func WithFeeAmount(amount *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if amount == nil {
+			if must {
+				return fmt.Errorf("invalid feeamount")
+			}
 			return nil
 		}
 		_amount, err := decimal.NewFromString(*amount)
@@ -125,9 +158,12 @@ func WithFeeAmount(amount *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithChainTxID(txID *string) func(context.Context, *Handler) error {
+func WithChainTxID(txID *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if txID == nil {
+			if must {
+				return fmt.Errorf("invalid chaintxid")
+			}
 			return nil
 		}
 		if *txID == "" {
@@ -138,9 +174,12 @@ func WithChainTxID(txID *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithState(state *basetypes.TxState) func(context.Context, *Handler) error {
+func WithState(state *basetypes.TxState, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if state == nil {
+			if must {
+				return fmt.Errorf("invalid state")
+			}
 			return nil
 		}
 		switch *state {
@@ -159,16 +198,19 @@ func WithState(state *basetypes.TxState) func(context.Context, *Handler) error {
 	}
 }
 
-func WithExtra(extra *string) func(context.Context, *Handler) error {
+func WithExtra(extra *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Extra = extra
 		return nil
 	}
 }
 
-func WithType(_type *basetypes.TxType) func(context.Context, *Handler) error {
+func WithType(_type *basetypes.TxType, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if _type == nil {
+			if must {
+				return fmt.Errorf("invalid type")
+			}
 			return nil
 		}
 		switch *_type {
@@ -188,19 +230,19 @@ func WithType(_type *basetypes.TxType) func(context.Context, *Handler) error {
 }
 
 // nolint:gocyclo
-func WithReqs(reqs []*npool.TxReq) func(context.Context, *Handler) error {
+func WithReqs(reqs []*npool.TxReq, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		_reqs := []*txcrud.Req{}
 		for _, req := range reqs {
 			_req := &txcrud.Req{
 				Extra: req.Extra,
 			}
-			if req.ID != nil {
-				id, err := uuid.Parse(req.GetID())
+			if req.EntID != nil {
+				id, err := uuid.Parse(req.GetEntID())
 				if err != nil {
 					return err
 				}
-				_req.ID = &id
+				_req.EntID = &id
 			}
 			if req.CoinTypeID != nil {
 				id, err := uuid.Parse(req.GetCoinTypeID())
@@ -277,27 +319,27 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 		if conds == nil {
 			return nil
 		}
-		if conds.ID != nil {
-			id, err := uuid.Parse(conds.GetID().GetValue())
+		if conds.EntID != nil {
+			id, err := uuid.Parse(conds.GetEntID().GetValue())
 			if err != nil {
 				return err
 			}
-			h.Conds.ID = &cruder.Cond{
-				Op:  conds.GetID().GetOp(),
+			h.Conds.EntID = &cruder.Cond{
+				Op:  conds.GetEntID().GetOp(),
 				Val: id,
 			}
 		}
-		if conds.IDs != nil {
+		if conds.EntIDs != nil {
 			ids := []uuid.UUID{}
-			for _, id := range conds.GetIDs().GetValue() {
+			for _, id := range conds.GetEntIDs().GetValue() {
 				_id, err := uuid.Parse(id)
 				if err != nil {
 					return err
 				}
 				ids = append(ids, _id)
 			}
-			h.Conds.IDs = &cruder.Cond{
-				Op:  conds.GetIDs().GetOp(),
+			h.Conds.EntIDs = &cruder.Cond{
+				Op:  conds.GetEntIDs().GetOp(),
 				Val: ids,
 			}
 		}
