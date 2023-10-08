@@ -12,7 +12,8 @@ import (
 )
 
 type Handler struct {
-	ID     *uuid.UUID
+	ID     *int
+	EntID  *uuid.UUID
 	Name   *string
 	Logo   *string
 	Unit   *string
@@ -31,23 +32,43 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if u == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
+		}
+		_u := int(*u)
+		h.ID = &_u
+		return nil
+	}
+}
+
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
-		h.ID = &_id
+		h.EntID = &_id
 		return nil
 	}
 }
 
-func WithName(name *string) func(context.Context, *Handler) error {
+func WithName(name *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if name == nil {
+			if must {
+				return fmt.Errorf("invalid name")
+			}
 			return nil
 		}
 		if *name == "" {
@@ -58,16 +79,19 @@ func WithName(name *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithLogo(logo *string) func(context.Context, *Handler) error {
+func WithLogo(logo *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Logo = logo
 		return nil
 	}
 }
 
-func WithUnit(unit *string) func(context.Context, *Handler) error {
+func WithUnit(unit *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if unit == nil {
+			if must {
+				return fmt.Errorf("invalid unit")
+			}
 			return nil
 		}
 		if *unit == "" {
@@ -81,13 +105,13 @@ func WithUnit(unit *string) func(context.Context, *Handler) error {
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &fiatcrud.Conds{}
-		if conds.ID != nil {
-			id, err := uuid.Parse(conds.GetID().GetValue())
+		if conds.EntID != nil {
+			id, err := uuid.Parse(conds.GetEntID().GetValue())
 			if err != nil {
 				return err
 			}
-			h.Conds.ID = &cruder.Cond{
-				Op:  conds.GetID().GetOp(),
+			h.Conds.EntID = &cruder.Cond{
+				Op:  conds.GetEntID().GetOp(),
 				Val: id,
 			}
 		}

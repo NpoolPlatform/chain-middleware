@@ -24,10 +24,10 @@ func (h *createHandler) createFiat(ctx context.Context, cli *ent.Client) error {
 	if _, err := fiatcrud.CreateSet(
 		cli.Fiat.Create(),
 		&fiatcrud.Req{
-			ID:   h.ID,
-			Name: h.Name,
-			Logo: h.Logo,
-			Unit: h.Unit,
+			EntID: h.EntID,
+			Name:  h.Name,
+			Logo:  h.Logo,
+			Unit:  h.Unit,
 		},
 	).Save(ctx); err != nil {
 		return err
@@ -70,8 +70,8 @@ func (h *Handler) CreateFiat(ctx context.Context) (*npool.Fiat, error) {
 	}
 
 	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	handler := &createHandler{

@@ -43,7 +43,7 @@ func (h *queryHandler) selectFiat(stm *ent.FiatQuery) {
 
 func (h *queryHandler) queryFiat(ctx context.Context, cli *ent.Client) error {
 	_stm1, err := currencycrud.SetQueryConds(cli.FiatCurrency.Query(), &currencycrud.Conds{
-		ID: &cruder.Cond{Op: cruder.EQ, Val: *h.ID},
+		EntID: &cruder.Cond{Op: cruder.EQ, Val: *h.EntID},
 	})
 	if err != nil {
 		return err
@@ -54,7 +54,7 @@ func (h *queryHandler) queryFiat(ctx context.Context, cli *ent.Client) error {
 	}
 
 	_stm2, err := fiatcrud.SetQueryConds(cli.Fiat.Query(), &fiatcrud.Conds{
-		ID: &cruder.Cond{Op: cruder.EQ, Val: _info1.FiatID},
+		EntID: &cruder.Cond{Op: cruder.EQ, Val: _info1.FiatID},
 	})
 	if err != nil {
 		return err
@@ -66,9 +66,9 @@ func (h *queryHandler) queryFiat(ctx context.Context, cli *ent.Client) error {
 
 func (h *queryHandler) queryFiats(ctx context.Context, cli *ent.Client) error {
 	stm, err := fiatcrud.SetQueryConds(cli.Fiat.Query(), &fiatcrud.Conds{
-		ID:   h.Conds.FiatID,
-		IDs:  h.Conds.FiatIDs,
-		Name: h.Conds.FiatName,
+		EntID:  h.Conds.FiatID,
+		EntIDs: h.Conds.FiatIDs,
+		Name:   h.Conds.FiatName,
 	})
 	if err != nil {
 		return err
