@@ -15,9 +15,9 @@ func (s *Server) UpdateCoinDescription(ctx context.Context, in *npool.UpdateCoin
 	req := in.GetInfo()
 	handler, err := description1.NewHandler(
 		ctx,
-		description1.WithID(req.ID),
-		description1.WithTitle(req.Title),
-		description1.WithMessage(req.Message),
+		description1.WithID(req.ID, true),
+		description1.WithTitle(req.Title, false),
+		description1.WithMessage(req.Message, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

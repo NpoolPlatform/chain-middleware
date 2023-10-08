@@ -127,7 +127,7 @@ func _refreshCoins(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 
 		h2, err := coincurrency1.NewHandler(
 			ctx,
-			coincurrency1.WithReqs(reqs),
+			coincurrency1.WithReqs(reqs, true),
 		)
 		if err != nil {
 			logger.Sugar().Errorw(

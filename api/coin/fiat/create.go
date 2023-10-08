@@ -15,9 +15,9 @@ func (s *Server) CreateCoinFiat(ctx context.Context, in *npool.CreateCoinFiatReq
 	req := in.GetInfo()
 	handler, err := coinfiat1.NewHandler(
 		ctx,
-		coinfiat1.WithCoinTypeID(req.CoinTypeID),
-		coinfiat1.WithFiatID(req.FiatID),
-		coinfiat1.WithFeedType(req.FeedType),
+		coinfiat1.WithCoinTypeID(req.CoinTypeID, true),
+		coinfiat1.WithFiatID(req.FiatID, true),
+		coinfiat1.WithFeedType(req.FeedType, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

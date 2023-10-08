@@ -16,10 +16,10 @@ func (s *Server) UpdateTx(ctx context.Context, in *npool.UpdateTxRequest) (*npoo
 	req := in.GetInfo()
 	handler, err := tx1.NewHandler(
 		ctx,
-		tx1.WithID(req.ID),
-		tx1.WithChainTxID(req.ChainTxID),
-		tx1.WithState(req.State),
-		tx1.WithExtra(req.Extra),
+		tx1.WithID(req.ID, true),
+		tx1.WithChainTxID(req.ChainTxID, false),
+		tx1.WithState(req.State, false),
+		tx1.WithExtra(req.Extra, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

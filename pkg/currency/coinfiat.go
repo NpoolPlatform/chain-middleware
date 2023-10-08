@@ -187,10 +187,10 @@ func _refreshCoinFiats(ctx context.Context, feedType basetypes.CurrencyFeedType)
 					for _, _fiatFeed := range _fiatFeeds {
 						h4, err := coinfiatcurrency1.NewHandler(
 							ctx,
-							coinfiatcurrency1.WithCoinTypeID(&_coinFeed.CoinTypeID),
-							coinfiatcurrency1.WithFiatID(&_fiatFeed.FiatID),
-							coinfiatcurrency1.WithMarketValueHigh(&price),
-							coinfiatcurrency1.WithMarketValueLow(&price),
+							coinfiatcurrency1.WithCoinTypeID(&_coinFeed.CoinTypeID, true),
+							coinfiatcurrency1.WithFiatID(&_fiatFeed.FiatID, true),
+							coinfiatcurrency1.WithMarketValueHigh(&price, true),
+							coinfiatcurrency1.WithMarketValueLow(&price, true),
 						)
 						if err != nil {
 							logger.Sugar().Errorw(

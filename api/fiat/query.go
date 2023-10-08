@@ -14,7 +14,7 @@ import (
 func (s *Server) GetFiat(ctx context.Context, in *npool.GetFiatRequest) (*npool.GetFiatResponse, error) {
 	handler, err := fiat1.NewHandler(
 		ctx,
-		fiat1.WithID(&in.ID),
+		fiat1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

@@ -15,7 +15,7 @@ import (
 func (s *Server) GetCoin(ctx context.Context, in *npool.GetCoinRequest) (*npool.GetCoinResponse, error) {
 	handler, err := appcoin1.NewHandler(
 		ctx,
-		appcoin1.WithID(&in.ID),
+		appcoin1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
