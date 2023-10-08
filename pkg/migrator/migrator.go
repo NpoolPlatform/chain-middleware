@@ -188,6 +188,25 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 	if err != nil {
 		return err
 	}
+	rows, err = tx.QueryContext(
+		ctx,
+		fmt.Sprintf("select id from %v.%v where ent_id=''", dbName, table),
+	)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var id uint32
+		if err := rows.Scan(&id); err != nil {
+			return err
+		}
+		if _, err := tx.ExecContext(
+			ctx,
+			fmt.Sprintf("update %v.%v set ent_id='%v' where id=%v", dbName, table, uuid.New(), id),
+		); err != nil {
+			return err
+		}
+	}
 	logger.Sugar().Infow(
 		"migrateEntID",
 		"db", dbName,
