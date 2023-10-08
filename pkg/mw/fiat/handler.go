@@ -40,8 +40,7 @@ func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
 			}
 			return nil
 		}
-		_u := uint32(*u)
-		h.ID = &_u
+		h.ID = u
 		return nil
 	}
 }
