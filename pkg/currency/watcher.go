@@ -2,7 +2,6 @@ package currency
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
@@ -22,7 +21,7 @@ func refresh(ctx context.Context, fiat bool) {
 var w *watcher.Watcher
 
 func Watch(ctx context.Context) {
-	lockKey := fmt.Sprintf("%v", basetypes.Prefix_PrefixUpdateCoinCurrency)
+	lockKey := basetypes.Prefix_PrefixUpdateCoinCurrency.String()
 	for {
 		if err := redis2.TryLock(lockKey, 0); err == nil {
 			break

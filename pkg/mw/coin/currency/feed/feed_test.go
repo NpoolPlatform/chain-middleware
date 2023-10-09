@@ -48,11 +48,11 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -67,9 +67,9 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithFeedType(req.FeedType),
-		WithFeedCoinName(req.FeedCoinName),
+		WithCoinTypeID(req.CoinTypeID, true),
+		WithFeedType(req.FeedType, true),
+		WithFeedCoinName(req.FeedCoinName, true),
 	)
 	assert.Nil(t, err)
 
@@ -91,9 +91,9 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
-		WithFeedCoinName(req.FeedCoinName),
-		WithDisabled(req.Disabled),
+		WithID(&ret.ID, true),
+		WithFeedCoinName(req.FeedCoinName, true),
+		WithDisabled(req.Disabled, true),
 	)
 	assert.Nil(t, err)
 

@@ -41,7 +41,7 @@ var unit = uuid.NewString()
 var logo = uuid.NewString()
 
 var ret = &npool.Coin{
-	ID:                          uuid.NewString(),
+	EntID:                       uuid.NewString(),
 	AppID:                       uuid.NewString(),
 	CoinName:                    name,
 	Name:                        name,
@@ -99,11 +99,11 @@ func setupAppCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithUnit(&ret.Unit),
-		coin1.WithLogo(&ret.Logo),
-		coin1.WithENV(&ret.ENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithUnit(&ret.Unit, true),
+		coin1.WithLogo(&ret.Logo, true),
+		coin1.WithENV(&ret.ENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -151,7 +151,7 @@ func updateCoin(t *testing.T) {
 }
 
 func getCoin(t *testing.T) {
-	info, err := GetCoin(context.Background(), ret.ID)
+	info, err := GetCoin(context.Background(), ret.EntID)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, ret)
 	}
@@ -159,7 +159,7 @@ func getCoin(t *testing.T) {
 
 func getCoins(t *testing.T) {
 	infos, total, err := GetCoins(context.Background(), &npool.Conds{
-		ID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.EntID},
 	}, 0, 100)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
@@ -176,7 +176,7 @@ func deleteCoin(t *testing.T) {
 		assert.Equal(t, info, ret)
 	}
 
-	info, err = GetCoin(context.Background(), ret.ID)
+	info, err = GetCoin(context.Background(), ret.EntID)
 	assert.Nil(t, err)
 	assert.Nil(t, info)
 }

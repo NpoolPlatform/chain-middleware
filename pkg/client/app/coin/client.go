@@ -52,7 +52,7 @@ func CreateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 func GetCoin(ctx context.Context, id string) (*npool.Coin, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetCoin(ctx, &npool.GetCoinRequest{
-			ID: id,
+			EntID: id,
 		})
 		if err != nil {
 			return nil, err
@@ -145,7 +145,7 @@ func UpdateCoin(ctx context.Context, in *npool.CoinReq) (*npool.Coin, error) {
 	return info.(*npool.Coin), nil
 }
 
-func DeleteCoin(ctx context.Context, id string) (*npool.Coin, error) {
+func DeleteCoin(ctx context.Context, id uint32) (*npool.Coin, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.DeleteCoin(ctx, &npool.DeleteCoinRequest{
 			Info: &npool.CoinReq{

@@ -56,11 +56,11 @@ func setupFeed(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -96,7 +96,7 @@ func updateFeed(t *testing.T) {
 
 func getFeeds(t *testing.T) {
 	infos, total, err := GetFeeds(context.Background(), &npool.Conds{
-		ID:         &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+		EntID:      &basetypes.StringVal{Op: cruder.EQ, Value: ret.EntID},
 		CoinTypeID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.CoinTypeID},
 	}, 0, 100)
 	if assert.Nil(t, err) {
