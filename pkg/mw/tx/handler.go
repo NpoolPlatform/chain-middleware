@@ -173,6 +173,7 @@ func WithChainTxID(txID *string, must bool) func(context.Context, *Handler) erro
 	}
 }
 
+//nolint:dupl
 func WithState(state *basetypes.TxState, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if state == nil {
@@ -204,6 +205,7 @@ func WithExtra(extra *string, must bool) func(context.Context, *Handler) error {
 	}
 }
 
+//nolint:dupl
 func WithType(_type *basetypes.TxType, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if _type == nil {

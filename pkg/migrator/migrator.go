@@ -98,6 +98,7 @@ func tables(ctx context.Context, dbName string, tx *sql.Tx) ([]string, error) {
 	return tables, nil
 }
 
+//nolint:funlen,gocyclo
 func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 	logger.Sugar().Infow(
 		"migrateEntID",
