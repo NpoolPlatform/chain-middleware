@@ -114,7 +114,7 @@ func updateCoin(t *testing.T) {
 }
 
 func getCoin(t *testing.T) {
-	info, err := GetCoin(context.Background(), ret.ID)
+	info, err := GetCoin(context.Background(), ret.EntID)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, ret)
 	}
@@ -122,7 +122,7 @@ func getCoin(t *testing.T) {
 
 func getCoins(t *testing.T) {
 	infos, total, err := GetCoins(context.Background(), &npool.Conds{
-		ID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.EntID},
 	}, 0, 100)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)

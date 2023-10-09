@@ -53,11 +53,11 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -66,10 +66,10 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 	h2, err := currency1.NewHandler(
 		context.Background(),
-		currency1.WithCoinTypeID(req.CoinTypeID),
-		currency1.WithMarketValueHigh(req.MarketValueHigh),
-		currency1.WithMarketValueLow(req.MarketValueLow),
-		currency1.WithFeedType(req.FeedType),
+		currency1.WithCoinTypeID(req.CoinTypeID, true),
+		currency1.WithMarketValueHigh(req.MarketValueHigh, true),
+		currency1.WithMarketValueLow(req.MarketValueLow, true),
+		currency1.WithFeedType(req.FeedType, true),
 	)
 	assert.Nil(t, err)
 

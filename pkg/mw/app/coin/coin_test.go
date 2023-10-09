@@ -78,10 +78,10 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithUnit(&coinUnit),
-		coin1.WithENV(&coinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithUnit(&coinUnit, true),
+		coin1.WithENV(&coinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -96,23 +96,23 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(req.ID),
-		WithAppID(req.AppID),
-		WithCoinTypeID(req.CoinTypeID),
-		WithName(req.Name),
-		WithDisplayNames(req.DisplayNames),
-		WithLogo(req.Logo),
-		WithForPay(req.ForPay),
-		WithProductPage(req.ProductPage),
-		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount),
-		WithDailyRewardAmount(req.DailyRewardAmount),
-		WithDisplay(req.Display),
-		WithDisplayIndex(req.DisplayIndex),
-		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw),
-		WithMarketValue(req.MarketValue),
-		WithSettlePercent(req.SettlePercent),
-		WithSettleTips(req.SettleTips),
-		WithSetter(req.Setter),
+		WithEntID(req.EntID, true),
+		WithAppID(req.AppID, true),
+		WithCoinTypeID(req.CoinTypeID, true),
+		WithName(req.Name, true),
+		WithDisplayNames(req.DisplayNames, true),
+		WithLogo(req.Logo, true),
+		WithForPay(req.ForPay, true),
+		WithProductPage(req.ProductPage, true),
+		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount, true),
+		WithDailyRewardAmount(req.DailyRewardAmount, true),
+		WithDisplay(req.Display, true),
+		WithDisplayIndex(req.DisplayIndex, true),
+		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw, true),
+		WithMarketValue(req.MarketValue, true),
+		WithSettlePercent(req.SettlePercent, true),
+		WithSettleTips(req.SettleTips, true),
+		WithSetter(req.Setter, true),
 	)
 	assert.Nil(t, err)
 
@@ -145,21 +145,21 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(req.ID),
-		WithName(req.Name),
-		WithDisplayNames(req.DisplayNames),
-		WithLogo(req.Logo),
-		WithForPay(req.ForPay),
-		WithProductPage(req.ProductPage),
-		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount),
-		WithDailyRewardAmount(req.DailyRewardAmount),
-		WithDisplay(req.Display),
-		WithDisplayIndex(req.DisplayIndex),
-		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw),
-		WithMarketValue(req.MarketValue),
-		WithSettlePercent(req.SettlePercent),
-		WithSettleTips(req.SettleTips),
-		WithSetter(req.Setter),
+		WithEntID(req.EntID, true),
+		WithName(req.Name, true),
+		WithDisplayNames(req.DisplayNames, true),
+		WithLogo(req.Logo, true),
+		WithForPay(req.ForPay, true),
+		WithProductPage(req.ProductPage, true),
+		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount, true),
+		WithDailyRewardAmount(req.DailyRewardAmount, true),
+		WithDisplay(req.Display, true),
+		WithDisplayIndex(req.DisplayIndex, true),
+		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw, true),
+		WithMarketValue(req.MarketValue, true),
+		WithSettlePercent(req.SettlePercent, true),
+		WithSettleTips(req.SettleTips, true),
+		WithSetter(req.Setter, true),
 	)
 	assert.Nil(t, err)
 
@@ -173,7 +173,7 @@ func update(t *testing.T) {
 func _delete(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
+		WithID(&ret.ID, true),
 	)
 	assert.Nil(t, err)
 

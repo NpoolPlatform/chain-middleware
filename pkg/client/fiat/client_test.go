@@ -69,7 +69,7 @@ func updateFiat(t *testing.T) {
 }
 
 func getFiat(t *testing.T) {
-	info, err := GetFiat(context.Background(), ret.ID)
+	info, err := GetFiat(context.Background(), ret.EntID)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, ret)
 	}
@@ -77,7 +77,7 @@ func getFiat(t *testing.T) {
 
 func getFiats(t *testing.T) {
 	infos, total, err := GetFiats(context.Background(), &npool.Conds{
-		ID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.EntID},
 	}, 0, 2)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
