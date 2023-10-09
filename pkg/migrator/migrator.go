@@ -204,6 +204,19 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 	if err != nil {
 		return err
 	}
+	logger.Sugar().Infow(
+		"migrateEntID",
+		"db", dbName,
+		"table", table,
+		"State", "ID INT",
+	)
+	_, err = tx.ExecContext(
+		ctx,
+		fmt.Sprintf("alter table %v.%v add id int unsigned not null auto_increment, drop primary key, add primary key(id)", dbName, table),
+	)
+	if err != nil {
+		return err
+	}
 	rows, err = tx.QueryContext(
 		ctx,
 		fmt.Sprintf("select id from %v.%v where ent_id=''", dbName, table),
@@ -228,19 +241,6 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		); err != nil {
 			return err
 		}
-	}
-	logger.Sugar().Infow(
-		"migrateEntID",
-		"db", dbName,
-		"table", table,
-		"State", "ID INT",
-	)
-	_, err = tx.ExecContext(
-		ctx,
-		fmt.Sprintf("alter table %v.%v add id int unsigned not null auto_increment, drop primary key, add primary key(id)", dbName, table),
-	)
-	if err != nil {
-		return err
 	}
 	logger.Sugar().Infow(
 		"migrateEntID",
