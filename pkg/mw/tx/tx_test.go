@@ -82,7 +82,7 @@ func create(t *testing.T) {
 		WithToAccountID(req.ToAccountID, true),
 		WithAmount(req.Amount, true),
 		WithFeeAmount(req.FeeAmount, true),
-		WithChainTxID(req.ChainTxID, true),
+		WithChainTxID(req.ChainTxID, false),
 		WithState(req.State, true),
 		WithExtra(req.Extra, true),
 		WithType(req.Type, true),
@@ -94,6 +94,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, info, ret)
 	}
 }
@@ -106,10 +107,10 @@ func update(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
 		WithID(&ret.ID, true),
-		WithChainTxID(req.ChainTxID, true),
-		WithState(req.State, true),
-		WithExtra(req.Extra, true),
-		WithType(req.Type, true),
+		WithChainTxID(req.ChainTxID, false),
+		WithState(req.State, false),
+		WithExtra(req.Extra, false),
+		WithType(req.Type, false),
 	)
 	assert.Nil(t, err)
 
@@ -126,10 +127,10 @@ func update(t *testing.T) {
 	handler, err = NewHandler(
 		context.Background(),
 		WithID(&ret.ID, true),
-		WithChainTxID(req.ChainTxID, true),
-		WithState(req.State, true),
-		WithExtra(req.Extra, true),
-		WithType(req.Type, true),
+		WithChainTxID(req.ChainTxID, false),
+		WithState(req.State, false),
+		WithExtra(req.Extra, false),
+		WithType(req.Type, false),
 	)
 	assert.Nil(t, err)
 

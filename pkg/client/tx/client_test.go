@@ -50,7 +50,7 @@ var ret = &npool.Tx{
 }
 
 var req = &npool.TxReq{
-	ID:            &ret.ID,
+	EntID:         &ret.EntID,
 	FromAccountID: &ret.FromAccountID,
 	ToAccountID:   &ret.ToAccountID,
 	Amount:        &ret.Amount,
@@ -88,6 +88,7 @@ func createTx(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, ret, info)
 	}
 }
