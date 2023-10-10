@@ -28,6 +28,7 @@ type queryHandler struct {
 func (h *queryHandler) selectCoinFiat(stm *ent.CoinFiatQuery) {
 	h.stm = stm.Select(
 		entcoinfiat.FieldID,
+		entcoinfiat.FieldEntID,
 		entcoinfiat.FieldCoinTypeID,
 		entcoinfiat.FieldFiatID,
 		entcoinfiat.FieldFeedType,
@@ -37,13 +38,17 @@ func (h *queryHandler) selectCoinFiat(stm *ent.CoinFiatQuery) {
 }
 
 func (h *queryHandler) queryCoinFiat(cli *ent.Client) error {
-	h.selectCoinFiat(
-		cli.CoinFiat.
-			Query().
-			Where(
-				entcoinfiat.ID(*h.ID),
-			),
-	)
+	if h.ID == nil && h.EntID == nil {
+		return fmt.Errorf("invalid id")
+	}
+	stm := cli.CoinFiat.Query().Where(entcoinfiat.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entcoinfiat.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entcoinfiat.EntID(*h.EntID))
+	}
+	h.selectCoinFiat(stm)
 	return nil
 }
 
@@ -69,7 +74,7 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) {
 		LeftJoin(t).
 		On(
 			s.C(entcoinfiat.FieldCoinTypeID),
-			t.C(entcoinbase.FieldID),
+			t.C(entcoinbase.FieldEntID),
 		).
 		AppendSelect(
 			sql.As(t.C(entcoinbase.FieldName), "coin_name"),
@@ -85,7 +90,7 @@ func (h *queryHandler) queryJoinFiat(s *sql.Selector) {
 		LeftJoin(t).
 		On(
 			s.C(entcoinfiat.FieldFiatID),
-			t.C(entfiat.FieldID),
+			t.C(entfiat.FieldEntID),
 		).
 		AppendSelect(
 			sql.As(t.C(entfiat.FieldName), "fiat_name"),
@@ -112,10 +117,6 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetCoinFiat(ctx context.Context) (*npool.CoinFiat, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	handler := &queryHandler{
 		Handler: h,
 	}
