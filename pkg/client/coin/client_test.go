@@ -36,6 +36,14 @@ func init() {
 
 var name = uuid.NewString()
 var unit = uuid.NewString()
+var chainType = uuid.NewString()
+var chainNativeUnit = uuid.NewString()
+var chainAtomicUnit = uuid.NewString()
+var chainUnitExp = uint32(1)
+var gasType = basetypes.GasType_FixedGas
+var chainID = uuid.NewString()
+var chainNickname = uuid.NewString()
+var chainNativeCoinName = uuid.NewString()
 var ret = &npool.Coin{
 	Name:                        name,
 	Presale:                     false,
@@ -59,9 +67,17 @@ var ret = &npool.Coin{
 }
 
 var req = &npool.CoinReq{
-	Name: &ret.Name,
-	Unit: &ret.Unit,
-	ENV:  &ret.ENV,
+	Name:                &ret.Name,
+	Unit:                &ret.Unit,
+	ENV:                 &ret.ENV,
+	ChainType:           &chainType,
+	ChainNativeUnit:     &chainNativeUnit,
+	ChainAtomicUnit:     &chainAtomicUnit,
+	ChainUnitExp:        &chainUnitExp,
+	GasType:             &gasType,
+	ChainID:             &chainID,
+	ChainNickname:       &chainNickname,
+	ChainNativeCoinName: &chainNativeCoinName,
 }
 
 func createCoin(t *testing.T) {
@@ -70,6 +86,7 @@ func createCoin(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		ret.FeeCoinTypeID = info.FeeCoinTypeID
 		assert.Equal(t, ret, info)
 	}

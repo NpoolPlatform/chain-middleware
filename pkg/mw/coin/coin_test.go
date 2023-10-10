@@ -10,6 +10,8 @@ import (
 	testinit "github.com/NpoolPlatform/chain-middleware/pkg/testinit"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/coin"
 
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,6 +25,14 @@ func init() {
 	}
 }
 
+var chainType = uuid.NewString()
+var chainNativeUnit = uuid.NewString()
+var chainAtomicUnit = uuid.NewString()
+var chainUnitExp = uint32(1)
+var gasType = basetypes.GasType_FixedGas
+var chainID = uuid.NewString()
+var chainNickname = uuid.NewString()
+var chainNativeCoinName = uuid.NewString()
 var ret = &npool.Coin{
 	Name:                        uuid.NewString(),
 	Unit:                        "BTC1",
@@ -43,9 +53,17 @@ var ret = &npool.Coin{
 }
 
 var req = &npool.CoinReq{
-	Name: &ret.Name,
-	Unit: &ret.Unit,
-	ENV:  &ret.ENV,
+	Name:                &ret.Name,
+	Unit:                &ret.Unit,
+	ENV:                 &ret.ENV,
+	ChainType:           &chainType,
+	ChainNativeUnit:     &chainNativeUnit,
+	ChainAtomicUnit:     &chainAtomicUnit,
+	ChainUnitExp:        &chainUnitExp,
+	GasType:             &gasType,
+	ChainID:             &chainID,
+	ChainNickname:       &chainNickname,
+	ChainNativeCoinName: &chainNativeCoinName,
 }
 
 //nolint
@@ -57,9 +75,17 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	h1, err := NewHandler(
 		context.Background(),
-		WithName(&ret.Name, true),
-		WithUnit(&ret.Unit, true),
-		WithENV(&ret.ENV, true),
+		WithName(req.Name, true),
+		WithUnit(req.Unit, true),
+		WithENV(req.ENV, true),
+		WithChainType(req.ChainType, true),
+		WithChainNativeUnit(req.ChainNativeUnit, true),
+		WithChainAtomicUnit(req.ChainAtomicUnit, true),
+		WithChainUnitExp(req.ChainUnitExp, true),
+		WithGasType(req.GasType, true),
+		WithChainID(req.ChainID, true),
+		WithChainNickname(req.ChainNickname, true),
+		WithChainNativeCoinName(req.ChainNativeCoinName, true),
 	)
 	assert.Nil(t, err)
 
