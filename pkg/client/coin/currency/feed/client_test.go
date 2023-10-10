@@ -78,6 +78,7 @@ func createFeed(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, ret, info)
 	}
 }
