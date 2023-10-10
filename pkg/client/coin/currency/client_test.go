@@ -84,6 +84,7 @@ func setupCurrency(t *testing.T) func(*testing.T) {
 	assert.Nil(t, err)
 
 	ret.ID = info.ID
+	ret.EntID = info.EntID
 	ret.CreatedAt = info.CreatedAt
 	ret.UpdatedAt = info.UpdatedAt
 

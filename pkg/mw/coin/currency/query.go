@@ -36,7 +36,7 @@ func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) {
 		Modify(func(s *sql.Selector) {
 			t := sql.Table(entcoinbase.Table)
 			s.AppendSelect(
-				sql.As(t.C(entcoinbase.FieldID), "coin_type_id"),
+				sql.As(t.C(entcoinbase.FieldEntID), "coin_type_id"),
 				sql.As(t.C(entcoinbase.FieldName), "coin_name"),
 				sql.As(t.C(entcoinbase.FieldLogo), "coin_logo"),
 				sql.As(t.C(entcoinbase.FieldUnit), "coin_unit"),
@@ -91,7 +91,7 @@ func (h *queryHandler) queryJoinCoinExtra(s *sql.Selector) {
 	t := sql.Table(entcoinextra.Table)
 	s.LeftJoin(t).
 		On(
-			s.C(entcoinbase.FieldID),
+			s.C(entcoinbase.FieldEntID),
 			t.C(entcoinextra.FieldCoinTypeID),
 		).
 		AppendSelect(
@@ -104,7 +104,7 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
 	t := sql.Table(entcurrency.Table)
 	s.LeftJoin(t).
 		On(
-			s.C(entcoinbase.FieldID),
+			s.C(entcoinbase.FieldEntID),
 			t.C(entcurrency.FieldCoinTypeID),
 		).
 		OnP(
@@ -112,6 +112,7 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
 		).
 		AppendSelect(
 			sql.As(t.C(entcurrency.FieldID), "id"),
+			sql.As(t.C(entcurrency.FieldEntID), "ent_id"),
 			sql.As(t.C(entcurrency.FieldFeedType), "feed_type"),
 			sql.As(t.C(entcurrency.FieldMarketValueHigh), "market_value_high"),
 			sql.As(t.C(entcurrency.FieldMarketValueLow), "market_value_low"),
@@ -154,8 +155,8 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetCurrency(ctx context.Context) (*npool.Currency, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
+	if h.EntID == nil {
+		return nil, fmt.Errorf("invalid entid")
 	}
 
 	handler := &queryHandler{
