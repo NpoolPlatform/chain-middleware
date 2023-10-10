@@ -53,6 +53,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, info.String(), ret.String())
 	}
 }

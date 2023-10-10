@@ -23,6 +23,7 @@ type queryHandler struct {
 func (h *queryHandler) selectFiat(stm *ent.FiatQuery) {
 	h.stm = stm.Select(
 		entfiat.FieldID,
+		entfiat.FieldEntID,
 		entfiat.FieldName,
 		entfiat.FieldLogo,
 		entfiat.FieldUnit,
@@ -32,17 +33,17 @@ func (h *queryHandler) selectFiat(stm *ent.FiatQuery) {
 }
 
 func (h *queryHandler) queryFiat(cli *ent.Client) error {
-	if h.ID == nil {
+	if h.ID == nil && h.EntID == nil {
 		return fmt.Errorf("invalid id")
 	}
-
-	h.selectFiat(
-		cli.Fiat.
-			Query().
-			Where(
-				entfiat.ID(*h.ID),
-			),
-	)
+	stm := cli.Fiat.Query().Where(entfiat.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entfiat.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entfiat.EntID(*h.EntID))
+	}
+	h.selectFiat(stm)
 	return nil
 }
 
