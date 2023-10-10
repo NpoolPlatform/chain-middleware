@@ -27,6 +27,7 @@ type queryHandler struct {
 func (h *queryHandler) selectFeed(stm *ent.FiatCurrencyFeedQuery) {
 	h.stm = stm.Select(
 		entcurrencyfeed.FieldID,
+		entcurrencyfeed.FieldEntID,
 		entcurrencyfeed.FieldFiatID,
 		entcurrencyfeed.FieldFeedType,
 		entcurrencyfeed.FieldFeedFiatName,
@@ -37,13 +38,17 @@ func (h *queryHandler) selectFeed(stm *ent.FiatCurrencyFeedQuery) {
 }
 
 func (h *queryHandler) queryFeed(cli *ent.Client) error {
-	h.selectFeed(
-		cli.FiatCurrencyFeed.
-			Query().
-			Where(
-				entcurrencyfeed.ID(*h.ID),
-			),
-	)
+	if h.ID == nil && h.EntID == nil {
+		return fmt.Errorf("invalid id")
+	}
+	stm := cli.FiatCurrencyFeed.Query().Where(entcurrencyfeed.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entcurrencyfeed.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entcurrencyfeed.EntID(*h.EntID))
+	}
+	h.selectFeed(stm)
 	return nil
 }
 
@@ -69,7 +74,7 @@ func (h *queryHandler) queryJoinFiat(s *sql.Selector) {
 		LeftJoin(t).
 		On(
 			s.C(entcurrencyfeed.FieldFiatID),
-			t.C(entfiat.FieldID),
+			t.C(entfiat.FieldEntID),
 		).
 		AppendSelect(
 			sql.As(t.C(entfiat.FieldName), "fiat_name"),
@@ -95,10 +100,6 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetFeed(ctx context.Context) (*npool.Feed, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	handler := &queryHandler{
 		Handler: h,
 	}
