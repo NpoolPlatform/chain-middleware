@@ -60,6 +60,7 @@ func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx, req *cur
 		}
 
 		h.ID = &info.ID
+		h.EntID = &info.EntID
 
 		return nil
 	}
@@ -72,6 +73,7 @@ func (h *createHandler) createCurrency(ctx context.Context, tx *ent.Tx, req *cur
 	}
 
 	h.ID = &info.ID
+	h.EntID = &info.EntID
 
 	return nil
 }

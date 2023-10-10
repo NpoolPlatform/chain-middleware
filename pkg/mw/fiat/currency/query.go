@@ -33,7 +33,7 @@ func (h *queryHandler) selectFiat(stm *ent.FiatQuery) {
 		Modify(func(s *sql.Selector) {
 			t := sql.Table(entfiat.Table)
 			s.AppendSelect(
-				sql.As(t.C(entfiat.FieldID), "fiat_id"),
+				sql.As(t.C(entfiat.FieldEntID), "fiat_id"),
 				sql.As(t.C(entfiat.FieldName), "fiat_name"),
 				sql.As(t.C(entfiat.FieldLogo), "fiat_logo"),
 				sql.As(t.C(entfiat.FieldUnit), "fiat_unit"),
@@ -89,7 +89,7 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
 	t := sql.Table(entcurrency.Table)
 	s.LeftJoin(t).
 		On(
-			s.C(entfiat.FieldID),
+			s.C(entfiat.FieldEntID),
 			t.C(entcurrency.FieldFiatID),
 		).
 		OnP(
@@ -97,6 +97,7 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
 		).
 		AppendSelect(
 			sql.As(t.C(entcurrency.FieldID), "id"),
+			sql.As(t.C(entcurrency.FieldEntID), "ent_id"),
 			sql.As(t.C(entcurrency.FieldFeedType), "feed_type"),
 			sql.As(t.C(entcurrency.FieldMarketValueHigh), "market_value_high"),
 			sql.As(t.C(entcurrency.FieldMarketValueLow), "market_value_low"),
@@ -128,8 +129,8 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetCurrency(ctx context.Context) (*npool.Currency, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
+	if h.EntID == nil {
+		return nil, fmt.Errorf("invalid entid")
 	}
 
 	handler := &queryHandler{
