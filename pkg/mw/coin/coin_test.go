@@ -68,6 +68,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		ret.FeeCoinTypeID = info.EntID
 		assert.Equal(t, info.String(), ret.String())
 	}
@@ -107,33 +108,33 @@ func update(t *testing.T) {
 	h1, err := NewHandler(
 		context.Background(),
 		WithID(req.ID, true),
-		WithName(req.Name, true),
-		WithUnit(req.Unit, true),
-		WithLogo(req.Logo, true),
-		WithReservedAmount(req.ReservedAmount, true),
-		WithHomePage(req.HomePage, true),
-		WithSpecs(req.Specs, true),
+		WithName(req.Name, false),
+		WithUnit(req.Unit, false),
+		WithLogo(req.Logo, false),
+		WithReservedAmount(req.ReservedAmount, false),
+		WithHomePage(req.HomePage, false),
+		WithSpecs(req.Specs, false),
 		// TODO: this should be get from chain type
-		WithFeeCoinTypeID(req.FeeCoinTypeID, true),
-		WithWithdrawFeeByStableUSD(req.WithdrawFeeByStableUSD, true),
-		WithWithdrawFeeAmount(req.WithdrawFeeAmount, true),
-		WithCollectFeeAmount(req.CollectFeeAmount, true),
-		WithHotWalletFeeAmount(req.HotWalletFeeAmount, true),
-		WithLowFeeAmount(req.LowFeeAmount, true),
-		WithHotLowFeeAmount(req.HotLowFeeAmount, true),
-		WithHotWalletFeeAmount(req.HotWalletFeeAmount, true),
-		WithHotWalletAccountAmount(req.HotWalletAccountAmount, true),
-		WithPaymentAccountCollectAmount(req.PaymentAccountCollectAmount, true),
-		WithLeastTransferAmount(req.LeastTransferAmount, true),
-		WithPresale(req.Presale, true),
-		WithForPay(req.ForPay, true),
-		WithDisabled(req.Disabled, true),
+		WithFeeCoinTypeID(req.FeeCoinTypeID, false),
+		WithWithdrawFeeByStableUSD(req.WithdrawFeeByStableUSD, false),
+		WithWithdrawFeeAmount(req.WithdrawFeeAmount, false),
+		WithCollectFeeAmount(req.CollectFeeAmount, false),
+		WithHotWalletFeeAmount(req.HotWalletFeeAmount, false),
+		WithLowFeeAmount(req.LowFeeAmount, false),
+		WithHotLowFeeAmount(req.HotLowFeeAmount, false),
+		WithHotWalletFeeAmount(req.HotWalletFeeAmount, false),
+		WithHotWalletAccountAmount(req.HotWalletAccountAmount, false),
+		WithPaymentAccountCollectAmount(req.PaymentAccountCollectAmount, false),
+		WithLeastTransferAmount(req.LeastTransferAmount, false),
+		WithPresale(req.Presale, false),
+		WithForPay(req.ForPay, false),
+		WithDisabled(req.Disabled, false),
 		// TODO: this should be in create from register coin
-		WithStableUSD(req.StableUSD, true),
+		WithStableUSD(req.StableUSD, false),
 		// TODO: this should be in create from register coin
-		WithNeedMemo(req.NeedMemo, true),
-		WithRefreshCurrency(req.RefreshCurrency, true),
-		WithCheckNewAddressBalance(req.CheckNewAddressBalance, true),
+		WithNeedMemo(req.NeedMemo, false),
+		WithRefreshCurrency(req.RefreshCurrency, false),
+		WithCheckNewAddressBalance(req.CheckNewAddressBalance, false),
 	)
 	assert.Nil(t, err)
 

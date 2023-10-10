@@ -40,17 +40,17 @@ func (h *queryHandler) selectCoin(stm *ent.CoinBaseQuery) {
 }
 
 func (h *queryHandler) queryCoin(cli *ent.Client) error {
-	if h.ID == nil {
+	if h.ID == nil && h.EntID == nil {
 		return fmt.Errorf("invalid id")
 	}
-
-	h.selectCoin(
-		cli.CoinBase.
-			Query().
-			Where(
-				entbase.ID(*h.ID),
-			),
-	)
+	stm := cli.CoinBase.Query().Where(entbase.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entbase.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entbase.EntID(*h.EntID))
+	}
+	h.selectCoin(stm)
 	return nil
 }
 
@@ -73,7 +73,7 @@ func (h *queryHandler) queryJoinExtra(s *sql.Selector) {
 	s.
 		LeftJoin(t).
 		On(
-			s.C(entbase.FieldID),
+			s.C(entbase.FieldEntID),
 			t.C(entextra.FieldCoinTypeID),
 		).
 		AppendSelect(
@@ -88,7 +88,7 @@ func (h *queryHandler) queryJoinSetting(s *sql.Selector) {
 	s.
 		LeftJoin(t1).
 		On(
-			s.C(entbase.FieldID),
+			s.C(entbase.FieldEntID),
 			t1.C(entsetting.FieldCoinTypeID),
 		).
 		AppendSelect(
@@ -111,7 +111,7 @@ func (h *queryHandler) queryJoinSetting(s *sql.Selector) {
 	s.
 		LeftJoin(t2).
 		On(
-			t2.C(entbase.FieldID),
+			t2.C(entbase.FieldEntID),
 			t1.C(entsetting.FieldFeeCoinTypeID),
 		).
 		AppendSelect(
@@ -156,7 +156,6 @@ func (h *Handler) GetCoin(ctx context.Context) (*npool.Coin, error) {
 	if len(handler.infos) > 1 {
 		return nil, fmt.Errorf("too many record")
 	}
-
 	return handler.infos[0], nil
 }
 

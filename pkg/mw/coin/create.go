@@ -284,7 +284,7 @@ func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error
 		tx.Setting.Create(),
 		&settingcrud.Req{
 			CoinTypeID:                  h.EntID,
-			FeeCoinTypeID:               h.FeeCoinTypeID,
+			FeeCoinTypeID:               h.EntID,
 			WithdrawFeeByStableUSD:      h.WithdrawFeeByStableUSD,
 			WithdrawFeeAmount:           h.WithdrawFeeAmount,
 			CollectFeeAmount:            h.CollectFeeAmount,
