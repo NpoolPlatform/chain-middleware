@@ -61,8 +61,9 @@ func setupCoin(t *testing.T) func(*testing.T) {
 	)
 	assert.Nil(t, err)
 
-	_, err = h1.CreateCoin(context.Background())
+	info1, err := h1.CreateCoin(context.Background())
 	assert.Nil(t, err)
+	h1.ID = &info1.ID
 
 	h2, err := appcoin1.NewHandler(
 		context.Background(),
@@ -71,8 +72,9 @@ func setupCoin(t *testing.T) func(*testing.T) {
 	)
 	assert.Nil(t, err)
 
-	_, err = h2.CreateCoin(context.Background())
+	info2, err := h2.CreateCoin(context.Background())
 	assert.Nil(t, err)
+	h2.ID = &info2.ID
 
 	return func(*testing.T) {
 		_, _ = h1.DeleteCoin(context.Background())
@@ -83,7 +85,7 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithEntID(req.EntID, true),
+		WithEntID(req.EntID, false),
 		WithAppID(req.AppID, true),
 		WithCoinTypeID(req.CoinTypeID, true),
 		WithTitle(req.Title, true),
@@ -97,6 +99,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, info, ret)
 	}
 }
@@ -110,7 +113,7 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithEntID(&ret.EntID, true),
+		WithID(&ret.ID, true),
 		WithTitle(req.Title, true),
 		WithMessage(req.Message, true),
 	)

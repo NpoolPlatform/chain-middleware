@@ -39,7 +39,7 @@ func (h *queryHandler) selectCoinDescription(stm *ent.CoinDescriptionQuery) {
 }
 
 func (h *queryHandler) queryCoinDescription(cli *ent.Client) error {
-	if h.ID == nil || h.EntID == nil {
+	if h.ID == nil && h.EntID == nil {
 		return fmt.Errorf("invalid id")
 	}
 	stm := cli.CoinDescription.Query().Where(entdescription.DeletedAt(0))
@@ -75,7 +75,7 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) {
 		LeftJoin(t).
 		On(
 			s.C(entdescription.FieldCoinTypeID),
-			t.C(entcoinbase.FieldID),
+			t.C(entcoinbase.FieldEntID),
 		).
 		AppendSelect(
 			sql.As(t.C(entcoinbase.FieldName), "coin_name"),
@@ -102,10 +102,6 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetCoinDescription(ctx context.Context) (*npool.CoinDescription, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	handler := &queryHandler{
 		Handler: h,
 	}

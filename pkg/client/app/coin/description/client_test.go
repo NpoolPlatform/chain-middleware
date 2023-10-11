@@ -71,8 +71,9 @@ func setupAppCoinDescription(t *testing.T) func(*testing.T) {
 	)
 	assert.Nil(t, err)
 
-	_, err = h1.CreateCoin(context.Background())
+	info1, err := h1.CreateCoin(context.Background())
 	assert.Nil(t, err)
+	h1.ID = &info1.ID
 
 	h2, err := appcoin1.NewHandler(
 		context.Background(),
@@ -81,8 +82,9 @@ func setupAppCoinDescription(t *testing.T) func(*testing.T) {
 	)
 	assert.Nil(t, err)
 
-	_, err = h2.CreateCoin(context.Background())
+	info2, err := h2.CreateCoin(context.Background())
 	assert.Nil(t, err)
+	h2.ID = &info2.ID
 
 	return func(*testing.T) {
 		_, _ = h1.DeleteCoin(context.Background())
@@ -96,6 +98,7 @@ func createCoinDescription(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, ret, info)
 	}
 }
