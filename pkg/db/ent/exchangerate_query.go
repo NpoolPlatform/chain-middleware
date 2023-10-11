@@ -190,7 +190,11 @@ func (erq *ExchangeRateQuery) IDs(ctx context.Context) ([]uint32, error) {
 
 // IDsX is like IDs, but panics if an error occurs.
 func (erq *ExchangeRateQuery) IDsX(ctx context.Context) []uint32 {
+	ids, err := erq.IDs(ctx)
 	if err != nil {
+		panic(err)
+	}
+	return ids
 }
 
 // Count returns the count of the given query.
