@@ -77,8 +77,16 @@ var ret = &npool.Coin{
 	LeastTransferAmount:         "0.000000000000000000",
 }
 
+var chainType = uuid.NewString()
+var chainNativeUnit = uuid.NewString()
+var chainAtomicUnit = uuid.NewString()
+var chainUnitExp = uint32(1)
+var gasType = basetypes.GasType_FixedGas
+var chainID = uuid.NewString()
+var chainNickname = uuid.NewString()
+var chainNativeCoinName = uuid.NewString()
+
 var req = &npool.CoinReq{
-	ID:                       &ret.ID,
 	AppID:                    &ret.AppID,
 	Name:                     &ret.Name,
 	DisplayNames:             ret.DisplayNames,
@@ -89,6 +97,7 @@ var req = &npool.CoinReq{
 	SettlePercent:            &ret.SettlePercent,
 	SettleTips:               ret.SettleTips,
 	Setter:                   &ret.Setter,
+	DailyRewardAmount:        &ret.DailyRewardAmount,
 	MaxAmountPerWithdraw:     &ret.MaxAmountPerWithdraw,
 }
 
@@ -104,6 +113,14 @@ func setupAppCoin(t *testing.T) func(*testing.T) {
 		coin1.WithUnit(&ret.Unit, true),
 		coin1.WithLogo(&ret.Logo, true),
 		coin1.WithENV(&ret.ENV, true),
+		coin1.WithChainType(&chainType, true),
+		coin1.WithChainNativeUnit(&chainNativeUnit, true),
+		coin1.WithChainAtomicUnit(&chainAtomicUnit, true),
+		coin1.WithChainUnitExp(&chainUnitExp, true),
+		coin1.WithGasType(&gasType, true),
+		coin1.WithChainID(&chainID, true),
+		coin1.WithChainNickname(&chainNickname, true),
+		coin1.WithChainNativeCoinName(&chainNativeCoinName, true),
 	)
 	assert.Nil(t, err)
 
@@ -121,6 +138,7 @@ func createCoin(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		ret.FeeCoinTypeID = info.FeeCoinTypeID
 		ret.DisplayNamesStr = info.DisplayNamesStr
 		ret.SettleTipsStr = info.SettleTipsStr

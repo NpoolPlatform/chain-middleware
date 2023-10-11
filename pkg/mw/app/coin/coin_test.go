@@ -96,23 +96,23 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithEntID(req.EntID, true),
+		WithEntID(req.EntID, false),
 		WithAppID(req.AppID, true),
 		WithCoinTypeID(req.CoinTypeID, true),
 		WithName(req.Name, true),
-		WithDisplayNames(req.DisplayNames, true),
+		WithDisplayNames(req.DisplayNames, false),
 		WithLogo(req.Logo, true),
-		WithForPay(req.ForPay, true),
-		WithProductPage(req.ProductPage, true),
-		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount, true),
-		WithDailyRewardAmount(req.DailyRewardAmount, true),
-		WithDisplay(req.Display, true),
-		WithDisplayIndex(req.DisplayIndex, true),
-		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw, true),
-		WithMarketValue(req.MarketValue, true),
-		WithSettlePercent(req.SettlePercent, true),
-		WithSettleTips(req.SettleTips, true),
-		WithSetter(req.Setter, true),
+		WithForPay(req.ForPay, false),
+		WithProductPage(req.ProductPage, false),
+		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount, false),
+		WithDailyRewardAmount(req.DailyRewardAmount, false),
+		WithDisplay(req.Display, false),
+		WithDisplayIndex(req.DisplayIndex, false),
+		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw, false),
+		WithMarketValue(req.MarketValue, false),
+		WithSettlePercent(req.SettlePercent, false),
+		WithSettleTips(req.SettleTips, false),
+		WithSetter(req.Setter, false),
 	)
 	assert.Nil(t, err)
 
@@ -121,6 +121,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		ret.FeeCoinTypeID = ret.CoinTypeID
 		ret.DisplayNamesStr = info.DisplayNamesStr
 		ret.SettleTipsStr = info.SettleTipsStr
@@ -145,21 +146,21 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithEntID(req.EntID, true),
-		WithName(req.Name, true),
-		WithDisplayNames(req.DisplayNames, true),
-		WithLogo(req.Logo, true),
-		WithForPay(req.ForPay, true),
-		WithProductPage(req.ProductPage, true),
-		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount, true),
-		WithDailyRewardAmount(req.DailyRewardAmount, true),
-		WithDisplay(req.Display, true),
-		WithDisplayIndex(req.DisplayIndex, true),
-		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw, true),
-		WithMarketValue(req.MarketValue, true),
-		WithSettlePercent(req.SettlePercent, true),
-		WithSettleTips(req.SettleTips, true),
-		WithSetter(req.Setter, true),
+		WithID(req.ID, true),
+		WithName(req.Name, false),
+		WithDisplayNames(req.DisplayNames, false),
+		WithLogo(req.Logo, false),
+		WithForPay(req.ForPay, false),
+		WithProductPage(req.ProductPage, false),
+		WithWithdrawAutoReviewAmount(req.WithdrawAutoReviewAmount, false),
+		WithDailyRewardAmount(req.DailyRewardAmount, false),
+		WithDisplay(req.Display, false),
+		WithDisplayIndex(req.DisplayIndex, false),
+		WithMaxAmountPerWithdraw(req.MaxAmountPerWithdraw, false),
+		WithMarketValue(req.MarketValue, false),
+		WithSettlePercent(req.SettlePercent, false),
+		WithSettleTips(req.SettleTips, false),
+		WithSetter(req.Setter, false),
 	)
 	assert.Nil(t, err)
 
