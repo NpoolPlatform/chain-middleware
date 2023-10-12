@@ -3,6 +3,7 @@ package currencyhistory
 import (
 	"context"
 
+	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 	historycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/fiat/currency/history"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency/history"
 
@@ -91,6 +92,9 @@ func WithOffset(offset int32) func(context.Context, *Handler) error {
 
 func WithLimit(limit int32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if limit == 0 {
+			limit = constant.DefaultRowLimit
+		}
 		h.Limit = limit
 		return nil
 	}
