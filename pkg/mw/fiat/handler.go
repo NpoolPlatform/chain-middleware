@@ -104,6 +104,9 @@ func WithUnit(unit *string, must bool) func(context.Context, *Handler) error {
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &fiatcrud.Conds{}
+		if conds == nil {
+			return nil
+		}
 		if conds.EntID != nil {
 			id, err := uuid.Parse(conds.GetEntID().GetValue())
 			if err != nil {

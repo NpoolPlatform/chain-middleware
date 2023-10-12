@@ -29,6 +29,9 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &historycrud.Conds{}
+		if conds == nil {
+			return nil
+		}
 		if conds.EntID != nil {
 			id, err := uuid.Parse(conds.GetEntID().GetValue())
 			if err != nil {
