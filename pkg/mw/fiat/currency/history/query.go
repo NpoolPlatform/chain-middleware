@@ -26,6 +26,7 @@ type queryHandler struct {
 func (h *queryHandler) selectCurrencyHistory(stm *ent.FiatCurrencyHistoryQuery) {
 	h.stm = stm.Select(
 		entcurrencyhis.FieldID,
+		entcurrencyhis.FieldEntID,
 		entcurrencyhis.FieldFiatID,
 		entcurrencyhis.FieldFeedType,
 		entcurrencyhis.FieldMarketValueHigh,
@@ -56,7 +57,7 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) {
 	s.LeftJoin(t1).
 		On(
 			s.C(entcurrencyhis.FieldFiatID),
-			t1.C(entfiat.FieldID),
+			t1.C(entfiat.FieldEntID),
 		).
 		AppendSelect(
 			sql.As(t1.C(entfiat.FieldName), "fiat_name"),

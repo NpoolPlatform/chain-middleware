@@ -2,7 +2,6 @@ package coin
 
 import (
 	"context"
-	"fmt"
 
 	coincrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
@@ -11,10 +10,6 @@ import (
 )
 
 func (h *Handler) ExistCoin(ctx context.Context) (bool, error) {
-	if h.ID == nil {
-		return false, fmt.Errorf("invalid id")
-	}
-
 	exist := false
 	var err error
 
@@ -23,7 +18,7 @@ func (h *Handler) ExistCoin(ctx context.Context) (bool, error) {
 			CoinBase.
 			Query().
 			Where(
-				entbase.ID(*h.ID),
+				entbase.EntID(*h.EntID),
 				entbase.DeletedAt(0),
 			).
 			Exist(_ctx)

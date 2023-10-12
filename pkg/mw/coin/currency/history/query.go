@@ -41,6 +41,7 @@ func (h *queryHandler) queryCurrencyHistories(cli *ent.Client) (*ent.CurrencyHis
 func (h *queryHandler) queryJoinMyself(s *sql.Selector) {
 	t := sql.Table(entcurrencyhis.Table)
 	s.AppendSelect(
+		sql.As(t.C(entcurrencyhis.FieldEntID), "ent_id"),
 		sql.As(t.C(entcurrencyhis.FieldCoinTypeID), "coin_type_id"),
 		sql.As(t.C(entcurrencyhis.FieldFeedType), "feed_type"),
 		sql.As(t.C(entcurrencyhis.FieldMarketValueHigh), "market_value_high"),
@@ -55,7 +56,7 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) error {
 	s.LeftJoin(t).
 		On(
 			s.C(entcurrencyhis.FieldCoinTypeID),
-			t.C(entcoinbase.FieldID),
+			t.C(entcoinbase.FieldEntID),
 		)
 
 	if h.Conds.CoinNames != nil {
