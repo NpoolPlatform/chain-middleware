@@ -24,7 +24,6 @@ func (s *Server) CreateTx(ctx context.Context, in *npool.CreateTxRequest) (*npoo
 		tx1.WithAmount(req.Amount, true),
 		tx1.WithFeeAmount(req.FeeAmount, true),
 		tx1.WithChainTxID(req.ChainTxID, false),
-		tx1.WithState(req.State, true),
 		tx1.WithExtra(req.Extra, true),
 		tx1.WithType(req.Type, true),
 	)
