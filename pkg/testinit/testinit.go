@@ -42,12 +42,12 @@ func Init() error {
 	if err != nil {
 		return fmt.Errorf("cannot init app stub: %v", err)
 	}
+	if err := migrator.Migrate(context.Background()); err != nil {
+		return fmt.Errorf("fail migrate db: %v", err)
+	}
 	err = db.Init()
 	if err != nil {
 		return fmt.Errorf("cannot init database: %v", err)
-	}
-	if err := migrator.Migrate(context.Background()); err != nil {
-		return fmt.Errorf("fail migrate db: %v", err)
 	}
 
 	return nil
