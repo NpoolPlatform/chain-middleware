@@ -377,9 +377,6 @@ func Migrate(ctx context.Context) error {
 		"Round", 1,
 	)
 	for _, table := range _tables {
-		if table != "currency_histories" {
-			continue
-		}
 		if err = migrateEntID(ctx, dbname, table, conn); err != nil {
 			return err
 		}
@@ -390,9 +387,6 @@ func Migrate(ctx context.Context) error {
 		"Round", 2,
 	)
 	for _, table := range _tables {
-		if table != "currency_histories" {
-			continue
-		}
 		if err = migrateEntID(ctx, dbname, table, conn); err != nil {
 			return err
 		}
