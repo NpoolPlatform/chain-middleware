@@ -22,8 +22,8 @@ const (
 	keyUsername  = "username"
 	keyPassword  = "password"
 	keyDBName    = "database_name"
-	maxOpen      = 2
-	maxIdle      = 1
+	maxOpen      = 5
+	maxIdle      = 2
 	MaxLife      = 0
 	keyServiceID = "serviceid"
 )
@@ -75,7 +75,7 @@ func open(hostname string) (conn *sql.DB, err error) {
 	return conn, nil
 }
 
-func tables(ctx context.Context, dbName string, tx *sql.Tx) ([]string, error) {
+func tables(ctx context.Context, dbName string, tx *sql.DB) ([]string, error) {
 	tables := []string{}
 	rows, err := tx.QueryContext(
 		ctx,
@@ -99,7 +99,7 @@ func tables(ctx context.Context, dbName string, tx *sql.Tx) ([]string, error) {
 }
 
 //nolint:funlen,gocyclo
-func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
+func migrateEntID(ctx context.Context, dbName, table string, tx *sql.DB) error {
 	logger.Sugar().Infow(
 		"migrateEntID",
 		"db", dbName,
@@ -107,6 +107,7 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 	)
 
 	_type := []byte{}
+	idInt := false
 	rows, err := tx.QueryContext(
 		ctx,
 		fmt.Sprintf("select column_type from information_schema.columns where table_name='%v' and column_name='id' and table_schema='%v'", table, dbName),
@@ -118,6 +119,9 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		if err := rows.Scan(&_type); err != nil {
 			return err
 		}
+	}
+	if strings.Contains(string(_type), "int") {
+		idInt = true
 	}
 	if strings.Contains(string(_type), "int") && !strings.Contains(string(_type), "unsigned") {
 		logger.Sugar().Infow(
@@ -150,21 +154,6 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 		}
 	}
 	if rc == 1 {
-		if key != "UNI" {
-			logger.Sugar().Infow(
-				"migrateEntID",
-				"db", dbName,
-				"table", table,
-				"State", "ENT_ID UNIQUE",
-			)
-			_, err = tx.ExecContext(
-				ctx,
-				fmt.Sprintf("alter table %v.%v change column ent_id ent_id char(36) unique", dbName, table),
-			)
-			if err != nil {
-				return err
-			}
-		}
 		logger.Sugar().Infow(
 			"migrateEntID",
 			"db", dbName,
@@ -187,36 +176,72 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 				ctx,
 				fmt.Sprintf("update %v.%v set ent_id='%v' where id=%v", dbName, table, uuid.New(), id),
 			); err != nil {
+				logger.Sugar().Errorw(
+					"migrateEntID",
+					"ID", id,
+					"Error", err,
+				)
+				return err
+			}
+		}
+		if key != "UNI" {
+			logger.Sugar().Infow(
+				"migrateEntID",
+				"db", dbName,
+				"table", table,
+				"State", "ENT_ID UNIQUE",
+			)
+			_, err = tx.ExecContext(
+				ctx,
+				fmt.Sprintf("alter table %v.%v change column ent_id ent_id char(36) unique", dbName, table),
+			)
+			if err != nil {
 				return err
 			}
 		}
 		return nil
 	}
-	logger.Sugar().Infow(
-		"migrateEntID",
-		"db", dbName,
-		"table", table,
-		"State", "ID -> EntID",
-	)
-	_, err = tx.ExecContext(
-		ctx,
-		fmt.Sprintf("alter table %v.%v change column id ent_id char(36) unique", dbName, table),
-	)
-	if err != nil {
-		return err
-	}
-	logger.Sugar().Infow(
-		"migrateEntID",
-		"db", dbName,
-		"table", table,
-		"State", "ID INT",
-	)
-	_, err = tx.ExecContext(
-		ctx,
-		fmt.Sprintf("alter table %v.%v add id int unsigned not null auto_increment, drop primary key, add primary key(id)", dbName, table),
-	)
-	if err != nil {
-		return err
+	if !idInt {
+		logger.Sugar().Infow(
+			"migrateEntID",
+			"db", dbName,
+			"table", table,
+			"State", "ID -> EntID",
+		)
+		_, err = tx.ExecContext(
+			ctx,
+			fmt.Sprintf("alter table %v.%v change column id ent_id char(36) unique", dbName, table),
+		)
+		if err != nil {
+			return err
+		}
+		logger.Sugar().Infow(
+			"migrateEntID",
+			"db", dbName,
+			"table", table,
+			"State", "ID INT",
+		)
+		_, err = tx.ExecContext(
+			ctx,
+			fmt.Sprintf("alter table %v.%v add id int unsigned not null auto_increment, drop primary key, add primary key(id)", dbName, table),
+		)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err = tx.ExecContext(
+			ctx,
+			fmt.Sprintf("alter table %v.%v add ent_id char(36) not null", dbName, table),
+		)
+		if err != nil {
+			logger.Sugar().Errorw(
+				"migrateEntID",
+				"dbName", dbName,
+				"table", table,
+				"Error", err,
+			)
+			return err
+		}
 	}
 	rows, err = tx.QueryContext(
 		ctx,
@@ -255,7 +280,6 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.Tx) error {
 func Migrate(ctx context.Context) error {
 	var err error
 	var conn *sql.DB
-	var tx *sql.Tx
 
 	logger.Sugar().Infow("Migrate", "Start", "...")
 	defer func(err *error) {
@@ -278,23 +302,30 @@ func Migrate(ctx context.Context) error {
 		}
 	}()
 
-	tx, err = conn.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
-	if err != nil {
-		return err
-	}
-
 	dbname := config.GetStringValueWithNameSpace(servicename.ServiceDomain, keyDBName)
-	_tables, err := tables(ctx, dbname, tx)
+	_tables, err := tables(ctx, dbname, conn)
 	if err != nil {
 		return err
 	}
 
+	logger.Sugar().Infow(
+		"Migrate",
+		"Round", 1,
+	)
 	for _, table := range _tables {
-		if err = migrateEntID(ctx, dbname, table, tx); err != nil {
-			_ = tx.Rollback()
+		if err = migrateEntID(ctx, dbname, table, conn); err != nil {
 			return err
 		}
 	}
-	_ = tx.Commit()
+
+	logger.Sugar().Infow(
+		"Migrate",
+		"Round", 2,
+	)
+	for _, table := range _tables {
+		if err = migrateEntID(ctx, dbname, table, conn); err != nil {
+			return err
+		}
+	}
 	return nil
 }
