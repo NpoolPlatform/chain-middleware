@@ -161,15 +161,19 @@ func setEmptyEntID(ctx context.Context, dbName, table string, tx *sql.DB) error 
 	)
 	rows, err := tx.QueryContext(
 		ctx,
-		fmt.Sprintf("select id from %v.%v where ent_id=''", dbName, table),
+		fmt.Sprintf("select id, ent_id from %v.%v", dbName, table),
 	)
 	if err != nil {
 		return err
 	}
 	for rows.Next() {
 		var id uint32
-		if err := rows.Scan(&id); err != nil {
+		var entID string
+		if err := rows.Scan(&id, &entID); err != nil {
 			return err
+		}
+		if _, err := uuid.Parse(entID); err == nil {
+			continue
 		}
 		if _, err := tx.ExecContext(
 			ctx,
