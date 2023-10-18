@@ -236,12 +236,12 @@ func addIDColumn(ctx context.Context, dbName, table string, tx *sql.DB) error {
 	return nil
 }
 
-func dropIDPrimaryKey(ctx context.Context, dbName, table string, tx *sql.DB) error {
+func dropPrimaryKey(ctx context.Context, dbName, table string, tx *sql.DB) error {
 	logger.Sugar().Infow(
-		"setIDPrimaryKey",
+		"dropPrimaryKey",
 		"db", dbName,
 		"table", table,
-		"State", "ID PRIMARY",
+		"State", "DROP PRIMARY",
 	)
 	_, err := tx.ExecContext(
 		ctx,
@@ -249,7 +249,9 @@ func dropIDPrimaryKey(ctx context.Context, dbName, table string, tx *sql.DB) err
 	)
 	if err != nil {
 		logger.Sugar().Warnw(
-			"setIDPrimaryKey",
+			"dropPrimaryKey",
+			"db", dbName,
+			"table", table,
 			"Error", err,
 		)
 	}
@@ -313,7 +315,7 @@ func migrateEntID(ctx context.Context, dbName, table string, tx *sql.DB) error {
 		}
 	}
 	if !idInt {
-		if err := dropIDPrimaryKey(ctx, dbName, table, tx); err != nil {
+		if err := dropPrimaryKey(ctx, dbName, table, tx); err != nil {
 			return err
 		}
 		if err := addIDColumn(ctx, dbName, table, tx); err != nil {
@@ -350,15 +352,14 @@ func Migrate(ctx context.Context) error {
 	var conn *sql.DB
 
 	logger.Sugar().Infow("Migrate", "Start", "...")
-	defer func(err *error) {
-		_ = redis2.Unlock(lockKey())
-		logger.Sugar().Infow("Migrate", "Done", "...", "error", *err)
-	}(&err)
-
 	err = redis2.TryLock(lockKey(), 0)
 	if err != nil {
 		return err
 	}
+	defer func(err *error) {
+		_ = redis2.Unlock(lockKey())
+		logger.Sugar().Infow("Migrate", "Done", "...", "error", *err)
+	}(&err)
 
 	conn, err = open(servicename.ServiceDomain)
 	if err != nil {
