@@ -102,6 +102,8 @@ func SetQueryConds(q *ent.FiatCurrencyHistoryQuery, conds *Conds) (*ent.FiatCurr
 			return nil, fmt.Errorf("invalid startat")
 		}
 		switch conds.StartAt.Op {
+		case cruder.EQ:
+			q.Where(entfiatcurrencyhis.CreatedAt(at))
 		case cruder.GTE:
 			q.Where(entfiatcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:
@@ -116,6 +118,8 @@ func SetQueryConds(q *ent.FiatCurrencyHistoryQuery, conds *Conds) (*ent.FiatCurr
 			return nil, fmt.Errorf("invalid endat")
 		}
 		switch conds.EndAt.Op {
+		case cruder.EQ:
+			q.Where(entfiatcurrencyhis.CreatedAt(at))
 		case cruder.GTE:
 			q.Where(entfiatcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:
