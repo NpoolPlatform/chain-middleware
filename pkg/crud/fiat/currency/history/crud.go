@@ -103,7 +103,7 @@ func SetQueryConds(q *ent.FiatCurrencyHistoryQuery, conds *Conds) (*ent.FiatCurr
 		}
 		switch conds.StartAt.Op {
 		case cruder.EQ:
-			q.Where(entfiatcurrencyhis.CreatedAt(at))
+			q.Where(entfiatcurrencyhis.CreatedAtGTE(at))
 		case cruder.GTE:
 			q.Where(entfiatcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:
@@ -119,7 +119,7 @@ func SetQueryConds(q *ent.FiatCurrencyHistoryQuery, conds *Conds) (*ent.FiatCurr
 		}
 		switch conds.EndAt.Op {
 		case cruder.EQ:
-			q.Where(entfiatcurrencyhis.CreatedAt(at))
+			q.Where(entfiatcurrencyhis.CreatedAtLTE(at))
 		case cruder.GTE:
 			q.Where(entfiatcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:
