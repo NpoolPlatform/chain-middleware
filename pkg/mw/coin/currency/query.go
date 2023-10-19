@@ -25,24 +25,14 @@ import (
 
 type queryHandler struct {
 	*Handler
-	stm   *ent.CoinBaseSelect
-	infos []*npool.Currency
-	total uint32
+	stmSelect *ent.CoinBaseSelect
+	stmCount  *ent.CoinBaseSelect
+	infos     []*npool.Currency
+	total     uint32
 }
 
-func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) {
-	h.stm = stm.
-		Select(entcoinbase.FieldCreatedAt).
-		Modify(func(s *sql.Selector) {
-			t := sql.Table(entcoinbase.Table)
-			s.AppendSelect(
-				sql.As(t.C(entcoinbase.FieldEntID), "coin_type_id"),
-				sql.As(t.C(entcoinbase.FieldName), "coin_name"),
-				sql.As(t.C(entcoinbase.FieldLogo), "coin_logo"),
-				sql.As(t.C(entcoinbase.FieldUnit), "coin_unit"),
-				sql.As(t.C(entcoinbase.FieldEnv), "coin_env"),
-			)
-		})
+func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) *ent.CoinBaseSelect {
+	return stm.Select(entcoinbase.FieldCreatedAt)
 }
 
 func (h *queryHandler) queryCoinBase(ctx context.Context, cli *ent.Client) error {
@@ -64,27 +54,31 @@ func (h *queryHandler) queryCoinBase(ctx context.Context, cli *ent.Client) error
 		return err
 	}
 
-	h.selectCoinBase(_stm2)
+	h.stmSelect = h.selectCoinBase(_stm2)
 	return nil
 }
 
-func (h *queryHandler) queryCoinBases(ctx context.Context, cli *ent.Client) error {
+func (h *queryHandler) queryCoinBases(cli *ent.Client) (*ent.CoinBaseSelect, error) {
 	stm, err := coincrud.SetQueryConds(cli.CoinBase.Query(), &coincrud.Conds{
 		EntID:  h.Conds.CoinTypeID,
 		EntIDs: h.Conds.CoinTypeIDs,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	total, err := stm.Count(ctx)
-	if err != nil {
-		return err
-	}
-	h.total = uint32(total)
+	return h.selectCoinBase(stm), nil
+}
 
-	h.selectCoinBase(stm)
-	return nil
+func (h *queryHandler) queryJoinMyself(s *sql.Selector) {
+	t := sql.Table(entcoinbase.Table)
+	s.AppendSelect(
+		sql.As(t.C(entcoinbase.FieldEntID), "coin_type_id"),
+		sql.As(t.C(entcoinbase.FieldName), "coin_name"),
+		sql.As(t.C(entcoinbase.FieldLogo), "coin_logo"),
+		sql.As(t.C(entcoinbase.FieldUnit), "coin_unit"),
+		sql.As(t.C(entcoinbase.FieldEnv), "coin_env"),
+	)
 }
 
 func (h *queryHandler) queryJoinCoinExtra(s *sql.Selector) {
@@ -99,8 +93,8 @@ func (h *queryHandler) queryJoinCoinExtra(s *sql.Selector) {
 		)
 }
 
-func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
-	s.GroupBy(entcurrency.FieldCoinTypeID)
+//nolint:gocyclo
+func (h *queryHandler) queryJoinCurrency(s *sql.Selector) error {
 	t := sql.Table(entcurrency.Table)
 	s.LeftJoin(t).
 		On(
@@ -119,17 +113,90 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
 			sql.As(t.C(entcurrency.FieldCreatedAt), "created_at"),
 			sql.As(t.C(entcurrency.FieldUpdatedAt), "updated_at"),
 		)
+
+	if h.Conds != nil && h.Conds.EntID != nil {
+		id, ok := h.Conds.EntID.Val.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("invalid entid")
+		}
+		switch h.Conds.EntID.Op {
+		case cruder.EQ:
+			s.Where(
+				sql.EQ(t.C(entcurrency.FieldEntID), id),
+			)
+		default:
+			return fmt.Errorf("invalid currency field op")
+		}
+	}
+	if h.Conds != nil && h.Conds.CoinTypeID != nil {
+		id, ok := h.Conds.CoinTypeID.Val.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("invalid cointypeid")
+		}
+		switch h.Conds.CoinTypeID.Op {
+		case cruder.EQ:
+			s.Where(
+				sql.EQ(t.C(entcurrency.FieldCoinTypeID), id),
+			)
+		default:
+			return fmt.Errorf("invalid currency field op")
+		}
+	}
+	if h.Conds != nil && h.Conds.CoinTypeIDs != nil {
+		ids, ok := h.Conds.CoinTypeIDs.Val.([]uuid.UUID)
+		if !ok {
+			return fmt.Errorf("invalid cointypeids")
+		}
+		var valueInterfaces []interface{}
+		for _, value := range ids {
+			valueInterfaces = append(valueInterfaces, value)
+		}
+		switch h.Conds.CoinTypeIDs.Op {
+		case cruder.IN:
+			s.Where(
+				sql.In(t.C(entcurrency.FieldCoinTypeID), valueInterfaces...),
+			)
+		default:
+			return fmt.Errorf("invalid currency field op")
+		}
+	}
+	if h.Conds != nil && h.Conds.FeedType != nil {
+		feedType, ok := h.Conds.FeedType.Val.(basetypes.CurrencyFeedType)
+		if !ok {
+			return fmt.Errorf("invalid feedtype")
+		}
+		switch h.Conds.FeedType.Op {
+		case cruder.EQ:
+			s.Where(
+				sql.EQ(t.C(entcurrency.FieldFeedType), feedType.String()),
+			)
+		default:
+			return fmt.Errorf("invalid currency field op")
+		}
+	}
+	return nil
 }
 
 func (h *queryHandler) queryJoin() {
-	h.stm.Modify(func(s *sql.Selector) {
+	h.stmSelect.Modify(func(s *sql.Selector) {
+		h.queryJoinMyself(s)
 		h.queryJoinCoinExtra(s)
-		h.queryJoinCurrency(s)
+		if err := h.queryJoinCurrency(s); err != nil {
+			return
+		}
+	})
+	if h.stmCount == nil {
+		return
+	}
+	h.stmCount.Modify(func(s *sql.Selector) {
+		if err := h.queryJoinCurrency(s); err != nil {
+			return
+		}
 	})
 }
 
 func (h *queryHandler) scan(ctx context.Context) error {
-	return h.stm.Scan(ctx, &h.infos)
+	return h.stmSelect.Scan(ctx, &h.infos)
 }
 
 func (h *queryHandler) formalize() {
@@ -169,7 +236,7 @@ func (h *Handler) GetCurrency(ctx context.Context) (*npool.Currency, error) {
 		}
 		handler.queryJoin()
 		const singleRowLimit = 1
-		handler.stm.
+		handler.stmSelect.
 			Offset(0).
 			Limit(singleRowLimit)
 		return handler.scan(_ctx)
@@ -190,12 +257,25 @@ func (h *Handler) GetCurrencies(ctx context.Context) ([]*npool.Currency, uint32,
 		Handler: h,
 	}
 
-	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		if err := handler.queryCoinBases(_ctx, cli); err != nil {
+	var err error
+	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		handler.stmSelect, err = handler.queryCoinBases(cli)
+		if err != nil {
 			return err
 		}
+		handler.stmCount, err = handler.queryCoinBases(cli)
+		if err != nil {
+			return err
+		}
+
 		handler.queryJoin()
-		handler.stm.
+		_total, err := handler.stmCount.Count(_ctx)
+		if err != nil {
+			return err
+		}
+		handler.total = uint32(_total)
+
+		handler.stmSelect.
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit))
 		return handler.scan(_ctx)

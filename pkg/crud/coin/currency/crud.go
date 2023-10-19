@@ -52,11 +52,13 @@ func UpdateSet(u *ent.CurrencyUpdateOne, req *Req) *ent.CurrencyUpdateOne {
 
 type Conds struct {
 	EntID       *cruder.Cond
+	FeedType    *cruder.Cond
 	CoinTypeID  *cruder.Cond
 	CoinTypeIDs *cruder.Cond
 }
 
 func SetQueryConds(q *ent.CurrencyQuery, conds *Conds) (*ent.CurrencyQuery, error) {
+	fmt.Println("1111111111111111111111111")
 	if conds.EntID != nil {
 		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
@@ -65,6 +67,18 @@ func SetQueryConds(q *ent.CurrencyQuery, conds *Conds) (*ent.CurrencyQuery, erro
 		switch conds.EntID.Op {
 		case cruder.EQ:
 			q.Where(entcurrency.EntID(id))
+		default:
+			return nil, fmt.Errorf("invalid currency field")
+		}
+	}
+	if conds.FeedType != nil {
+		feedType, ok := conds.FeedType.Val.(basetypes.CurrencyFeedType)
+		if !ok {
+			return nil, fmt.Errorf("invalid feedtype")
+		}
+		switch conds.FeedType.Op {
+		case cruder.EQ:
+			q.Where(entcurrency.FeedType(feedType.String()))
 		default:
 			return nil, fmt.Errorf("invalid currency field")
 		}

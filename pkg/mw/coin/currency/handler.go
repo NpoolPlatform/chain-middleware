@@ -205,6 +205,17 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				Val: id,
 			}
 		}
+		if conds.FeedType != nil {
+			switch conds.GetFeedType().GetValue() {
+			case uint32(basetypes.CurrencyFeedType_CoinGecko):
+			case uint32(basetypes.CurrencyFeedType_CoinBase):
+			case uint32(basetypes.CurrencyFeedType_StableUSDHardCode):
+			default:
+				return fmt.Errorf("invalid feedtype")
+			}
+			_type := conds.GetFeedType().GetValue()
+			h.Conds.FeedType = &cruder.Cond{Op: conds.GetFeedType().GetOp(), Val: basetypes.CurrencyFeedType(_type)}
+		}
 		if conds.CoinTypeID != nil {
 			id, err := uuid.Parse(conds.GetCoinTypeID().GetValue())
 			if err != nil {
