@@ -32,7 +32,10 @@ type queryHandler struct {
 
 func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) {
 	h.stm = stm.
-		Select(entcoinbase.FieldCreatedAt).
+		Select(
+			entcoinbase.FieldCreatedAt,
+			entcoinbase.FieldID,
+		).
 		Modify(func(s *sql.Selector) {
 			t := sql.Table(entcoinbase.Table)
 			s.AppendSelect(
