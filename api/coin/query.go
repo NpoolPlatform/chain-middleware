@@ -72,32 +72,3 @@ func (s *Server) GetCoins(ctx context.Context, in *npool.GetCoinsRequest) (*npoo
 		Total: total,
 	}, nil
 }
-
-func (s *Server) GetCoinOnly(ctx context.Context, in *npool.GetCoinOnlyRequest) (*npool.GetCoinOnlyResponse, error) {
-	handler, err := coin1.NewHandler(
-		ctx,
-		coin1.WithConds(in.GetConds()),
-	)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetCoinOnly",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetCoinOnlyResponse{}, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	info, err := handler.GetCoinOnly(ctx)
-	if err != nil {
-		logger.Sugar().Errorw(
-			"GetCoinOnly",
-			"In", in,
-			"Error", err,
-		)
-		return &npool.GetCoinOnlyResponse{}, status.Error(codes.Internal, err.Error())
-	}
-
-	return &npool.GetCoinOnlyResponse{
-		Info: info,
-	}, nil
-}

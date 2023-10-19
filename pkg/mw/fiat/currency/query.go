@@ -6,6 +6,7 @@ import (
 
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency"
+	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
@@ -22,23 +23,14 @@ import (
 
 type queryHandler struct {
 	*Handler
-	stm   *ent.FiatSelect
-	infos []*npool.Currency
-	total uint32
+	stmSelect *ent.FiatSelect
+	stmCount  *ent.FiatSelect
+	infos     []*npool.Currency
+	total     uint32
 }
 
-func (h *queryHandler) selectFiat(stm *ent.FiatQuery) {
-	h.stm = stm.
-		Select(entfiat.FieldCreatedAt).
-		Modify(func(s *sql.Selector) {
-			t := sql.Table(entfiat.Table)
-			s.AppendSelect(
-				sql.As(t.C(entfiat.FieldEntID), "fiat_id"),
-				sql.As(t.C(entfiat.FieldName), "fiat_name"),
-				sql.As(t.C(entfiat.FieldLogo), "fiat_logo"),
-				sql.As(t.C(entfiat.FieldUnit), "fiat_unit"),
-			)
-		})
+func (h *queryHandler) selectFiat(stm *ent.FiatQuery) *ent.FiatSelect {
+	return stm.Select(entfiat.FieldCreatedAt)
 }
 
 func (h *queryHandler) queryFiat(ctx context.Context, cli *ent.Client) error {
@@ -60,32 +52,34 @@ func (h *queryHandler) queryFiat(ctx context.Context, cli *ent.Client) error {
 		return err
 	}
 
-	h.selectFiat(_stm2)
+	h.stmSelect = h.selectFiat(_stm2)
 	return nil
 }
 
-func (h *queryHandler) queryFiats(ctx context.Context, cli *ent.Client) error {
+func (h *queryHandler) queryFiats(cli *ent.Client) (*ent.FiatSelect, error) {
 	stm, err := fiatcrud.SetQueryConds(cli.Fiat.Query(), &fiatcrud.Conds{
 		EntID:  h.Conds.FiatID,
 		EntIDs: h.Conds.FiatIDs,
 		Name:   h.Conds.FiatName,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	total, err := stm.Count(ctx)
-	if err != nil {
-		return err
-	}
-	h.total = uint32(total)
-
-	h.selectFiat(stm)
-	return nil
+	return h.selectFiat(stm), nil
 }
 
-func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
-	s.GroupBy(entcurrency.FieldFiatID)
+func (h *queryHandler) queryJoinMyself(s *sql.Selector) {
+	t := sql.Table(entfiat.Table)
+	s.AppendSelect(
+		sql.As(t.C(entfiat.FieldEntID), "fiat_id"),
+		sql.As(t.C(entfiat.FieldName), "fiat_name"),
+		sql.As(t.C(entfiat.FieldLogo), "fiat_logo"),
+		sql.As(t.C(entfiat.FieldUnit), "fiat_unit"),
+	)
+}
+
+func (h *queryHandler) queryJoinCurrency(s *sql.Selector) error {
 	t := sql.Table(entcurrency.Table)
 	s.LeftJoin(t).
 		On(
@@ -104,16 +98,76 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) {
 			sql.As(t.C(entcurrency.FieldCreatedAt), "created_at"),
 			sql.As(t.C(entcurrency.FieldUpdatedAt), "updated_at"),
 		)
+
+	if h.Conds != nil && h.Conds.EntID != nil {
+		id, ok := h.Conds.EntID.Val.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("invalid entid")
+		}
+		switch h.Conds.EntID.Op {
+		case cruder.EQ:
+			s.Where(
+				sql.EQ(t.C(entcurrency.FieldEntID), id),
+			)
+		default:
+			return fmt.Errorf("invalid fiat currency field op")
+		}
+	}
+	if h.Conds != nil && h.Conds.FiatID != nil {
+		id, ok := h.Conds.FiatID.Val.(string)
+		if !ok {
+			return fmt.Errorf("invalid fiatid")
+		}
+		switch h.Conds.FiatID.Op {
+		case cruder.EQ:
+			s.Where(
+				sql.EQ(t.C(entcurrency.FieldFiatID), id),
+			)
+		default:
+			return fmt.Errorf("invalid fiat currency field op")
+		}
+	}
+	if h.Conds != nil && h.Conds.FiatIDs != nil {
+		ids, ok := h.Conds.FiatIDs.Val.([]string)
+		if !ok {
+			return fmt.Errorf("invalid fiatids")
+		}
+		var valueInterfaces []interface{}
+		for _, value := range ids {
+			valueInterfaces = append(valueInterfaces, value)
+		}
+		switch h.Conds.FiatIDs.Op {
+		case cruder.IN:
+			s.Where(
+				sql.In(t.C(entcurrency.FieldFiatID), valueInterfaces...),
+			)
+		default:
+			return fmt.Errorf("invalid fiat currency field op")
+		}
+	}
+
+	return nil
 }
 
 func (h *queryHandler) queryJoin() {
-	h.stm.Modify(func(s *sql.Selector) {
-		h.queryJoinCurrency(s)
+	h.stmSelect.Modify(func(s *sql.Selector) {
+		h.queryJoinMyself(s)
+		if err := h.queryJoinCurrency(s); err != nil {
+			return
+		}
+	})
+	if h.stmCount == nil {
+		return
+	}
+	h.stmCount.Modify(func(s *sql.Selector) {
+		if err := h.queryJoinCurrency(s); err != nil {
+			return
+		}
 	})
 }
 
 func (h *queryHandler) scan(ctx context.Context) error {
-	return h.stm.Scan(ctx, &h.infos)
+	return h.stmSelect.Scan(ctx, &h.infos)
 }
 
 func (h *queryHandler) formalize() {
@@ -143,7 +197,7 @@ func (h *Handler) GetCurrency(ctx context.Context) (*npool.Currency, error) {
 		}
 		handler.queryJoin()
 		const singleRowLimit = 1
-		handler.stm.
+		handler.stmSelect.
 			Offset(0).
 			Limit(singleRowLimit)
 		return handler.scan(_ctx)
@@ -164,12 +218,25 @@ func (h *Handler) GetCurrencies(ctx context.Context) ([]*npool.Currency, uint32,
 		Handler: h,
 	}
 
-	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
-		if err := handler.queryFiats(_ctx, cli); err != nil {
+	var err error
+	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
+		handler.stmSelect, err = handler.queryFiats(cli)
+		if err != nil {
 			return err
 		}
+		handler.stmCount, err = handler.queryFiats(cli)
+		if err != nil {
+			return err
+		}
+
 		handler.queryJoin()
-		handler.stm.
+		_total, err := handler.stmCount.Count(_ctx)
+		if err != nil {
+			return err
+		}
+		handler.total = uint32(_total)
+
+		handler.stmSelect.
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit))
 		return handler.scan(_ctx)
