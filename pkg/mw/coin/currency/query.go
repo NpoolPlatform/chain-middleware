@@ -32,10 +32,7 @@ type queryHandler struct {
 
 func (h *queryHandler) selectCoinBase(stm *ent.CoinBaseQuery) {
 	h.stm = stm.
-		Select(
-			entcoinbase.FieldCreatedAt,
-			entcoinbase.FieldID,
-		).
+		Select(entcoinbase.FieldCreatedAt).
 		Modify(func(s *sql.Selector) {
 			t := sql.Table(entcoinbase.Table)
 			s.AppendSelect(
@@ -152,7 +149,7 @@ func (h *queryHandler) formalize() {
 			info.MarketValueLow = decimal.NewFromInt(0).String()
 		}
 		if _, err := uuid.Parse(info.EntID); err != nil {
-			info.EntID = info.CoinTypeID
+			info.EntID = uuid.Nil.String()
 		}
 	}
 }
