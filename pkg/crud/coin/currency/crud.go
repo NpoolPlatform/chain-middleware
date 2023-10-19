@@ -58,7 +58,6 @@ type Conds struct {
 }
 
 func SetQueryConds(q *ent.CurrencyQuery, conds *Conds) (*ent.CurrencyQuery, error) {
-	fmt.Println("1111111111111111111111111")
 	if conds.EntID != nil {
 		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {

@@ -215,6 +215,20 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 				Val: id,
 			}
 		}
+		if conds.FiatIDs != nil {
+			ids := []uuid.UUID{}
+			for _, id := range conds.GetFiatIDs().GetValue() {
+				_id, err := uuid.Parse(id)
+				if err != nil {
+					return err
+				}
+				ids = append(ids, _id)
+			}
+			h.Conds.FiatIDs = &cruder.Cond{
+				Op:  conds.GetFiatIDs().GetOp(),
+				Val: ids,
+			}
+		}
 		if conds.FiatName != nil {
 			h.Conds.FiatName = &cruder.Cond{
 				Op:  conds.GetFiatName().GetOp(),

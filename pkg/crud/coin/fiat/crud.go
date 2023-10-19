@@ -46,6 +46,18 @@ type Conds struct {
 }
 
 func SetQueryConds(q *ent.CoinFiatQuery, conds *Conds) (*ent.CoinFiatQuery, error) {
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid entid")
+		}
+		switch conds.EntID.Op {
+		case cruder.EQ:
+			q.Where(entcoinfiat.EntID(id))
+		default:
+			return nil, fmt.Errorf("invalid currency field")
+		}
+	}
 	if conds.CoinTypeID != nil {
 		id, ok := conds.CoinTypeID.Val.(uuid.UUID)
 		if !ok {
@@ -64,7 +76,7 @@ func SetQueryConds(q *ent.CoinFiatQuery, conds *Conds) (*ent.CoinFiatQuery, erro
 			return nil, fmt.Errorf("invalid cointypeids")
 		}
 		switch conds.CoinTypeIDs.Op {
-		case cruder.EQ:
+		case cruder.IN:
 			q.Where(entcoinfiat.CoinTypeIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid currency field")
