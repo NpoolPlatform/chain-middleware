@@ -97,6 +97,8 @@ type Conds struct {
 	NativeUnit *cruder.Cond
 	ChainID    *cruder.Cond
 	Nickname   *cruder.Cond
+	ChainType  *cruder.Cond
+	EntIDs     *cruder.Cond
 }
 
 //nolint:funlen,gocyclo
@@ -173,6 +175,18 @@ func SetQueryConds(q *ent.ChainBaseQuery, conds *Conds) (*ent.ChainBaseQuery, er
 		switch conds.Nickname.Op {
 		case cruder.EQ:
 			q.Where(entchainbase.Nickname(nickname))
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
+	if conds.EntIDs != nil {
+		ids, ok := conds.EntIDs.Val.([]uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid entids")
+		}
+		switch conds.EntIDs.Op {
+		case cruder.IN:
+			q.Where(entchainbase.EntIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid chainbase field")
 		}
