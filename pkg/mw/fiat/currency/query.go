@@ -179,6 +179,9 @@ func (h *queryHandler) formalize() {
 		if _, err := decimal.NewFromString(info.MarketValueLow); err != nil {
 			info.MarketValueLow = decimal.NewFromInt(0).String()
 		}
+		if _, err := uuid.Parse(info.EntID); err != nil {
+			info.EntID = uuid.Nil.String()
+		}
 	}
 }
 
