@@ -47,15 +47,15 @@ func (h *Handler) CreateFeed(ctx context.Context) (*npool.Feed, error) {
 	}
 
 	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	err = db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		if _, err := currencyfeedcrud.CreateSet(
 			cli.CurrencyFeed.Create(),
 			&currencyfeedcrud.Req{
-				ID:           h.ID,
+				EntID:        h.EntID,
 				CoinTypeID:   h.CoinTypeID,
 				FeedType:     h.FeedType,
 				FeedCoinName: h.FeedCoinName,

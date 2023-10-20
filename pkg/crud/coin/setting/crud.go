@@ -12,7 +12,7 @@ import (
 )
 
 type Req struct {
-	ID                          *uuid.UUID
+	EntID                       *uuid.UUID
 	CoinTypeID                  *uuid.UUID
 	FeeCoinTypeID               *uuid.UUID
 	WithdrawFeeByStableUSD      *bool
@@ -31,8 +31,8 @@ type Req struct {
 }
 
 func CreateSet(c *ent.SettingCreate, req *Req) *ent.SettingCreate { //nolint
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.CoinTypeID != nil {
 		c.SetCoinTypeID(*req.CoinTypeID)
@@ -127,20 +127,20 @@ func UpdateSet(u *ent.SettingUpdateOne, req *Req) *ent.SettingUpdateOne {
 }
 
 type Conds struct {
-	ID            *cruder.Cond
+	EntID         *cruder.Cond
 	CoinTypeID    *cruder.Cond
 	FeeCoinTypeID *cruder.Cond
 }
 
 func SetQueryConds(q *ent.SettingQuery, conds *Conds) (*ent.SettingQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entsetting.ID(id))
+			q.Where(entsetting.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid setting field")
 		}

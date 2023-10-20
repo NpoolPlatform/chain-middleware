@@ -7,9 +7,12 @@ import (
 	entchainbase "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
 	"github.com/NpoolPlatform/libent-cruder/pkg/cruder"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
+
+	"github.com/google/uuid"
 )
 
 type Req struct {
+	EntID      *uuid.UUID
 	Name       *string
 	Logo       *string
 	NativeUnit *string
@@ -23,6 +26,9 @@ type Req struct {
 }
 
 func CreateSet(c *ent.ChainBaseCreate, req *Req) *ent.ChainBaseCreate {
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
+	}
 	if req.Name != nil {
 		c.SetName(*req.Name)
 	}
@@ -85,15 +91,32 @@ func UpdateSet(u *ent.ChainBaseUpdateOne, req *Req) *ent.ChainBaseUpdateOne {
 }
 
 type Conds struct {
+	EntID      *cruder.Cond
 	Name       *cruder.Cond
 	ENV        *cruder.Cond
 	NativeUnit *cruder.Cond
 	ChainID    *cruder.Cond
 	Nickname   *cruder.Cond
+	ChainType  *cruder.Cond
+	EntIDs     *cruder.Cond
 }
 
-//nolint:gocyclo
+//nolint:funlen,gocyclo
 func SetQueryConds(q *ent.ChainBaseQuery, conds *Conds) (*ent.ChainBaseQuery, error) {
+	if conds.EntID != nil {
+		name, ok := conds.EntID.Val.(uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid entid")
+		}
+		switch conds.EntID.Op {
+		case cruder.EQ:
+			q.Where(
+				entchainbase.EntID(name),
+			)
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
 	if conds.Name != nil {
 		name, ok := conds.Name.Val.(string)
 		if !ok {
@@ -152,6 +175,18 @@ func SetQueryConds(q *ent.ChainBaseQuery, conds *Conds) (*ent.ChainBaseQuery, er
 		switch conds.Nickname.Op {
 		case cruder.EQ:
 			q.Where(entchainbase.Nickname(nickname))
+		default:
+			return nil, fmt.Errorf("invalid chainbase field")
+		}
+	}
+	if conds.EntIDs != nil {
+		ids, ok := conds.EntIDs.Val.([]uuid.UUID)
+		if !ok {
+			return nil, fmt.Errorf("invalid entids")
+		}
+		switch conds.EntIDs.Op {
+		case cruder.IN:
+			q.Where(entchainbase.EntIDIn(ids...))
 		default:
 			return nil, fmt.Errorf("invalid chainbase field")
 		}

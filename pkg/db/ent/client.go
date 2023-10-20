@@ -9,7 +9,6 @@ import (
 	"log"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/migrate"
-	"github.com/google/uuid"
 
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/appcoin"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
@@ -283,7 +282,7 @@ func (c *AppCoinClient) UpdateOne(ac *AppCoin) *AppCoinUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AppCoinClient) UpdateOneID(id uuid.UUID) *AppCoinUpdateOne {
+func (c *AppCoinClient) UpdateOneID(id uint32) *AppCoinUpdateOne {
 	mutation := newAppCoinMutation(c.config, OpUpdateOne, withAppCoinID(id))
 	return &AppCoinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -300,7 +299,7 @@ func (c *AppCoinClient) DeleteOne(ac *AppCoin) *AppCoinDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *AppCoinClient) DeleteOneID(id uuid.UUID) *AppCoinDeleteOne {
+func (c *AppCoinClient) DeleteOneID(id uint32) *AppCoinDeleteOne {
 	builder := c.Delete().Where(appcoin.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -315,12 +314,12 @@ func (c *AppCoinClient) Query() *AppCoinQuery {
 }
 
 // Get returns a AppCoin entity by its id.
-func (c *AppCoinClient) Get(ctx context.Context, id uuid.UUID) (*AppCoin, error) {
+func (c *AppCoinClient) Get(ctx context.Context, id uint32) (*AppCoin, error) {
 	return c.Query().Where(appcoin.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AppCoinClient) GetX(ctx context.Context, id uuid.UUID) *AppCoin {
+func (c *AppCoinClient) GetX(ctx context.Context, id uint32) *AppCoin {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -465,7 +464,7 @@ func (c *CoinBaseClient) UpdateOne(cb *CoinBase) *CoinBaseUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CoinBaseClient) UpdateOneID(id uuid.UUID) *CoinBaseUpdateOne {
+func (c *CoinBaseClient) UpdateOneID(id uint32) *CoinBaseUpdateOne {
 	mutation := newCoinBaseMutation(c.config, OpUpdateOne, withCoinBaseID(id))
 	return &CoinBaseUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -482,7 +481,7 @@ func (c *CoinBaseClient) DeleteOne(cb *CoinBase) *CoinBaseDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CoinBaseClient) DeleteOneID(id uuid.UUID) *CoinBaseDeleteOne {
+func (c *CoinBaseClient) DeleteOneID(id uint32) *CoinBaseDeleteOne {
 	builder := c.Delete().Where(coinbase.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -497,12 +496,12 @@ func (c *CoinBaseClient) Query() *CoinBaseQuery {
 }
 
 // Get returns a CoinBase entity by its id.
-func (c *CoinBaseClient) Get(ctx context.Context, id uuid.UUID) (*CoinBase, error) {
+func (c *CoinBaseClient) Get(ctx context.Context, id uint32) (*CoinBase, error) {
 	return c.Query().Where(coinbase.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CoinBaseClient) GetX(ctx context.Context, id uuid.UUID) *CoinBase {
+func (c *CoinBaseClient) GetX(ctx context.Context, id uint32) *CoinBase {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -556,7 +555,7 @@ func (c *CoinDescriptionClient) UpdateOne(cd *CoinDescription) *CoinDescriptionU
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CoinDescriptionClient) UpdateOneID(id uuid.UUID) *CoinDescriptionUpdateOne {
+func (c *CoinDescriptionClient) UpdateOneID(id uint32) *CoinDescriptionUpdateOne {
 	mutation := newCoinDescriptionMutation(c.config, OpUpdateOne, withCoinDescriptionID(id))
 	return &CoinDescriptionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -573,7 +572,7 @@ func (c *CoinDescriptionClient) DeleteOne(cd *CoinDescription) *CoinDescriptionD
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CoinDescriptionClient) DeleteOneID(id uuid.UUID) *CoinDescriptionDeleteOne {
+func (c *CoinDescriptionClient) DeleteOneID(id uint32) *CoinDescriptionDeleteOne {
 	builder := c.Delete().Where(coindescription.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -588,12 +587,12 @@ func (c *CoinDescriptionClient) Query() *CoinDescriptionQuery {
 }
 
 // Get returns a CoinDescription entity by its id.
-func (c *CoinDescriptionClient) Get(ctx context.Context, id uuid.UUID) (*CoinDescription, error) {
+func (c *CoinDescriptionClient) Get(ctx context.Context, id uint32) (*CoinDescription, error) {
 	return c.Query().Where(coindescription.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CoinDescriptionClient) GetX(ctx context.Context, id uuid.UUID) *CoinDescription {
+func (c *CoinDescriptionClient) GetX(ctx context.Context, id uint32) *CoinDescription {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -647,7 +646,7 @@ func (c *CoinExtraClient) UpdateOne(ce *CoinExtra) *CoinExtraUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CoinExtraClient) UpdateOneID(id uuid.UUID) *CoinExtraUpdateOne {
+func (c *CoinExtraClient) UpdateOneID(id uint32) *CoinExtraUpdateOne {
 	mutation := newCoinExtraMutation(c.config, OpUpdateOne, withCoinExtraID(id))
 	return &CoinExtraUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -664,7 +663,7 @@ func (c *CoinExtraClient) DeleteOne(ce *CoinExtra) *CoinExtraDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CoinExtraClient) DeleteOneID(id uuid.UUID) *CoinExtraDeleteOne {
+func (c *CoinExtraClient) DeleteOneID(id uint32) *CoinExtraDeleteOne {
 	builder := c.Delete().Where(coinextra.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -679,12 +678,12 @@ func (c *CoinExtraClient) Query() *CoinExtraQuery {
 }
 
 // Get returns a CoinExtra entity by its id.
-func (c *CoinExtraClient) Get(ctx context.Context, id uuid.UUID) (*CoinExtra, error) {
+func (c *CoinExtraClient) Get(ctx context.Context, id uint32) (*CoinExtra, error) {
 	return c.Query().Where(coinextra.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CoinExtraClient) GetX(ctx context.Context, id uuid.UUID) *CoinExtra {
+func (c *CoinExtraClient) GetX(ctx context.Context, id uint32) *CoinExtra {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1011,7 +1010,7 @@ func (c *CurrencyClient) UpdateOne(cu *Currency) *CurrencyUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CurrencyClient) UpdateOneID(id uuid.UUID) *CurrencyUpdateOne {
+func (c *CurrencyClient) UpdateOneID(id uint32) *CurrencyUpdateOne {
 	mutation := newCurrencyMutation(c.config, OpUpdateOne, withCurrencyID(id))
 	return &CurrencyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1028,7 +1027,7 @@ func (c *CurrencyClient) DeleteOne(cu *Currency) *CurrencyDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CurrencyClient) DeleteOneID(id uuid.UUID) *CurrencyDeleteOne {
+func (c *CurrencyClient) DeleteOneID(id uint32) *CurrencyDeleteOne {
 	builder := c.Delete().Where(currency.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1043,12 +1042,12 @@ func (c *CurrencyClient) Query() *CurrencyQuery {
 }
 
 // Get returns a Currency entity by its id.
-func (c *CurrencyClient) Get(ctx context.Context, id uuid.UUID) (*Currency, error) {
+func (c *CurrencyClient) Get(ctx context.Context, id uint32) (*Currency, error) {
 	return c.Query().Where(currency.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CurrencyClient) GetX(ctx context.Context, id uuid.UUID) *Currency {
+func (c *CurrencyClient) GetX(ctx context.Context, id uint32) *Currency {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1102,7 +1101,7 @@ func (c *CurrencyFeedClient) UpdateOne(cf *CurrencyFeed) *CurrencyFeedUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CurrencyFeedClient) UpdateOneID(id uuid.UUID) *CurrencyFeedUpdateOne {
+func (c *CurrencyFeedClient) UpdateOneID(id uint32) *CurrencyFeedUpdateOne {
 	mutation := newCurrencyFeedMutation(c.config, OpUpdateOne, withCurrencyFeedID(id))
 	return &CurrencyFeedUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1119,7 +1118,7 @@ func (c *CurrencyFeedClient) DeleteOne(cf *CurrencyFeed) *CurrencyFeedDeleteOne 
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CurrencyFeedClient) DeleteOneID(id uuid.UUID) *CurrencyFeedDeleteOne {
+func (c *CurrencyFeedClient) DeleteOneID(id uint32) *CurrencyFeedDeleteOne {
 	builder := c.Delete().Where(currencyfeed.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1134,12 +1133,12 @@ func (c *CurrencyFeedClient) Query() *CurrencyFeedQuery {
 }
 
 // Get returns a CurrencyFeed entity by its id.
-func (c *CurrencyFeedClient) Get(ctx context.Context, id uuid.UUID) (*CurrencyFeed, error) {
+func (c *CurrencyFeedClient) Get(ctx context.Context, id uint32) (*CurrencyFeed, error) {
 	return c.Query().Where(currencyfeed.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CurrencyFeedClient) GetX(ctx context.Context, id uuid.UUID) *CurrencyFeed {
+func (c *CurrencyFeedClient) GetX(ctx context.Context, id uint32) *CurrencyFeed {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1193,7 +1192,7 @@ func (c *CurrencyHistoryClient) UpdateOne(ch *CurrencyHistory) *CurrencyHistoryU
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CurrencyHistoryClient) UpdateOneID(id uuid.UUID) *CurrencyHistoryUpdateOne {
+func (c *CurrencyHistoryClient) UpdateOneID(id uint32) *CurrencyHistoryUpdateOne {
 	mutation := newCurrencyHistoryMutation(c.config, OpUpdateOne, withCurrencyHistoryID(id))
 	return &CurrencyHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1210,7 +1209,7 @@ func (c *CurrencyHistoryClient) DeleteOne(ch *CurrencyHistory) *CurrencyHistoryD
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *CurrencyHistoryClient) DeleteOneID(id uuid.UUID) *CurrencyHistoryDeleteOne {
+func (c *CurrencyHistoryClient) DeleteOneID(id uint32) *CurrencyHistoryDeleteOne {
 	builder := c.Delete().Where(currencyhistory.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1225,12 +1224,12 @@ func (c *CurrencyHistoryClient) Query() *CurrencyHistoryQuery {
 }
 
 // Get returns a CurrencyHistory entity by its id.
-func (c *CurrencyHistoryClient) Get(ctx context.Context, id uuid.UUID) (*CurrencyHistory, error) {
+func (c *CurrencyHistoryClient) Get(ctx context.Context, id uint32) (*CurrencyHistory, error) {
 	return c.Query().Where(currencyhistory.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CurrencyHistoryClient) GetX(ctx context.Context, id uuid.UUID) *CurrencyHistory {
+func (c *CurrencyHistoryClient) GetX(ctx context.Context, id uint32) *CurrencyHistory {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1284,7 +1283,7 @@ func (c *ExchangeRateClient) UpdateOne(er *ExchangeRate) *ExchangeRateUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ExchangeRateClient) UpdateOneID(id uuid.UUID) *ExchangeRateUpdateOne {
+func (c *ExchangeRateClient) UpdateOneID(id uint32) *ExchangeRateUpdateOne {
 	mutation := newExchangeRateMutation(c.config, OpUpdateOne, withExchangeRateID(id))
 	return &ExchangeRateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1301,7 +1300,7 @@ func (c *ExchangeRateClient) DeleteOne(er *ExchangeRate) *ExchangeRateDeleteOne 
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *ExchangeRateClient) DeleteOneID(id uuid.UUID) *ExchangeRateDeleteOne {
+func (c *ExchangeRateClient) DeleteOneID(id uint32) *ExchangeRateDeleteOne {
 	builder := c.Delete().Where(exchangerate.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1316,12 +1315,12 @@ func (c *ExchangeRateClient) Query() *ExchangeRateQuery {
 }
 
 // Get returns a ExchangeRate entity by its id.
-func (c *ExchangeRateClient) Get(ctx context.Context, id uuid.UUID) (*ExchangeRate, error) {
+func (c *ExchangeRateClient) Get(ctx context.Context, id uint32) (*ExchangeRate, error) {
 	return c.Query().Where(exchangerate.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ExchangeRateClient) GetX(ctx context.Context, id uuid.UUID) *ExchangeRate {
+func (c *ExchangeRateClient) GetX(ctx context.Context, id uint32) *ExchangeRate {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1375,7 +1374,7 @@ func (c *FiatClient) UpdateOne(f *Fiat) *FiatUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *FiatClient) UpdateOneID(id uuid.UUID) *FiatUpdateOne {
+func (c *FiatClient) UpdateOneID(id uint32) *FiatUpdateOne {
 	mutation := newFiatMutation(c.config, OpUpdateOne, withFiatID(id))
 	return &FiatUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1392,7 +1391,7 @@ func (c *FiatClient) DeleteOne(f *Fiat) *FiatDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *FiatClient) DeleteOneID(id uuid.UUID) *FiatDeleteOne {
+func (c *FiatClient) DeleteOneID(id uint32) *FiatDeleteOne {
 	builder := c.Delete().Where(fiat.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1407,12 +1406,12 @@ func (c *FiatClient) Query() *FiatQuery {
 }
 
 // Get returns a Fiat entity by its id.
-func (c *FiatClient) Get(ctx context.Context, id uuid.UUID) (*Fiat, error) {
+func (c *FiatClient) Get(ctx context.Context, id uint32) (*Fiat, error) {
 	return c.Query().Where(fiat.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *FiatClient) GetX(ctx context.Context, id uuid.UUID) *Fiat {
+func (c *FiatClient) GetX(ctx context.Context, id uint32) *Fiat {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1466,7 +1465,7 @@ func (c *FiatCurrencyClient) UpdateOne(fc *FiatCurrency) *FiatCurrencyUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *FiatCurrencyClient) UpdateOneID(id uuid.UUID) *FiatCurrencyUpdateOne {
+func (c *FiatCurrencyClient) UpdateOneID(id uint32) *FiatCurrencyUpdateOne {
 	mutation := newFiatCurrencyMutation(c.config, OpUpdateOne, withFiatCurrencyID(id))
 	return &FiatCurrencyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1483,7 +1482,7 @@ func (c *FiatCurrencyClient) DeleteOne(fc *FiatCurrency) *FiatCurrencyDeleteOne 
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *FiatCurrencyClient) DeleteOneID(id uuid.UUID) *FiatCurrencyDeleteOne {
+func (c *FiatCurrencyClient) DeleteOneID(id uint32) *FiatCurrencyDeleteOne {
 	builder := c.Delete().Where(fiatcurrency.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1498,12 +1497,12 @@ func (c *FiatCurrencyClient) Query() *FiatCurrencyQuery {
 }
 
 // Get returns a FiatCurrency entity by its id.
-func (c *FiatCurrencyClient) Get(ctx context.Context, id uuid.UUID) (*FiatCurrency, error) {
+func (c *FiatCurrencyClient) Get(ctx context.Context, id uint32) (*FiatCurrency, error) {
 	return c.Query().Where(fiatcurrency.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *FiatCurrencyClient) GetX(ctx context.Context, id uuid.UUID) *FiatCurrency {
+func (c *FiatCurrencyClient) GetX(ctx context.Context, id uint32) *FiatCurrency {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1557,7 +1556,7 @@ func (c *FiatCurrencyFeedClient) UpdateOne(fcf *FiatCurrencyFeed) *FiatCurrencyF
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *FiatCurrencyFeedClient) UpdateOneID(id uuid.UUID) *FiatCurrencyFeedUpdateOne {
+func (c *FiatCurrencyFeedClient) UpdateOneID(id uint32) *FiatCurrencyFeedUpdateOne {
 	mutation := newFiatCurrencyFeedMutation(c.config, OpUpdateOne, withFiatCurrencyFeedID(id))
 	return &FiatCurrencyFeedUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1574,7 +1573,7 @@ func (c *FiatCurrencyFeedClient) DeleteOne(fcf *FiatCurrencyFeed) *FiatCurrencyF
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *FiatCurrencyFeedClient) DeleteOneID(id uuid.UUID) *FiatCurrencyFeedDeleteOne {
+func (c *FiatCurrencyFeedClient) DeleteOneID(id uint32) *FiatCurrencyFeedDeleteOne {
 	builder := c.Delete().Where(fiatcurrencyfeed.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1589,12 +1588,12 @@ func (c *FiatCurrencyFeedClient) Query() *FiatCurrencyFeedQuery {
 }
 
 // Get returns a FiatCurrencyFeed entity by its id.
-func (c *FiatCurrencyFeedClient) Get(ctx context.Context, id uuid.UUID) (*FiatCurrencyFeed, error) {
+func (c *FiatCurrencyFeedClient) Get(ctx context.Context, id uint32) (*FiatCurrencyFeed, error) {
 	return c.Query().Where(fiatcurrencyfeed.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *FiatCurrencyFeedClient) GetX(ctx context.Context, id uuid.UUID) *FiatCurrencyFeed {
+func (c *FiatCurrencyFeedClient) GetX(ctx context.Context, id uint32) *FiatCurrencyFeed {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1648,7 +1647,7 @@ func (c *FiatCurrencyHistoryClient) UpdateOne(fch *FiatCurrencyHistory) *FiatCur
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *FiatCurrencyHistoryClient) UpdateOneID(id uuid.UUID) *FiatCurrencyHistoryUpdateOne {
+func (c *FiatCurrencyHistoryClient) UpdateOneID(id uint32) *FiatCurrencyHistoryUpdateOne {
 	mutation := newFiatCurrencyHistoryMutation(c.config, OpUpdateOne, withFiatCurrencyHistoryID(id))
 	return &FiatCurrencyHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1665,7 +1664,7 @@ func (c *FiatCurrencyHistoryClient) DeleteOne(fch *FiatCurrencyHistory) *FiatCur
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *FiatCurrencyHistoryClient) DeleteOneID(id uuid.UUID) *FiatCurrencyHistoryDeleteOne {
+func (c *FiatCurrencyHistoryClient) DeleteOneID(id uint32) *FiatCurrencyHistoryDeleteOne {
 	builder := c.Delete().Where(fiatcurrencyhistory.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1680,12 +1679,12 @@ func (c *FiatCurrencyHistoryClient) Query() *FiatCurrencyHistoryQuery {
 }
 
 // Get returns a FiatCurrencyHistory entity by its id.
-func (c *FiatCurrencyHistoryClient) Get(ctx context.Context, id uuid.UUID) (*FiatCurrencyHistory, error) {
+func (c *FiatCurrencyHistoryClient) Get(ctx context.Context, id uint32) (*FiatCurrencyHistory, error) {
 	return c.Query().Where(fiatcurrencyhistory.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *FiatCurrencyHistoryClient) GetX(ctx context.Context, id uuid.UUID) *FiatCurrencyHistory {
+func (c *FiatCurrencyHistoryClient) GetX(ctx context.Context, id uint32) *FiatCurrencyHistory {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1739,7 +1738,7 @@ func (c *SettingClient) UpdateOne(s *Setting) *SettingUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SettingClient) UpdateOneID(id uuid.UUID) *SettingUpdateOne {
+func (c *SettingClient) UpdateOneID(id uint32) *SettingUpdateOne {
 	mutation := newSettingMutation(c.config, OpUpdateOne, withSettingID(id))
 	return &SettingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1756,7 +1755,7 @@ func (c *SettingClient) DeleteOne(s *Setting) *SettingDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *SettingClient) DeleteOneID(id uuid.UUID) *SettingDeleteOne {
+func (c *SettingClient) DeleteOneID(id uint32) *SettingDeleteOne {
 	builder := c.Delete().Where(setting.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1771,12 +1770,12 @@ func (c *SettingClient) Query() *SettingQuery {
 }
 
 // Get returns a Setting entity by its id.
-func (c *SettingClient) Get(ctx context.Context, id uuid.UUID) (*Setting, error) {
+func (c *SettingClient) Get(ctx context.Context, id uint32) (*Setting, error) {
 	return c.Query().Where(setting.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SettingClient) GetX(ctx context.Context, id uuid.UUID) *Setting {
+func (c *SettingClient) GetX(ctx context.Context, id uint32) *Setting {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1830,7 +1829,7 @@ func (c *TranClient) UpdateOne(t *Tran) *TranUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *TranClient) UpdateOneID(id uuid.UUID) *TranUpdateOne {
+func (c *TranClient) UpdateOneID(id uint32) *TranUpdateOne {
 	mutation := newTranMutation(c.config, OpUpdateOne, withTranID(id))
 	return &TranUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1847,7 +1846,7 @@ func (c *TranClient) DeleteOne(t *Tran) *TranDeleteOne {
 }
 
 // DeleteOne returns a builder for deleting the given entity by its id.
-func (c *TranClient) DeleteOneID(id uuid.UUID) *TranDeleteOne {
+func (c *TranClient) DeleteOneID(id uint32) *TranDeleteOne {
 	builder := c.Delete().Where(tran.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1862,12 +1861,12 @@ func (c *TranClient) Query() *TranQuery {
 }
 
 // Get returns a Tran entity by its id.
-func (c *TranClient) Get(ctx context.Context, id uuid.UUID) (*Tran, error) {
+func (c *TranClient) Get(ctx context.Context, id uint32) (*Tran, error) {
 	return c.Query().Where(tran.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *TranClient) GetX(ctx context.Context, id uuid.UUID) *Tran {
+func (c *TranClient) GetX(ctx context.Context, id uint32) *Tran {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 	currencycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin/fiat/currency"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 
@@ -13,6 +14,7 @@ import (
 
 type Handler struct {
 	ID              *uint32
+	EntID           *uuid.UUID
 	CoinTypeID      *uuid.UUID
 	FiatID          *uuid.UUID
 	FeedType        *basetypes.CurrencyFeedType
@@ -35,16 +37,42 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *uint32) func(context.Context, *Handler) error {
+func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
-		h.ID = id
+		if u == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
+		}
+		h.ID = u
 		return nil
 	}
 }
 
-func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
+			return nil
+		}
+		_id, err := uuid.Parse(*id)
+		if err != nil {
+			return err
+		}
+		h.EntID = &_id
+		return nil
+	}
+}
+
+func WithCoinTypeID(id *string, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if id == nil {
+			if must {
+				return fmt.Errorf("invalid cointypeid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -56,9 +84,12 @@ func WithCoinTypeID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithFiatID(id *string) func(context.Context, *Handler) error {
+func WithFiatID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid fiatid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -70,9 +101,12 @@ func WithFiatID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithFeedType(feedType *basetypes.CurrencyFeedType) func(context.Context, *Handler) error {
+func WithFeedType(feedType *basetypes.CurrencyFeedType, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if feedType == nil {
+			if must {
+				return fmt.Errorf("invalid feedtype")
+			}
 			return nil
 		}
 		switch *feedType {
@@ -87,9 +121,12 @@ func WithFeedType(feedType *basetypes.CurrencyFeedType) func(context.Context, *H
 	}
 }
 
-func WithMarketValueHigh(value *string) func(context.Context, *Handler) error {
+func WithMarketValueHigh(value *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if value == nil {
+			if must {
+				return fmt.Errorf("invalid marketvaluehigh")
+			}
 			return nil
 		}
 		_value, err := decimal.NewFromString(*value)
@@ -101,9 +138,12 @@ func WithMarketValueHigh(value *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithMarketValueLow(value *string) func(context.Context, *Handler) error {
+func WithMarketValueLow(value *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if value == nil {
+			if must {
+				return fmt.Errorf("invalid marketvaluelow")
+			}
 			return nil
 		}
 		_value, err := decimal.NewFromString(*value)
@@ -124,6 +164,9 @@ func WithOffset(offset int32) func(context.Context, *Handler) error {
 
 func WithLimit(limit int32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if limit == 0 {
+			limit = constant.DefaultRowLimit
+		}
 		h.Limit = limit
 		return nil
 	}

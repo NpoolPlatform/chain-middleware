@@ -84,6 +84,20 @@ func (cfu *CurrencyFeedUpdate) AddDeletedAt(u int32) *CurrencyFeedUpdate {
 	return cfu
 }
 
+// SetEntID sets the "ent_id" field.
+func (cfu *CurrencyFeedUpdate) SetEntID(u uuid.UUID) *CurrencyFeedUpdate {
+	cfu.mutation.SetEntID(u)
+	return cfu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfu *CurrencyFeedUpdate) SetNillableEntID(u *uuid.UUID) *CurrencyFeedUpdate {
+	if u != nil {
+		cfu.SetEntID(*u)
+	}
+	return cfu
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (cfu *CurrencyFeedUpdate) SetCoinTypeID(u uuid.UUID) *CurrencyFeedUpdate {
 	cfu.mutation.SetCoinTypeID(u)
@@ -250,7 +264,7 @@ func (cfu *CurrencyFeedUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   currencyfeed.Table,
 			Columns: currencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: currencyfeed.FieldID,
 			},
 		},
@@ -302,6 +316,13 @@ func (cfu *CurrencyFeedUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: currencyfeed.FieldDeletedAt,
+		})
+	}
+	if value, ok := cfu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: currencyfeed.FieldEntID,
 		})
 	}
 	if value, ok := cfu.mutation.CoinTypeID(); ok {
@@ -429,6 +450,20 @@ func (cfuo *CurrencyFeedUpdateOne) SetNillableDeletedAt(u *uint32) *CurrencyFeed
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cfuo *CurrencyFeedUpdateOne) AddDeletedAt(u int32) *CurrencyFeedUpdateOne {
 	cfuo.mutation.AddDeletedAt(u)
+	return cfuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (cfuo *CurrencyFeedUpdateOne) SetEntID(u uuid.UUID) *CurrencyFeedUpdateOne {
+	cfuo.mutation.SetEntID(u)
+	return cfuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfuo *CurrencyFeedUpdateOne) SetNillableEntID(u *uuid.UUID) *CurrencyFeedUpdateOne {
+	if u != nil {
+		cfuo.SetEntID(*u)
+	}
 	return cfuo
 }
 
@@ -611,7 +646,7 @@ func (cfuo *CurrencyFeedUpdateOne) sqlSave(ctx context.Context) (_node *Currency
 			Table:   currencyfeed.Table,
 			Columns: currencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: currencyfeed.FieldID,
 			},
 		},
@@ -680,6 +715,13 @@ func (cfuo *CurrencyFeedUpdateOne) sqlSave(ctx context.Context) (_node *Currency
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: currencyfeed.FieldDeletedAt,
+		})
+	}
+	if value, ok := cfuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: currencyfeed.FieldEntID,
 		})
 	}
 	if value, ok := cfuo.mutation.CoinTypeID(); ok {

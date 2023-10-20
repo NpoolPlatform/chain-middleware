@@ -51,11 +51,11 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -70,10 +70,10 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithMarketValueHigh(req.MarketValueHigh),
-		WithMarketValueLow(req.MarketValueLow),
-		WithFeedType(req.FeedType),
+		WithCoinTypeID(req.CoinTypeID, true),
+		WithMarketValueHigh(req.MarketValueHigh, true),
+		WithMarketValueLow(req.MarketValueLow, true),
+		WithFeedType(req.FeedType, true),
 	)
 	assert.Nil(t, err)
 
@@ -82,6 +82,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, ret, info)
 	}
 }
@@ -97,10 +98,10 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithMarketValueHigh(req.MarketValueHigh),
-		WithMarketValueLow(req.MarketValueLow),
-		WithFeedType(req.FeedType),
+		WithCoinTypeID(req.CoinTypeID, true),
+		WithMarketValueHigh(req.MarketValueHigh, true),
+		WithMarketValueLow(req.MarketValueLow, true),
+		WithFeedType(req.FeedType, true),
 	)
 	assert.Nil(t, err)
 
@@ -114,7 +115,7 @@ func update(t *testing.T) {
 func get(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
+		WithEntID(&ret.EntID, true),
 	)
 	assert.Nil(t, err)
 

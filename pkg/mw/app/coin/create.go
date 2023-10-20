@@ -26,6 +26,7 @@ func (h *createHandler) createAppCoin(ctx context.Context, tx *ent.Tx) error {
 		tx.AppCoin.Create(),
 		&appcoincrud.Req{
 			ID:                       h.ID,
+			EntID:                    h.EntID,
 			AppID:                    h.AppID,
 			CoinTypeID:               h.CoinTypeID,
 			Name:                     h.Name,
@@ -89,8 +90,8 @@ func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
 	}
 
 	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	handler := &createHandler{

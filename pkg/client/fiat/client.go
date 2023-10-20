@@ -51,7 +51,7 @@ func CreateFiat(ctx context.Context, in *npool.FiatReq) (*npool.Fiat, error) {
 func GetFiat(ctx context.Context, id string) (*npool.Fiat, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetFiat(ctx, &npool.GetFiatRequest{
-			ID: id,
+			EntID: id,
 		})
 		if err != nil {
 			return nil, err

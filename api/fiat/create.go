@@ -1,4 +1,3 @@
-//nolint:dupl
 package fiat
 
 import (
@@ -16,10 +15,11 @@ func (s *Server) CreateFiat(ctx context.Context, in *npool.CreateFiatRequest) (*
 	req := in.GetInfo()
 	handler, err := fiat1.NewHandler(
 		ctx,
-		fiat1.WithID(req.ID),
-		fiat1.WithName(req.Name),
-		fiat1.WithLogo(req.Logo),
-		fiat1.WithUnit(req.Unit),
+		fiat1.WithID(req.ID, false),
+		fiat1.WithEntID(req.EntID, false),
+		fiat1.WithName(req.Name, true),
+		fiat1.WithLogo(req.Logo, true),
+		fiat1.WithUnit(req.Unit, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

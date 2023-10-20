@@ -51,7 +51,7 @@ func CreateCoinDescription(ctx context.Context, in *npool.CoinDescriptionReq) (*
 func GetCoinDescription(ctx context.Context, id string) (*npool.CoinDescription, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetCoinDescription(ctx, &npool.GetCoinDescriptionRequest{
-			ID: id,
+			EntID: id,
 		})
 		if err != nil {
 			return nil, err

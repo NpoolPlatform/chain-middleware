@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
+	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
@@ -81,6 +82,20 @@ func (cbu *CoinBaseUpdate) SetNillableDeletedAt(u *uint32) *CoinBaseUpdate {
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cbu *CoinBaseUpdate) AddDeletedAt(u int32) *CoinBaseUpdate {
 	cbu.mutation.AddDeletedAt(u)
+	return cbu
+}
+
+// SetEntID sets the "ent_id" field.
+func (cbu *CoinBaseUpdate) SetEntID(u uuid.UUID) *CoinBaseUpdate {
+	cbu.mutation.SetEntID(u)
+	return cbu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cbu *CoinBaseUpdate) SetNillableEntID(u *uuid.UUID) *CoinBaseUpdate {
+	if u != nil {
+		cbu.SetEntID(*u)
+	}
 	return cbu
 }
 
@@ -330,7 +345,7 @@ func (cbu *CoinBaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coinbase.Table,
 			Columns: coinbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: coinbase.FieldID,
 			},
 		},
@@ -382,6 +397,13 @@ func (cbu *CoinBaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinbase.FieldDeletedAt,
+		})
+	}
+	if value, ok := cbu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinbase.FieldEntID,
 		})
 	}
 	if value, ok := cbu.mutation.Name(); ok {
@@ -561,6 +583,20 @@ func (cbuo *CoinBaseUpdateOne) SetNillableDeletedAt(u *uint32) *CoinBaseUpdateOn
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cbuo *CoinBaseUpdateOne) AddDeletedAt(u int32) *CoinBaseUpdateOne {
 	cbuo.mutation.AddDeletedAt(u)
+	return cbuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (cbuo *CoinBaseUpdateOne) SetEntID(u uuid.UUID) *CoinBaseUpdateOne {
+	cbuo.mutation.SetEntID(u)
+	return cbuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cbuo *CoinBaseUpdateOne) SetNillableEntID(u *uuid.UUID) *CoinBaseUpdateOne {
+	if u != nil {
+		cbuo.SetEntID(*u)
+	}
 	return cbuo
 }
 
@@ -823,7 +859,7 @@ func (cbuo *CoinBaseUpdateOne) sqlSave(ctx context.Context) (_node *CoinBase, er
 			Table:   coinbase.Table,
 			Columns: coinbase.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: coinbase.FieldID,
 			},
 		},
@@ -892,6 +928,13 @@ func (cbuo *CoinBaseUpdateOne) sqlSave(ctx context.Context) (_node *CoinBase, er
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinbase.FieldDeletedAt,
+		})
+	}
+	if value, ok := cbuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinbase.FieldEntID,
 		})
 	}
 	if value, ok := cbuo.mutation.Name(); ok {

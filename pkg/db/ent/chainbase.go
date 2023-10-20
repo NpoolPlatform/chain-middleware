@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
+	"github.com/google/uuid"
 )
 
 // ChainBase is the model entity for the ChainBase schema.
@@ -21,6 +22,8 @@ type ChainBase struct {
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
+	// EntID holds the value of the "ent_id" field.
+	EntID uuid.UUID `json:"ent_id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Logo holds the value of the "logo" field.
@@ -50,6 +53,8 @@ func (*ChainBase) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullInt64)
 		case chainbase.FieldName, chainbase.FieldLogo, chainbase.FieldNativeUnit, chainbase.FieldAtomicUnit, chainbase.FieldEnv, chainbase.FieldChainID, chainbase.FieldNickname, chainbase.FieldGasType:
 			values[i] = new(sql.NullString)
+		case chainbase.FieldEntID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ChainBase", columns[i])
 		}
@@ -88,6 +93,12 @@ func (cb *ChainBase) assignValues(columns []string, values []interface{}) error 
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				cb.DeletedAt = uint32(value.Int64)
+			}
+		case chainbase.FieldEntID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field ent_id", values[i])
+			} else if value != nil {
+				cb.EntID = *value
 			}
 		case chainbase.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -179,6 +190,9 @@ func (cb *ChainBase) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", cb.DeletedAt))
+	builder.WriteString(", ")
+	builder.WriteString("ent_id=")
+	builder.WriteString(fmt.Sprintf("%v", cb.EntID))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(cb.Name)

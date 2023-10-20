@@ -5,7 +5,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/mixin"
-	"github.com/google/uuid"
+	crudermixin "github.com/NpoolPlatform/libent-cruder/pkg/mixin"
 	"github.com/shopspring/decimal"
 )
 
@@ -17,16 +17,13 @@ type CoinBase struct {
 func (CoinBase) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		mixin.TimeMixin{},
+		crudermixin.AutoIDMixin{},
 	}
 }
 
 // Fields of the CoinBase.
 func (CoinBase) Fields() []ent.Field {
 	return []ent.Field{
-		field.
-			UUID("id", uuid.UUID{}).
-			Default(uuid.New).
-			Unique(),
 		field.
 			String("name").
 			Optional().

@@ -31,6 +31,7 @@ type queryHandler struct {
 func (h *queryHandler) selectAppCoin(stm *ent.AppCoinQuery) {
 	h.stm = stm.Select(
 		entappcoin.FieldID,
+		entappcoin.FieldEntID,
 		entappcoin.FieldAppID,
 		entappcoin.FieldCoinTypeID,
 		entappcoin.FieldName,
@@ -50,18 +51,17 @@ func (h *queryHandler) selectAppCoin(stm *ent.AppCoinQuery) {
 }
 
 func (h *queryHandler) queryAppCoin(cli *ent.Client) error {
-	if h.ID == nil {
+	if h.ID == nil && h.EntID == nil {
 		return fmt.Errorf("invalid id")
 	}
-
-	h.selectAppCoin(
-		cli.AppCoin.
-			Query().
-			Where(
-				entappcoin.ID(*h.ID),
-				entappcoin.DeletedAt(0),
-			),
-	)
+	stm := cli.AppCoin.Query().Where(entappcoin.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entappcoin.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entappcoin.EntID(*h.EntID))
+	}
+	h.selectAppCoin(stm)
 	return nil
 }
 
@@ -86,7 +86,7 @@ func (h *queryHandler) queryJoinCoinBase(s *sql.Selector) {
 	s.LeftJoin(t).
 		On(
 			s.C(entappcoin.FieldCoinTypeID),
-			t.C(entcoinbase.FieldID),
+			t.C(entcoinbase.FieldEntID),
 		).
 		OnP(
 			sql.EQ(t.C(entcoinbase.FieldDeletedAt), 0),
@@ -150,7 +150,7 @@ func (h *queryHandler) queryJoinCoinSetting(s *sql.Selector) {
 		LeftJoin(t2).
 		On(
 			t1.C(entsetting.FieldFeeCoinTypeID),
-			t2.C(entcoinbase.FieldID),
+			t2.C(entcoinbase.FieldEntID),
 		).
 		OnP(
 			sql.EQ(t2.C(entcoinbase.FieldDeletedAt), 0),

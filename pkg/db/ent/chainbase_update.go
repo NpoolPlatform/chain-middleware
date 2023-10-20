@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
+	"github.com/google/uuid"
 )
 
 // ChainBaseUpdate is the builder for updating ChainBase entities.
@@ -80,6 +81,20 @@ func (cbu *ChainBaseUpdate) SetNillableDeletedAt(u *uint32) *ChainBaseUpdate {
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cbu *ChainBaseUpdate) AddDeletedAt(u int32) *ChainBaseUpdate {
 	cbu.mutation.AddDeletedAt(u)
+	return cbu
+}
+
+// SetEntID sets the "ent_id" field.
+func (cbu *ChainBaseUpdate) SetEntID(u uuid.UUID) *ChainBaseUpdate {
+	cbu.mutation.SetEntID(u)
+	return cbu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cbu *ChainBaseUpdate) SetNillableEntID(u *uuid.UUID) *ChainBaseUpdate {
+	if u != nil {
+		cbu.SetEntID(*u)
+	}
 	return cbu
 }
 
@@ -410,6 +425,13 @@ func (cbu *ChainBaseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: chainbase.FieldDeletedAt,
 		})
 	}
+	if value, ok := cbu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: chainbase.FieldEntID,
+		})
+	}
 	if value, ok := cbu.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -607,6 +629,20 @@ func (cbuo *ChainBaseUpdateOne) SetNillableDeletedAt(u *uint32) *ChainBaseUpdate
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cbuo *ChainBaseUpdateOne) AddDeletedAt(u int32) *ChainBaseUpdateOne {
 	cbuo.mutation.AddDeletedAt(u)
+	return cbuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (cbuo *ChainBaseUpdateOne) SetEntID(u uuid.UUID) *ChainBaseUpdateOne {
+	cbuo.mutation.SetEntID(u)
+	return cbuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cbuo *ChainBaseUpdateOne) SetNillableEntID(u *uuid.UUID) *ChainBaseUpdateOne {
+	if u != nil {
+		cbuo.SetEntID(*u)
+	}
 	return cbuo
 }
 
@@ -965,6 +1001,13 @@ func (cbuo *ChainBaseUpdateOne) sqlSave(ctx context.Context) (_node *ChainBase, 
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: chainbase.FieldDeletedAt,
+		})
+	}
+	if value, ok := cbuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: chainbase.FieldEntID,
 		})
 	}
 	if value, ok := cbuo.mutation.Name(); ok {

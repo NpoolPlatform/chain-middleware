@@ -16,13 +16,15 @@ import (
 type CurrencyHistory struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID uint32 `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt uint32 `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
+	// EntID holds the value of the "ent_id" field.
+	EntID uuid.UUID `json:"ent_id,omitempty"`
 	// CoinTypeID holds the value of the "coin_type_id" field.
 	CoinTypeID uuid.UUID `json:"coin_type_id,omitempty"`
 	// FeedType holds the value of the "feed_type" field.
@@ -40,11 +42,11 @@ func (*CurrencyHistory) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case currencyhistory.FieldMarketValueHigh, currencyhistory.FieldMarketValueLow:
 			values[i] = new(decimal.Decimal)
-		case currencyhistory.FieldCreatedAt, currencyhistory.FieldUpdatedAt, currencyhistory.FieldDeletedAt:
+		case currencyhistory.FieldID, currencyhistory.FieldCreatedAt, currencyhistory.FieldUpdatedAt, currencyhistory.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
 		case currencyhistory.FieldFeedType:
 			values[i] = new(sql.NullString)
-		case currencyhistory.FieldID, currencyhistory.FieldCoinTypeID:
+		case currencyhistory.FieldEntID, currencyhistory.FieldCoinTypeID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type CurrencyHistory", columns[i])
@@ -62,11 +64,11 @@ func (ch *CurrencyHistory) assignValues(columns []string, values []interface{}) 
 	for i := range columns {
 		switch columns[i] {
 		case currencyhistory.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				ch.ID = *value
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			ch.ID = uint32(value.Int64)
 		case currencyhistory.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -84,6 +86,12 @@ func (ch *CurrencyHistory) assignValues(columns []string, values []interface{}) 
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				ch.DeletedAt = uint32(value.Int64)
+			}
+		case currencyhistory.FieldEntID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field ent_id", values[i])
+			} else if value != nil {
+				ch.EntID = *value
 			}
 		case currencyhistory.FieldCoinTypeID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -145,6 +153,9 @@ func (ch *CurrencyHistory) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", ch.DeletedAt))
+	builder.WriteString(", ")
+	builder.WriteString("ent_id=")
+	builder.WriteString(fmt.Sprintf("%v", ch.EntID))
 	builder.WriteString(", ")
 	builder.WriteString("coin_type_id=")
 	builder.WriteString(fmt.Sprintf("%v", ch.CoinTypeID))

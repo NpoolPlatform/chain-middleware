@@ -47,10 +47,10 @@ func setupFiat(t *testing.T) func(*testing.T) {
 
 	h1, err := fiat1.NewHandler(
 		context.Background(),
-		fiat1.WithID(&ret.FiatID),
-		fiat1.WithName(&ret.FiatName),
-		fiat1.WithLogo(&ret.FiatLogo),
-		fiat1.WithUnit(&ret.FiatUnit),
+		fiat1.WithEntID(&ret.FiatID, true),
+		fiat1.WithName(&ret.FiatName, true),
+		fiat1.WithLogo(&ret.FiatLogo, true),
+		fiat1.WithUnit(&ret.FiatUnit, true),
 	)
 	assert.Nil(t, err)
 
@@ -63,9 +63,9 @@ func setupFiat(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithFiatID(req.FiatID),
-		WithFeedType(req.FeedType),
-		WithFeedFiatName(req.FeedFiatName),
+		WithFiatID(req.FiatID, true),
+		WithFeedType(req.FeedType, true),
+		WithFeedFiatName(req.FeedFiatName, true),
 	)
 	assert.Nil(t, err)
 
@@ -74,6 +74,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, info, ret)
 	}
 }
@@ -87,9 +88,9 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
-		WithFeedFiatName(req.FeedFiatName),
-		WithDisabled(req.Disabled),
+		WithID(&ret.ID, true),
+		WithFeedFiatName(req.FeedFiatName, true),
+		WithDisabled(req.Disabled, true),
 	)
 	assert.Nil(t, err)
 

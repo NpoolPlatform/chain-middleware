@@ -15,7 +15,7 @@ import (
 func (s *Server) ExistCoin(ctx context.Context, in *npool.ExistCoinRequest) (*npool.ExistCoinResponse, error) {
 	handler, err := coin1.NewHandler(
 		ctx,
-		coin1.WithID(&in.ID),
+		coin1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

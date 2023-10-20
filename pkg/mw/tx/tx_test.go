@@ -58,11 +58,11 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -77,15 +77,15 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithFromAccountID(req.FromAccountID),
-		WithToAccountID(req.ToAccountID),
-		WithAmount(req.Amount),
-		WithFeeAmount(req.FeeAmount),
-		WithChainTxID(req.ChainTxID),
-		WithState(req.State),
-		WithExtra(req.Extra),
-		WithType(req.Type),
+		WithCoinTypeID(req.CoinTypeID, true),
+		WithFromAccountID(req.FromAccountID, true),
+		WithToAccountID(req.ToAccountID, true),
+		WithAmount(req.Amount, true),
+		WithFeeAmount(req.FeeAmount, true),
+		WithChainTxID(req.ChainTxID, false),
+		WithState(req.State, true),
+		WithExtra(req.Extra, true),
+		WithType(req.Type, true),
 	)
 	assert.Nil(t, err)
 
@@ -94,6 +94,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, info, ret)
 	}
 }
@@ -105,11 +106,11 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
-		WithChainTxID(req.ChainTxID),
-		WithState(req.State),
-		WithExtra(req.Extra),
-		WithType(req.Type),
+		WithID(&ret.ID, true),
+		WithChainTxID(req.ChainTxID, false),
+		WithState(req.State, false),
+		WithExtra(req.Extra, false),
+		WithType(req.Type, false),
 	)
 	assert.Nil(t, err)
 
@@ -125,11 +126,11 @@ func update(t *testing.T) {
 
 	handler, err = NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
-		WithChainTxID(req.ChainTxID),
-		WithState(req.State),
-		WithExtra(req.Extra),
-		WithType(req.Type),
+		WithID(&ret.ID, true),
+		WithChainTxID(req.ChainTxID, false),
+		WithState(req.State, false),
+		WithExtra(req.Extra, false),
+		WithType(req.Type, false),
 	)
 	assert.Nil(t, err)
 

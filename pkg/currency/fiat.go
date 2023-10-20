@@ -120,7 +120,7 @@ func _refreshFiats(ctx context.Context, feedType basetypes.CurrencyFeedType) err
 
 		h2, err := fiatcurrency1.NewHandler(
 			ctx,
-			fiatcurrency1.WithReqs(reqs),
+			fiatcurrency1.WithReqs(reqs, true),
 		)
 		if err != nil {
 			logger.Sugar().Errorw(

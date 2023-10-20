@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
+	"github.com/google/uuid"
 )
 
 // ChainBaseCreate is the builder for creating a ChainBase entity.
@@ -59,6 +60,20 @@ func (cbc *ChainBaseCreate) SetDeletedAt(u uint32) *ChainBaseCreate {
 func (cbc *ChainBaseCreate) SetNillableDeletedAt(u *uint32) *ChainBaseCreate {
 	if u != nil {
 		cbc.SetDeletedAt(*u)
+	}
+	return cbc
+}
+
+// SetEntID sets the "ent_id" field.
+func (cbc *ChainBaseCreate) SetEntID(u uuid.UUID) *ChainBaseCreate {
+	cbc.mutation.SetEntID(u)
+	return cbc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cbc *ChainBaseCreate) SetNillableEntID(u *uuid.UUID) *ChainBaseCreate {
+	if u != nil {
+		cbc.SetEntID(*u)
 	}
 	return cbc
 }
@@ -295,6 +310,13 @@ func (cbc *ChainBaseCreate) defaults() error {
 		v := chainbase.DefaultDeletedAt()
 		cbc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := cbc.mutation.EntID(); !ok {
+		if chainbase.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized chainbase.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := chainbase.DefaultEntID()
+		cbc.mutation.SetEntID(v)
+	}
 	if _, ok := cbc.mutation.Name(); !ok {
 		v := chainbase.DefaultName
 		cbc.mutation.SetName(v)
@@ -344,6 +366,9 @@ func (cbc *ChainBaseCreate) check() error {
 	}
 	if _, ok := cbc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "ChainBase.deleted_at"`)}
+	}
+	if _, ok := cbc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "ChainBase.ent_id"`)}
 	}
 	return nil
 }
@@ -402,6 +427,14 @@ func (cbc *ChainBaseCreate) createSpec() (*ChainBase, *sqlgraph.CreateSpec) {
 			Column: chainbase.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := cbc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: chainbase.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := cbc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -580,6 +613,18 @@ func (u *ChainBaseUpsert) UpdateDeletedAt() *ChainBaseUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *ChainBaseUpsert) AddDeletedAt(v uint32) *ChainBaseUpsert {
 	u.Add(chainbase.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ChainBaseUpsert) SetEntID(v uuid.UUID) *ChainBaseUpsert {
+	u.Set(chainbase.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ChainBaseUpsert) UpdateEntID() *ChainBaseUpsert {
+	u.SetExcluded(chainbase.FieldEntID)
 	return u
 }
 
@@ -861,6 +906,20 @@ func (u *ChainBaseUpsertOne) AddDeletedAt(v uint32) *ChainBaseUpsertOne {
 func (u *ChainBaseUpsertOne) UpdateDeletedAt() *ChainBaseUpsertOne {
 	return u.Update(func(s *ChainBaseUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ChainBaseUpsertOne) SetEntID(v uuid.UUID) *ChainBaseUpsertOne {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ChainBaseUpsertOne) UpdateEntID() *ChainBaseUpsertOne {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.UpdateEntID()
 	})
 }
 
@@ -1335,6 +1394,20 @@ func (u *ChainBaseUpsertBulk) AddDeletedAt(v uint32) *ChainBaseUpsertBulk {
 func (u *ChainBaseUpsertBulk) UpdateDeletedAt() *ChainBaseUpsertBulk {
 	return u.Update(func(s *ChainBaseUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ChainBaseUpsertBulk) SetEntID(v uuid.UUID) *ChainBaseUpsertBulk {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ChainBaseUpsertBulk) UpdateEntID() *ChainBaseUpsertBulk {
+	return u.Update(func(s *ChainBaseUpsert) {
+		s.UpdateEntID()
 	})
 }
 

@@ -16,6 +16,8 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
 	entextra "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinextra"
 	entsetting "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/setting"
+
+	"github.com/google/uuid"
 )
 
 type deleteHandler struct {
@@ -40,7 +42,7 @@ func (h *deleteHandler) deleteCoinExtra(ctx context.Context, tx *ent.Tx) error {
 		CoinExtra.
 		Query().
 		Where(
-			entextra.CoinTypeID(*h.ID),
+			entextra.CoinTypeID(*h.EntID),
 		).
 		ForUpdate().
 		Only(ctx)
@@ -71,7 +73,7 @@ func (h *deleteHandler) deleteCoinSetting(ctx context.Context, tx *ent.Tx) error
 		Setting.
 		Query().
 		Where(
-			entsetting.CoinTypeID(*h.ID),
+			entsetting.CoinTypeID(*h.EntID),
 		).
 		ForUpdate().
 		Only(ctx)
@@ -107,6 +109,11 @@ func (h *Handler) DeleteCoin(ctx context.Context) (*npool.Coin, error) {
 		return nil, err
 	}
 
+	entID, err := uuid.Parse(info.EntID)
+	if err != nil {
+		return nil, err
+	}
+	h.EntID = &entID
 	handler := &deleteHandler{
 		Handler: h,
 	}

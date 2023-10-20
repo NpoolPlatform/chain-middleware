@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/fiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // FiatQuery is the builder for querying Fiat entities.
@@ -87,8 +86,8 @@ func (fq *FiatQuery) FirstX(ctx context.Context) *Fiat {
 
 // FirstID returns the first Fiat ID from the query.
 // Returns a *NotFoundError when no Fiat ID was found.
-func (fq *FiatQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (fq *FiatQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = fq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -100,7 +99,7 @@ func (fq *FiatQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (fq *FiatQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (fq *FiatQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := fq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -138,8 +137,8 @@ func (fq *FiatQuery) OnlyX(ctx context.Context) *Fiat {
 // OnlyID is like Only, but returns the only Fiat ID in the query.
 // Returns a *NotSingularError when more than one Fiat ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (fq *FiatQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (fq *FiatQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = fq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -155,7 +154,7 @@ func (fq *FiatQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (fq *FiatQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (fq *FiatQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := fq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -181,8 +180,8 @@ func (fq *FiatQuery) AllX(ctx context.Context) []*Fiat {
 }
 
 // IDs executes the query and returns a list of Fiat IDs.
-func (fq *FiatQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (fq *FiatQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := fq.Select(fiat.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -190,7 +189,7 @@ func (fq *FiatQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (fq *FiatQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (fq *FiatQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := fq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,7 +376,7 @@ func (fq *FiatQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   fiat.Table,
 			Columns: fiat.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: fiat.FieldID,
 			},
 		},

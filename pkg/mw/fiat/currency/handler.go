@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 	currencycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/fiat/currency"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency"
@@ -15,7 +16,8 @@ import (
 )
 
 type Handler struct {
-	ID              *uuid.UUID
+	ID              *uint32
+	EntID           *uuid.UUID
 	FiatID          *uuid.UUID
 	FeedType        *basetypes.CurrencyFeedType
 	MarketValueHigh *decimal.Decimal
@@ -36,23 +38,42 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 	return handler, nil
 }
 
-func WithID(id *string) func(context.Context, *Handler) error {
+func WithID(u *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		if u == nil {
+			if must {
+				return fmt.Errorf("invalid id")
+			}
+			return nil
+		}
+		h.ID = u
+		return nil
+	}
+}
+
+func WithEntID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid entid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
 		if err != nil {
 			return err
 		}
-		h.ID = &_id
+		h.EntID = &_id
 		return nil
 	}
 }
 
-func WithFiatID(id *string) func(context.Context, *Handler) error {
+func WithFiatID(id *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if id == nil {
+			if must {
+				return fmt.Errorf("invalid fiatid")
+			}
 			return nil
 		}
 		_id, err := uuid.Parse(*id)
@@ -64,9 +85,12 @@ func WithFiatID(id *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithFeedType(feedType *basetypes.CurrencyFeedType) func(context.Context, *Handler) error {
+func WithFeedType(feedType *basetypes.CurrencyFeedType, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if feedType == nil {
+			if must {
+				return fmt.Errorf("invalid feedtype")
+			}
 			return nil
 		}
 		switch *feedType {
@@ -81,9 +105,12 @@ func WithFeedType(feedType *basetypes.CurrencyFeedType) func(context.Context, *H
 	}
 }
 
-func WithMarketValueHigh(value *string) func(context.Context, *Handler) error {
+func WithMarketValueHigh(value *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if value == nil {
+			if must {
+				return fmt.Errorf("invalid marketvaluehigh")
+			}
 			return nil
 		}
 		_value, err := decimal.NewFromString(*value)
@@ -95,9 +122,12 @@ func WithMarketValueHigh(value *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithMarketValueLow(value *string) func(context.Context, *Handler) error {
+func WithMarketValueLow(value *string, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		if value == nil {
+			if must {
+				return fmt.Errorf("invalid marketvaluelow")
+			}
 			return nil
 		}
 		_value, err := decimal.NewFromString(*value)
@@ -109,17 +139,17 @@ func WithMarketValueLow(value *string) func(context.Context, *Handler) error {
 	}
 }
 
-func WithReqs(reqs []*npool.CurrencyReq) func(context.Context, *Handler) error {
+func WithReqs(reqs []*npool.CurrencyReq, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		_reqs := []*currencycrud.Req{}
 		for _, req := range reqs {
 			_req := &currencycrud.Req{}
-			if req.ID != nil {
-				id, err := uuid.Parse(*req.ID)
+			if req.EntID != nil {
+				id, err := uuid.Parse(*req.EntID)
 				if err != nil {
 					return err
 				}
-				_req.ID = &id
+				_req.EntID = &id
 			}
 			if req.FiatID != nil {
 				id, err := uuid.Parse(*req.FiatID)
@@ -165,13 +195,13 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 		if conds == nil {
 			return nil
 		}
-		if conds.ID != nil {
-			id, err := uuid.Parse(conds.GetID().GetValue())
+		if conds.EntID != nil {
+			id, err := uuid.Parse(conds.GetEntID().GetValue())
 			if err != nil {
 				return err
 			}
-			h.Conds.ID = &cruder.Cond{
-				Op:  conds.GetID().GetOp(),
+			h.Conds.EntID = &cruder.Cond{
+				Op:  conds.GetEntID().GetOp(),
 				Val: id,
 			}
 		}
@@ -183,6 +213,20 @@ func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 			h.Conds.FiatID = &cruder.Cond{
 				Op:  conds.GetFiatID().GetOp(),
 				Val: id,
+			}
+		}
+		if conds.FiatIDs != nil {
+			ids := []uuid.UUID{}
+			for _, id := range conds.GetFiatIDs().GetValue() {
+				_id, err := uuid.Parse(id)
+				if err != nil {
+					return err
+				}
+				ids = append(ids, _id)
+			}
+			h.Conds.FiatIDs = &cruder.Cond{
+				Op:  conds.GetFiatIDs().GetOp(),
+				Val: ids,
 			}
 		}
 		if conds.FiatName != nil {
@@ -204,6 +248,9 @@ func WithOffset(offset int32) func(context.Context, *Handler) error {
 
 func WithLimit(limit int32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if limit == 0 {
+			limit = constant.DefaultRowLimit
+		}
 		h.Limit = limit
 		return nil
 	}

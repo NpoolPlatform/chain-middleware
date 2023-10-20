@@ -42,9 +42,9 @@ func setupFiat(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	h1, err := NewHandler(
 		context.Background(),
-		WithName(&ret.Name),
-		WithLogo(&ret.Logo),
-		WithUnit(&ret.Unit),
+		WithName(&ret.Name, true),
+		WithLogo(&ret.Logo, true),
+		WithUnit(&ret.Unit, true),
 	)
 	assert.Nil(t, err)
 
@@ -53,6 +53,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, info.String(), ret.String())
 	}
 }
@@ -66,10 +67,10 @@ func update(t *testing.T) {
 
 	h1, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
-		WithName(req.Name),
-		WithUnit(req.Unit),
-		WithLogo(req.Logo),
+		WithID(&ret.ID, true),
+		WithName(req.Name, true),
+		WithUnit(req.Unit, true),
+		WithLogo(req.Logo, true),
 	)
 	assert.Nil(t, err)
 

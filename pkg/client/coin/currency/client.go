@@ -35,7 +35,7 @@ func withCRUD(ctx context.Context, handler handler) (cruder.Any, error) {
 func GetCurrency(ctx context.Context, id string) (*npool.Currency, error) {
 	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetCurrency(ctx, &npool.GetCurrencyRequest{
-			ID: id,
+			EntID: id,
 		})
 		if err != nil {
 			return nil, err

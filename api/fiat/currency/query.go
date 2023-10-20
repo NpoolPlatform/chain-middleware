@@ -14,7 +14,7 @@ import (
 func (s *Server) GetCurrency(ctx context.Context, in *npool.GetCurrencyRequest) (*npool.GetCurrencyResponse, error) {
 	handler, err := currency1.NewHandler(
 		ctx,
-		currency1.WithID(&in.ID),
+		currency1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

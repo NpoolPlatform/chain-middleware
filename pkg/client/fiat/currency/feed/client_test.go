@@ -55,10 +55,10 @@ func setupFeed(t *testing.T) func(*testing.T) {
 
 	h1, err := fiat1.NewHandler(
 		context.Background(),
-		fiat1.WithID(&ret.FiatID),
-		fiat1.WithName(&ret.FiatName),
-		fiat1.WithUnit(&ret.FiatUnit),
-		fiat1.WithLogo(&ret.FiatLogo),
+		fiat1.WithEntID(&ret.FiatID, true),
+		fiat1.WithName(&ret.FiatName, true),
+		fiat1.WithUnit(&ret.FiatUnit, true),
+		fiat1.WithLogo(&ret.FiatLogo, true),
 	)
 	assert.Nil(t, err)
 
@@ -74,6 +74,7 @@ func createFeed(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, ret, info)
 	}
 }
@@ -92,7 +93,7 @@ func updateFeed(t *testing.T) {
 
 func getFeeds(t *testing.T) {
 	infos, total, err := GetFeeds(context.Background(), &npool.Conds{
-		ID:     &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+		EntID:  &basetypes.StringVal{Op: cruder.EQ, Value: ret.EntID},
 		FiatID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.FiatID},
 	}, 0, 100)
 	if assert.Nil(t, err) {

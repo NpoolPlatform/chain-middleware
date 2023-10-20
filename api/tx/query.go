@@ -15,7 +15,7 @@ import (
 func (s *Server) GetTx(ctx context.Context, in *npool.GetTxRequest) (*npool.GetTxResponse, error) {
 	handler, err := tx1.NewHandler(
 		ctx,
-		tx1.WithID(&in.ID),
+		tx1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

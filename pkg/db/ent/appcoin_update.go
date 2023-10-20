@@ -85,6 +85,20 @@ func (acu *AppCoinUpdate) AddDeletedAt(u int32) *AppCoinUpdate {
 	return acu
 }
 
+// SetEntID sets the "ent_id" field.
+func (acu *AppCoinUpdate) SetEntID(u uuid.UUID) *AppCoinUpdate {
+	acu.mutation.SetEntID(u)
+	return acu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (acu *AppCoinUpdate) SetNillableEntID(u *uuid.UUID) *AppCoinUpdate {
+	if u != nil {
+		acu.SetEntID(*u)
+	}
+	return acu
+}
+
 // SetAppID sets the "app_id" field.
 func (acu *AppCoinUpdate) SetAppID(u uuid.UUID) *AppCoinUpdate {
 	acu.mutation.SetAppID(u)
@@ -430,7 +444,7 @@ func (acu *AppCoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   appcoin.Table,
 			Columns: appcoin.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: appcoin.FieldID,
 			},
 		},
@@ -482,6 +496,13 @@ func (acu *AppCoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: appcoin.FieldDeletedAt,
+		})
+	}
+	if value, ok := acu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: appcoin.FieldEntID,
 		})
 	}
 	if value, ok := acu.mutation.AppID(); ok {
@@ -733,6 +754,20 @@ func (acuo *AppCoinUpdateOne) SetNillableDeletedAt(u *uint32) *AppCoinUpdateOne 
 // AddDeletedAt adds u to the "deleted_at" field.
 func (acuo *AppCoinUpdateOne) AddDeletedAt(u int32) *AppCoinUpdateOne {
 	acuo.mutation.AddDeletedAt(u)
+	return acuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (acuo *AppCoinUpdateOne) SetEntID(u uuid.UUID) *AppCoinUpdateOne {
+	acuo.mutation.SetEntID(u)
+	return acuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (acuo *AppCoinUpdateOne) SetNillableEntID(u *uuid.UUID) *AppCoinUpdateOne {
+	if u != nil {
+		acuo.SetEntID(*u)
+	}
 	return acuo
 }
 
@@ -1094,7 +1129,7 @@ func (acuo *AppCoinUpdateOne) sqlSave(ctx context.Context) (_node *AppCoin, err 
 			Table:   appcoin.Table,
 			Columns: appcoin.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: appcoin.FieldID,
 			},
 		},
@@ -1163,6 +1198,13 @@ func (acuo *AppCoinUpdateOne) sqlSave(ctx context.Context) (_node *AppCoin, err 
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: appcoin.FieldDeletedAt,
+		})
+	}
+	if value, ok := acuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: appcoin.FieldEntID,
 		})
 	}
 	if value, ok := acuo.mutation.AppID(); ok {

@@ -15,17 +15,17 @@ func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*
 	req := in.GetInfo()
 	handler, err := coin1.NewHandler(
 		ctx,
-		coin1.WithName(req.Name),
-		coin1.WithUnit(req.Unit),
-		coin1.WithENV(req.ENV),
-		coin1.WithChainType(req.ChainType),
-		coin1.WithChainNativeUnit(req.ChainNativeUnit),
-		coin1.WithChainAtomicUnit(req.ChainAtomicUnit),
-		coin1.WithChainUnitExp(req.ChainUnitExp),
-		coin1.WithGasType(req.GasType),
-		coin1.WithChainID(req.ChainID),
-		coin1.WithChainNickname(req.ChainNickname),
-		coin1.WithChainNativeCoinName(req.ChainNativeCoinName),
+		coin1.WithName(req.Name, true),
+		coin1.WithUnit(req.Unit, true),
+		coin1.WithENV(req.ENV, true),
+		coin1.WithChainType(req.ChainType, true),
+		coin1.WithChainNativeUnit(req.ChainNativeUnit, true),
+		coin1.WithChainAtomicUnit(req.ChainAtomicUnit, true),
+		coin1.WithChainUnitExp(req.ChainUnitExp, true),
+		coin1.WithGasType(req.GasType, true),
+		coin1.WithChainID(req.ChainID, true),
+		coin1.WithChainNickname(req.ChainNickname, true),
+		coin1.WithChainNativeCoinName(req.ChainNativeCoinName, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

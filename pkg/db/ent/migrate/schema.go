@@ -10,10 +10,11 @@ import (
 var (
 	// AppCoinsColumns holds the columns for the "app_coins" table.
 	AppCoinsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "app_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
@@ -33,6 +34,13 @@ var (
 		Name:       "app_coins",
 		Columns:    AppCoinsColumns,
 		PrimaryKey: []*schema.Column{AppCoinsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "appcoin_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{AppCoinsColumns[4]},
+			},
+		},
 	}
 	// ChainBasesColumns holds the columns for the "chain_bases" table.
 	ChainBasesColumns = []*schema.Column{
@@ -40,6 +48,7 @@ var (
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "logo", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "native_unit", Type: field.TypeString, Nullable: true, Default: ""},
@@ -55,13 +64,21 @@ var (
 		Name:       "chain_bases",
 		Columns:    ChainBasesColumns,
 		PrimaryKey: []*schema.Column{ChainBasesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "chainbase_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{ChainBasesColumns[4]},
+			},
+		},
 	}
 	// CoinBasesColumns holds the columns for the "coin_bases" table.
 	CoinBasesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "logo", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "presale", Type: field.TypeBool, Nullable: true, Default: false},
@@ -76,13 +93,21 @@ var (
 		Name:       "coin_bases",
 		Columns:    CoinBasesColumns,
 		PrimaryKey: []*schema.Column{CoinBasesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coinbase_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CoinBasesColumns[4]},
+			},
+		},
 	}
 	// CoinDescriptionsColumns holds the columns for the "coin_descriptions" table.
 	CoinDescriptionsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "app_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "used_for", Type: field.TypeString, Nullable: true, Default: "DefaultUsedFor"},
@@ -94,13 +119,21 @@ var (
 		Name:       "coin_descriptions",
 		Columns:    CoinDescriptionsColumns,
 		PrimaryKey: []*schema.Column{CoinDescriptionsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coindescription_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CoinDescriptionsColumns[4]},
+			},
+		},
 	}
 	// CoinExtrasColumns holds the columns for the "coin_extras" table.
 	CoinExtrasColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "home_page", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "specs", Type: field.TypeString, Nullable: true, Default: ""},
@@ -111,6 +144,13 @@ var (
 		Name:       "coin_extras",
 		Columns:    CoinExtrasColumns,
 		PrimaryKey: []*schema.Column{CoinExtrasColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coinextra_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CoinExtrasColumns[4]},
+			},
+		},
 	}
 	// CoinFiatsColumns holds the columns for the "coin_fiats" table.
 	CoinFiatsColumns = []*schema.Column{
@@ -118,6 +158,7 @@ var (
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
@@ -127,6 +168,13 @@ var (
 		Name:       "coin_fiats",
 		Columns:    CoinFiatsColumns,
 		PrimaryKey: []*schema.Column{CoinFiatsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coinfiat_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CoinFiatsColumns[4]},
+			},
+		},
 	}
 	// CoinFiatCurrenciesColumns holds the columns for the "coin_fiat_currencies" table.
 	CoinFiatCurrenciesColumns = []*schema.Column{
@@ -134,6 +182,7 @@ var (
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
@@ -145,6 +194,13 @@ var (
 		Name:       "coin_fiat_currencies",
 		Columns:    CoinFiatCurrenciesColumns,
 		PrimaryKey: []*schema.Column{CoinFiatCurrenciesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coinfiatcurrency_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CoinFiatCurrenciesColumns[4]},
+			},
+		},
 	}
 	// CoinFiatCurrencyHistoriesColumns holds the columns for the "coin_fiat_currency_histories" table.
 	CoinFiatCurrencyHistoriesColumns = []*schema.Column{
@@ -152,6 +208,7 @@ var (
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
@@ -163,13 +220,21 @@ var (
 		Name:       "coin_fiat_currency_histories",
 		Columns:    CoinFiatCurrencyHistoriesColumns,
 		PrimaryKey: []*schema.Column{CoinFiatCurrencyHistoriesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coinfiatcurrencyhistory_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CoinFiatCurrencyHistoriesColumns[4]},
+			},
+		},
 	}
 	// CurrenciesColumns holds the columns for the "currencies" table.
 	CurrenciesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
 		{Name: "market_value_high", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
@@ -182,23 +247,29 @@ var (
 		PrimaryKey: []*schema.Column{CurrenciesColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "currency_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CurrenciesColumns[4]},
+			},
+			{
 				Name:    "currency_coin_type_id_id",
 				Unique:  false,
-				Columns: []*schema.Column{CurrenciesColumns[4], CurrenciesColumns[0]},
+				Columns: []*schema.Column{CurrenciesColumns[5], CurrenciesColumns[0]},
 			},
 			{
 				Name:    "currency_coin_type_id",
 				Unique:  false,
-				Columns: []*schema.Column{CurrenciesColumns[4]},
+				Columns: []*schema.Column{CurrenciesColumns[5]},
 			},
 		},
 	}
 	// CurrencyFeedsColumns holds the columns for the "currency_feeds" table.
 	CurrencyFeedsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
 		{Name: "feed_coin_name", Type: field.TypeString, Nullable: true, Default: ""},
@@ -211,23 +282,29 @@ var (
 		PrimaryKey: []*schema.Column{CurrencyFeedsColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "currencyfeed_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CurrencyFeedsColumns[4]},
+			},
+			{
 				Name:    "currencyfeed_coin_type_id_id",
 				Unique:  false,
-				Columns: []*schema.Column{CurrencyFeedsColumns[4], CurrencyFeedsColumns[0]},
+				Columns: []*schema.Column{CurrencyFeedsColumns[5], CurrencyFeedsColumns[0]},
 			},
 			{
 				Name:    "currencyfeed_coin_type_id",
 				Unique:  false,
-				Columns: []*schema.Column{CurrencyFeedsColumns[4]},
+				Columns: []*schema.Column{CurrencyFeedsColumns[5]},
 			},
 		},
 	}
 	// CurrencyHistoriesColumns holds the columns for the "currency_histories" table.
 	CurrencyHistoriesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
 		{Name: "market_value_high", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
@@ -240,23 +317,29 @@ var (
 		PrimaryKey: []*schema.Column{CurrencyHistoriesColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "currencyhistory_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CurrencyHistoriesColumns[4]},
+			},
+			{
 				Name:    "currencyhistory_coin_type_id_id",
 				Unique:  false,
-				Columns: []*schema.Column{CurrencyHistoriesColumns[4], CurrencyHistoriesColumns[0]},
+				Columns: []*schema.Column{CurrencyHistoriesColumns[5], CurrencyHistoriesColumns[0]},
 			},
 			{
 				Name:    "currencyhistory_coin_type_id",
 				Unique:  false,
-				Columns: []*schema.Column{CurrencyHistoriesColumns[4]},
+				Columns: []*schema.Column{CurrencyHistoriesColumns[5]},
 			},
 		},
 	}
 	// ExchangeRatesColumns holds the columns for the "exchange_rates" table.
 	ExchangeRatesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "app_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "market_value", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
@@ -270,13 +353,21 @@ var (
 		Name:       "exchange_rates",
 		Columns:    ExchangeRatesColumns,
 		PrimaryKey: []*schema.Column{ExchangeRatesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "exchangerate_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{ExchangeRatesColumns[4]},
+			},
+		},
 	}
 	// FiatsColumns holds the columns for the "fiats" table.
 	FiatsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "name", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "logo", Type: field.TypeString, Nullable: true, Default: ""},
 		{Name: "unit", Type: field.TypeString, Nullable: true, Default: ""},
@@ -286,13 +377,21 @@ var (
 		Name:       "fiats",
 		Columns:    FiatsColumns,
 		PrimaryKey: []*schema.Column{FiatsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "fiat_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{FiatsColumns[4]},
+			},
+		},
 	}
 	// FiatCurrenciesColumns holds the columns for the "fiat_currencies" table.
 	FiatCurrenciesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
 		{Name: "market_value_low", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
@@ -303,13 +402,21 @@ var (
 		Name:       "fiat_currencies",
 		Columns:    FiatCurrenciesColumns,
 		PrimaryKey: []*schema.Column{FiatCurrenciesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "fiatcurrency_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{FiatCurrenciesColumns[4]},
+			},
+		},
 	}
 	// FiatCurrencyFeedsColumns holds the columns for the "fiat_currency_feeds" table.
 	FiatCurrencyFeedsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
 		{Name: "feed_fiat_name", Type: field.TypeString, Nullable: true, Default: ""},
@@ -322,23 +429,29 @@ var (
 		PrimaryKey: []*schema.Column{FiatCurrencyFeedsColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "fiatcurrencyfeed_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{FiatCurrencyFeedsColumns[4]},
+			},
+			{
 				Name:    "fiatcurrencyfeed_fiat_id_id",
 				Unique:  false,
-				Columns: []*schema.Column{FiatCurrencyFeedsColumns[4], FiatCurrencyFeedsColumns[0]},
+				Columns: []*schema.Column{FiatCurrencyFeedsColumns[5], FiatCurrencyFeedsColumns[0]},
 			},
 			{
 				Name:    "fiatcurrencyfeed_fiat_id",
 				Unique:  false,
-				Columns: []*schema.Column{FiatCurrencyFeedsColumns[4]},
+				Columns: []*schema.Column{FiatCurrencyFeedsColumns[5]},
 			},
 		},
 	}
 	// FiatCurrencyHistoriesColumns holds the columns for the "fiat_currency_histories" table.
 	FiatCurrencyHistoriesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "fiat_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "feed_type", Type: field.TypeString, Nullable: true, Default: "DefaultFeedType"},
 		{Name: "market_value_low", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"mysql": "decimal(37,18)"}},
@@ -349,13 +462,21 @@ var (
 		Name:       "fiat_currency_histories",
 		Columns:    FiatCurrencyHistoriesColumns,
 		PrimaryKey: []*schema.Column{FiatCurrencyHistoriesColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "fiatcurrencyhistory_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{FiatCurrencyHistoriesColumns[4]},
+			},
+		},
 	}
 	// SettingsColumns holds the columns for the "settings" table.
 	SettingsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "fee_coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "withdraw_fee_by_stable_usd", Type: field.TypeBool, Nullable: true, Default: true},
@@ -376,13 +497,21 @@ var (
 		Name:       "settings",
 		Columns:    SettingsColumns,
 		PrimaryKey: []*schema.Column{SettingsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "setting_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{SettingsColumns[4]},
+			},
+		},
 	}
 	// TransColumns holds the columns for the "trans" table.
 	TransColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeUUID, Unique: true},
+		{Name: "id", Type: field.TypeUint32, Increment: true},
 		{Name: "created_at", Type: field.TypeUint32},
 		{Name: "updated_at", Type: field.TypeUint32},
 		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "from_account_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "to_account_id", Type: field.TypeUUID, Nullable: true},
@@ -398,6 +527,13 @@ var (
 		Name:       "trans",
 		Columns:    TransColumns,
 		PrimaryKey: []*schema.Column{TransColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tran_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{TransColumns[4]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{

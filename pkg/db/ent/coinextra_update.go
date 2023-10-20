@@ -84,6 +84,20 @@ func (ceu *CoinExtraUpdate) AddDeletedAt(u int32) *CoinExtraUpdate {
 	return ceu
 }
 
+// SetEntID sets the "ent_id" field.
+func (ceu *CoinExtraUpdate) SetEntID(u uuid.UUID) *CoinExtraUpdate {
+	ceu.mutation.SetEntID(u)
+	return ceu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (ceu *CoinExtraUpdate) SetNillableEntID(u *uuid.UUID) *CoinExtraUpdate {
+	if u != nil {
+		ceu.SetEntID(*u)
+	}
+	return ceu
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (ceu *CoinExtraUpdate) SetCoinTypeID(u uuid.UUID) *CoinExtraUpdate {
 	ceu.mutation.SetCoinTypeID(u)
@@ -250,7 +264,7 @@ func (ceu *CoinExtraUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   coinextra.Table,
 			Columns: coinextra.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: coinextra.FieldID,
 			},
 		},
@@ -302,6 +316,13 @@ func (ceu *CoinExtraUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinextra.FieldDeletedAt,
+		})
+	}
+	if value, ok := ceu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinextra.FieldEntID,
 		})
 	}
 	if value, ok := ceu.mutation.CoinTypeID(); ok {
@@ -429,6 +450,20 @@ func (ceuo *CoinExtraUpdateOne) SetNillableDeletedAt(u *uint32) *CoinExtraUpdate
 // AddDeletedAt adds u to the "deleted_at" field.
 func (ceuo *CoinExtraUpdateOne) AddDeletedAt(u int32) *CoinExtraUpdateOne {
 	ceuo.mutation.AddDeletedAt(u)
+	return ceuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (ceuo *CoinExtraUpdateOne) SetEntID(u uuid.UUID) *CoinExtraUpdateOne {
+	ceuo.mutation.SetEntID(u)
+	return ceuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (ceuo *CoinExtraUpdateOne) SetNillableEntID(u *uuid.UUID) *CoinExtraUpdateOne {
+	if u != nil {
+		ceuo.SetEntID(*u)
+	}
 	return ceuo
 }
 
@@ -611,7 +646,7 @@ func (ceuo *CoinExtraUpdateOne) sqlSave(ctx context.Context) (_node *CoinExtra, 
 			Table:   coinextra.Table,
 			Columns: coinextra.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: coinextra.FieldID,
 			},
 		},
@@ -680,6 +715,13 @@ func (ceuo *CoinExtraUpdateOne) sqlSave(ctx context.Context) (_node *CoinExtra, 
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinextra.FieldDeletedAt,
+		})
+	}
+	if value, ok := ceuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinextra.FieldEntID,
 		})
 	}
 	if value, ok := ceuo.mutation.CoinTypeID(); ok {

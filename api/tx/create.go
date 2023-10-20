@@ -16,16 +16,16 @@ func (s *Server) CreateTx(ctx context.Context, in *npool.CreateTxRequest) (*npoo
 	req := in.GetInfo()
 	handler, err := tx1.NewHandler(
 		ctx,
-		tx1.WithID(req.ID),
-		tx1.WithCoinTypeID(req.CoinTypeID),
-		tx1.WithFromAccountID(req.FromAccountID),
-		tx1.WithToAccountID(req.ToAccountID),
-		tx1.WithAmount(req.Amount),
-		tx1.WithFeeAmount(req.FeeAmount),
-		tx1.WithChainTxID(req.ChainTxID),
-		tx1.WithState(req.State),
-		tx1.WithExtra(req.Extra),
-		tx1.WithType(req.Type),
+		tx1.WithID(req.ID, false),
+		tx1.WithEntID(req.EntID, false),
+		tx1.WithCoinTypeID(req.CoinTypeID, true),
+		tx1.WithFromAccountID(req.FromAccountID, true),
+		tx1.WithToAccountID(req.ToAccountID, true),
+		tx1.WithAmount(req.Amount, true),
+		tx1.WithFeeAmount(req.FeeAmount, true),
+		tx1.WithChainTxID(req.ChainTxID, false),
+		tx1.WithExtra(req.Extra, true),
+		tx1.WithType(req.Type, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
@@ -54,7 +54,7 @@ func (s *Server) CreateTx(ctx context.Context, in *npool.CreateTxRequest) (*npoo
 func (s *Server) CreateTxs(ctx context.Context, in *npool.CreateTxsRequest) (*npool.CreateTxsResponse, error) {
 	handler, err := tx1.NewHandler(
 		ctx,
-		tx1.WithReqs(in.GetInfos()),
+		tx1.WithReqs(in.GetInfos(), true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

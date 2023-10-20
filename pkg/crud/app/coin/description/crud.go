@@ -12,7 +12,8 @@ import (
 )
 
 type Req struct {
-	ID         *uuid.UUID
+	ID         *uint32
+	EntID      *uuid.UUID
 	AppID      *uuid.UUID
 	CoinTypeID *uuid.UUID
 	UsedFor    *basetypes.UsedFor
@@ -24,6 +25,9 @@ type Req struct {
 func CreateSet(c *ent.CoinDescriptionCreate, req *Req) *ent.CoinDescriptionCreate {
 	if req.ID != nil {
 		c.SetID(*req.ID)
+	}
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.AppID != nil {
 		c.SetAppID(*req.AppID)
@@ -58,21 +62,21 @@ func UpdateSet(u *ent.CoinDescriptionUpdateOne, req *Req) *ent.CoinDescriptionUp
 }
 
 type Conds struct {
-	ID         *cruder.Cond
+	EntID      *cruder.Cond
 	AppID      *cruder.Cond
 	CoinTypeID *cruder.Cond
 	UsedFor    *cruder.Cond
 }
 
 func SetQueryConds(q *ent.CoinDescriptionQuery, conds *Conds) (*ent.CoinDescriptionQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entcoindescription.ID(id))
+			q.Where(entcoindescription.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid entcoindescription field")
 		}

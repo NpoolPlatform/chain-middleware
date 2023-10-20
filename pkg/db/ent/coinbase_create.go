@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -62,6 +61,20 @@ func (cbc *CoinBaseCreate) SetDeletedAt(u uint32) *CoinBaseCreate {
 func (cbc *CoinBaseCreate) SetNillableDeletedAt(u *uint32) *CoinBaseCreate {
 	if u != nil {
 		cbc.SetDeletedAt(*u)
+	}
+	return cbc
+}
+
+// SetEntID sets the "ent_id" field.
+func (cbc *CoinBaseCreate) SetEntID(u uuid.UUID) *CoinBaseCreate {
+	cbc.mutation.SetEntID(u)
+	return cbc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cbc *CoinBaseCreate) SetNillableEntID(u *uuid.UUID) *CoinBaseCreate {
+	if u != nil {
+		cbc.SetEntID(*u)
 	}
 	return cbc
 }
@@ -179,16 +192,8 @@ func (cbc *CoinBaseCreate) SetNillableDisabled(b *bool) *CoinBaseCreate {
 }
 
 // SetID sets the "id" field.
-func (cbc *CoinBaseCreate) SetID(u uuid.UUID) *CoinBaseCreate {
+func (cbc *CoinBaseCreate) SetID(u uint32) *CoinBaseCreate {
 	cbc.mutation.SetID(u)
-	return cbc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (cbc *CoinBaseCreate) SetNillableID(u *uuid.UUID) *CoinBaseCreate {
-	if u != nil {
-		cbc.SetID(*u)
-	}
 	return cbc
 }
 
@@ -292,6 +297,13 @@ func (cbc *CoinBaseCreate) defaults() error {
 		v := coinbase.DefaultDeletedAt()
 		cbc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := cbc.mutation.EntID(); !ok {
+		if coinbase.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized coinbase.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := coinbase.DefaultEntID()
+		cbc.mutation.SetEntID(v)
+	}
 	if _, ok := cbc.mutation.Name(); !ok {
 		v := coinbase.DefaultName
 		cbc.mutation.SetName(v)
@@ -324,13 +336,6 @@ func (cbc *CoinBaseCreate) defaults() error {
 		v := coinbase.DefaultDisabled
 		cbc.mutation.SetDisabled(v)
 	}
-	if _, ok := cbc.mutation.ID(); !ok {
-		if coinbase.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized coinbase.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := coinbase.DefaultID()
-		cbc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -345,6 +350,9 @@ func (cbc *CoinBaseCreate) check() error {
 	if _, ok := cbc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "CoinBase.deleted_at"`)}
 	}
+	if _, ok := cbc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "CoinBase.ent_id"`)}
+	}
 	return nil
 }
 
@@ -356,12 +364,9 @@ func (cbc *CoinBaseCreate) sqlSave(ctx context.Context) (*CoinBase, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -372,7 +377,7 @@ func (cbc *CoinBaseCreate) createSpec() (*CoinBase, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: coinbase.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: coinbase.FieldID,
 			},
 		}
@@ -380,7 +385,7 @@ func (cbc *CoinBaseCreate) createSpec() (*CoinBase, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = cbc.conflict
 	if id, ok := cbc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := cbc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -405,6 +410,14 @@ func (cbc *CoinBaseCreate) createSpec() (*CoinBase, *sqlgraph.CreateSpec) {
 			Column: coinbase.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := cbc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinbase.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := cbc.mutation.Name(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -575,6 +588,18 @@ func (u *CoinBaseUpsert) UpdateDeletedAt() *CoinBaseUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *CoinBaseUpsert) AddDeletedAt(v uint32) *CoinBaseUpsert {
 	u.Add(coinbase.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinBaseUpsert) SetEntID(v uuid.UUID) *CoinBaseUpsert {
+	u.Set(coinbase.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinBaseUpsert) UpdateEntID() *CoinBaseUpsert {
+	u.SetExcluded(coinbase.FieldEntID)
 	return u
 }
 
@@ -835,6 +860,20 @@ func (u *CoinBaseUpsertOne) UpdateDeletedAt() *CoinBaseUpsertOne {
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *CoinBaseUpsertOne) SetEntID(v uuid.UUID) *CoinBaseUpsertOne {
+	return u.Update(func(s *CoinBaseUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinBaseUpsertOne) UpdateEntID() *CoinBaseUpsertOne {
+	return u.Update(func(s *CoinBaseUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *CoinBaseUpsertOne) SetName(v string) *CoinBaseUpsertOne {
 	return u.Update(func(s *CoinBaseUpsert) {
@@ -1019,12 +1058,7 @@ func (u *CoinBaseUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *CoinBaseUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: CoinBaseUpsertOne.ID is not supported by MySQL driver. Use CoinBaseUpsertOne.Exec instead")
-	}
+func (u *CoinBaseUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -1033,7 +1067,7 @@ func (u *CoinBaseUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *CoinBaseUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *CoinBaseUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1084,6 +1118,10 @@ func (cbcb *CoinBaseCreateBulk) Save(ctx context.Context) ([]*CoinBase, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = uint32(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1279,6 +1317,20 @@ func (u *CoinBaseUpsertBulk) AddDeletedAt(v uint32) *CoinBaseUpsertBulk {
 func (u *CoinBaseUpsertBulk) UpdateDeletedAt() *CoinBaseUpsertBulk {
 	return u.Update(func(s *CoinBaseUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinBaseUpsertBulk) SetEntID(v uuid.UUID) *CoinBaseUpsertBulk {
+	return u.Update(func(s *CoinBaseUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinBaseUpsertBulk) UpdateEntID() *CoinBaseUpsertBulk {
+	return u.Update(func(s *CoinBaseUpsert) {
+		s.UpdateEntID()
 	})
 }
 

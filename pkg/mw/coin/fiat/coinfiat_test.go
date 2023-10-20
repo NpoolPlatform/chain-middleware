@@ -53,11 +53,11 @@ func setupCoinFiat(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -66,10 +66,10 @@ func setupCoinFiat(t *testing.T) func(*testing.T) {
 
 	h2, err := fiat1.NewHandler(
 		context.Background(),
-		fiat1.WithID(&ret.FiatID),
-		fiat1.WithName(&ret.FiatName),
-		fiat1.WithLogo(&ret.FiatLogo),
-		fiat1.WithUnit(&ret.FiatUnit),
+		fiat1.WithEntID(&ret.FiatID, true),
+		fiat1.WithName(&ret.FiatName, true),
+		fiat1.WithLogo(&ret.FiatLogo, true),
+		fiat1.WithUnit(&ret.FiatUnit, true),
 	)
 	assert.Nil(t, err)
 
@@ -84,9 +84,9 @@ func setupCoinFiat(t *testing.T) func(*testing.T) {
 func createCoinFiat(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithCoinTypeID(req.CoinTypeID),
-		WithFiatID(req.FiatID),
-		WithFeedType(req.FeedType),
+		WithCoinTypeID(req.CoinTypeID, true),
+		WithFiatID(req.FiatID, true),
+		WithFeedType(req.FeedType, true),
 	)
 	assert.Nil(t, err)
 
@@ -95,6 +95,7 @@ func createCoinFiat(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, ret, info)
 	}
 }
@@ -122,7 +123,7 @@ func getCoinFiats(t *testing.T) {
 func deleteCoinFiat(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
+		WithID(&ret.ID, true),
 	)
 	assert.Nil(t, err)
 

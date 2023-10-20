@@ -37,7 +37,7 @@ func init() {
 }
 
 var ret = &npool.Currency{
-	ID:              uuid.NewString(),
+	EntID:           uuid.NewString(),
 	CoinName:        uuid.NewString(),
 	CoinUnit:        uuid.NewString(),
 	CoinENV:         "test",
@@ -60,11 +60,11 @@ func setupCurrency(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -73,10 +73,10 @@ func setupCurrency(t *testing.T) func(*testing.T) {
 
 	h2, err := currency1.NewHandler(
 		context.Background(),
-		currency1.WithCoinTypeID(req.CoinTypeID),
-		currency1.WithMarketValueHigh(req.MarketValueHigh),
-		currency1.WithMarketValueLow(req.MarketValueLow),
-		currency1.WithFeedType(req.FeedType),
+		currency1.WithCoinTypeID(req.CoinTypeID, true),
+		currency1.WithMarketValueHigh(req.MarketValueHigh, true),
+		currency1.WithMarketValueLow(req.MarketValueLow, true),
+		currency1.WithFeedType(req.FeedType, true),
 	)
 	assert.Nil(t, err)
 
@@ -84,6 +84,7 @@ func setupCurrency(t *testing.T) func(*testing.T) {
 	assert.Nil(t, err)
 
 	ret.ID = info.ID
+	ret.EntID = info.EntID
 	ret.CreatedAt = info.CreatedAt
 	ret.UpdatedAt = info.UpdatedAt
 
@@ -93,7 +94,7 @@ func setupCurrency(t *testing.T) func(*testing.T) {
 }
 
 func getCurrency(t *testing.T) {
-	info, err := GetCurrency(context.Background(), ret.ID)
+	info, err := GetCurrency(context.Background(), ret.EntID)
 	if assert.Nil(t, err) {
 		assert.Equal(t, ret, info)
 	}

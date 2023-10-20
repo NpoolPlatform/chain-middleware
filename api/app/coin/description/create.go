@@ -15,12 +15,13 @@ func (s *Server) CreateCoinDescription(ctx context.Context, in *npool.CreateCoin
 	req := in.GetInfo()
 	handler, err := description1.NewHandler(
 		ctx,
-		description1.WithID(req.ID),
-		description1.WithAppID(req.AppID),
-		description1.WithCoinTypeID(req.CoinTypeID),
-		description1.WithUsedFor(req.UsedFor),
-		description1.WithTitle(req.Title),
-		description1.WithMessage(req.Message),
+		description1.WithID(req.ID, false),
+		description1.WithEntID(req.EntID, false),
+		description1.WithAppID(req.AppID, true),
+		description1.WithCoinTypeID(req.CoinTypeID, true),
+		description1.WithUsedFor(req.UsedFor, true),
+		description1.WithTitle(req.Title, true),
+		description1.WithMessage(req.Message, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

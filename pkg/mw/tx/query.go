@@ -28,6 +28,7 @@ type queryHandler struct {
 func (h *queryHandler) selectTx(stm *ent.TranQuery) {
 	h.stm = stm.Select(
 		enttx.FieldID,
+		enttx.FieldEntID,
 		enttx.FieldCoinTypeID,
 		enttx.FieldFromAccountID,
 		enttx.FieldToAccountID,
@@ -43,13 +44,17 @@ func (h *queryHandler) selectTx(stm *ent.TranQuery) {
 }
 
 func (h *queryHandler) queryTx(cli *ent.Client) error {
-	h.selectTx(
-		cli.Tran.
-			Query().
-			Where(
-				enttx.ID(*h.ID),
-			),
-	)
+	if h.ID == nil && h.EntID == nil {
+		return fmt.Errorf("invalid id")
+	}
+	stm := cli.Tran.Query().Where(enttx.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(enttx.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(enttx.EntID(*h.EntID))
+	}
+	h.selectTx(stm)
 	return nil
 }
 
@@ -75,7 +80,7 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) {
 		LeftJoin(t).
 		On(
 			s.C(enttx.FieldCoinTypeID),
-			t.C(entcoinbase.FieldID),
+			t.C(entcoinbase.FieldEntID),
 		).
 		AppendSelect(
 			sql.As(t.C(entcoinbase.FieldName), "coin_name"),
@@ -115,10 +120,6 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetTx(ctx context.Context) (*npool.Tx, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	handler := &queryHandler{
 		Handler: h,
 	}

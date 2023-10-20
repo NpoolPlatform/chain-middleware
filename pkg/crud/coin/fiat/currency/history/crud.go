@@ -51,13 +51,14 @@ func UpdateSet(u *ent.CoinFiatCurrencyHistoryUpdateOne, req *Req) *ent.CoinFiatC
 }
 
 type Conds struct {
-	ID          *cruder.Cond
+	EntID       *cruder.Cond
 	CoinTypeID  *cruder.Cond
 	CoinTypeIDs *cruder.Cond
 	StartAt     *cruder.Cond
 	EndAt       *cruder.Cond
 }
 
+//nolint:gocyclo
 func SetQueryConds(q *ent.CoinFiatCurrencyHistoryQuery, conds *Conds) (*ent.CoinFiatCurrencyHistoryQuery, error) {
 	if conds.CoinTypeID != nil {
 		id, ok := conds.CoinTypeID.Val.(uuid.UUID)
@@ -89,6 +90,8 @@ func SetQueryConds(q *ent.CoinFiatCurrencyHistoryQuery, conds *Conds) (*ent.Coin
 			return nil, fmt.Errorf("invalid startat")
 		}
 		switch conds.StartAt.Op {
+		case cruder.EQ:
+			q.Where(entcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:
 			q.Where(entcurrencyhis.CreatedAtLTE(at))
 		case cruder.GTE:
@@ -103,6 +106,8 @@ func SetQueryConds(q *ent.CoinFiatCurrencyHistoryQuery, conds *Conds) (*ent.Coin
 			return nil, fmt.Errorf("invalid endat")
 		}
 		switch conds.EndAt.Op {
+		case cruder.EQ:
+			q.Where(entcurrencyhis.CreatedAtLTE(at))
 		case cruder.GTE:
 			q.Where(entcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:

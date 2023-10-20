@@ -27,6 +27,7 @@ type queryHandler struct {
 func (h *queryHandler) selectFeed(stm *ent.CurrencyFeedQuery) {
 	h.stm = stm.Select(
 		entcurrencyfeed.FieldID,
+		entcurrencyfeed.FieldEntID,
 		entcurrencyfeed.FieldCoinTypeID,
 		entcurrencyfeed.FieldFeedType,
 		entcurrencyfeed.FieldFeedCoinName,
@@ -37,13 +38,17 @@ func (h *queryHandler) selectFeed(stm *ent.CurrencyFeedQuery) {
 }
 
 func (h *queryHandler) queryFeed(cli *ent.Client) error {
-	h.selectFeed(
-		cli.CurrencyFeed.
-			Query().
-			Where(
-				entcurrencyfeed.ID(*h.ID),
-			),
-	)
+	if h.ID == nil && h.EntID == nil {
+		return fmt.Errorf("invalid id")
+	}
+	stm := cli.CurrencyFeed.Query().Where(entcurrencyfeed.DeletedAt(0))
+	if h.ID != nil {
+		stm.Where(entcurrencyfeed.ID(*h.ID))
+	}
+	if h.EntID != nil {
+		stm.Where(entcurrencyfeed.EntID(*h.EntID))
+	}
+	h.selectFeed(stm)
 	return nil
 }
 
@@ -69,7 +74,7 @@ func (h *queryHandler) queryJoinCoin(s *sql.Selector) {
 		LeftJoin(t).
 		On(
 			s.C(entcurrencyfeed.FieldCoinTypeID),
-			t.C(entcoinbase.FieldID),
+			t.C(entcoinbase.FieldEntID),
 		).
 		AppendSelect(
 			sql.As(t.C(entcoinbase.FieldName), "coin_name"),
@@ -96,10 +101,6 @@ func (h *queryHandler) formalize() {
 }
 
 func (h *Handler) GetFeed(ctx context.Context) (*npool.Feed, error) {
-	if h.ID == nil {
-		return nil, fmt.Errorf("invalid id")
-	}
-
 	handler := &queryHandler{
 		Handler: h,
 	}

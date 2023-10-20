@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -62,6 +61,20 @@ func (erc *ExchangeRateCreate) SetDeletedAt(u uint32) *ExchangeRateCreate {
 func (erc *ExchangeRateCreate) SetNillableDeletedAt(u *uint32) *ExchangeRateCreate {
 	if u != nil {
 		erc.SetDeletedAt(*u)
+	}
+	return erc
+}
+
+// SetEntID sets the "ent_id" field.
+func (erc *ExchangeRateCreate) SetEntID(u uuid.UUID) *ExchangeRateCreate {
+	erc.mutation.SetEntID(u)
+	return erc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (erc *ExchangeRateCreate) SetNillableEntID(u *uuid.UUID) *ExchangeRateCreate {
+	if u != nil {
+		erc.SetEntID(*u)
 	}
 	return erc
 }
@@ -157,16 +170,8 @@ func (erc *ExchangeRateCreate) SetNillableSetter(u *uuid.UUID) *ExchangeRateCrea
 }
 
 // SetID sets the "id" field.
-func (erc *ExchangeRateCreate) SetID(u uuid.UUID) *ExchangeRateCreate {
+func (erc *ExchangeRateCreate) SetID(u uint32) *ExchangeRateCreate {
 	erc.mutation.SetID(u)
-	return erc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (erc *ExchangeRateCreate) SetNillableID(u *uuid.UUID) *ExchangeRateCreate {
-	if u != nil {
-		erc.SetID(*u)
-	}
 	return erc
 }
 
@@ -270,6 +275,13 @@ func (erc *ExchangeRateCreate) defaults() error {
 		v := exchangerate.DefaultDeletedAt()
 		erc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := erc.mutation.EntID(); !ok {
+		if exchangerate.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized exchangerate.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := exchangerate.DefaultEntID()
+		erc.mutation.SetEntID(v)
+	}
 	if _, ok := erc.mutation.AppID(); !ok {
 		if exchangerate.DefaultAppID == nil {
 			return fmt.Errorf("ent: uninitialized exchangerate.DefaultAppID (forgotten import ent/runtime?)")
@@ -307,13 +319,6 @@ func (erc *ExchangeRateCreate) defaults() error {
 		v := exchangerate.DefaultSetter()
 		erc.mutation.SetSetter(v)
 	}
-	if _, ok := erc.mutation.ID(); !ok {
-		if exchangerate.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized exchangerate.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := exchangerate.DefaultID()
-		erc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -328,6 +333,9 @@ func (erc *ExchangeRateCreate) check() error {
 	if _, ok := erc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "ExchangeRate.deleted_at"`)}
 	}
+	if _, ok := erc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "ExchangeRate.ent_id"`)}
+	}
 	return nil
 }
 
@@ -339,12 +347,9 @@ func (erc *ExchangeRateCreate) sqlSave(ctx context.Context) (*ExchangeRate, erro
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -355,7 +360,7 @@ func (erc *ExchangeRateCreate) createSpec() (*ExchangeRate, *sqlgraph.CreateSpec
 		_spec = &sqlgraph.CreateSpec{
 			Table: exchangerate.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		}
@@ -363,7 +368,7 @@ func (erc *ExchangeRateCreate) createSpec() (*ExchangeRate, *sqlgraph.CreateSpec
 	_spec.OnConflict = erc.conflict
 	if id, ok := erc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := erc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -388,6 +393,14 @@ func (erc *ExchangeRateCreate) createSpec() (*ExchangeRate, *sqlgraph.CreateSpec
 			Column: exchangerate.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := erc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: exchangerate.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := erc.mutation.AppID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -550,6 +563,18 @@ func (u *ExchangeRateUpsert) UpdateDeletedAt() *ExchangeRateUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *ExchangeRateUpsert) AddDeletedAt(v uint32) *ExchangeRateUpsert {
 	u.Add(exchangerate.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ExchangeRateUpsert) SetEntID(v uuid.UUID) *ExchangeRateUpsert {
+	u.Set(exchangerate.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ExchangeRateUpsert) UpdateEntID() *ExchangeRateUpsert {
+	u.SetExcluded(exchangerate.FieldEntID)
 	return u
 }
 
@@ -798,6 +823,20 @@ func (u *ExchangeRateUpsertOne) UpdateDeletedAt() *ExchangeRateUpsertOne {
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *ExchangeRateUpsertOne) SetEntID(v uuid.UUID) *ExchangeRateUpsertOne {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ExchangeRateUpsertOne) UpdateEntID() *ExchangeRateUpsertOne {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetAppID sets the "app_id" field.
 func (u *ExchangeRateUpsertOne) SetAppID(v uuid.UUID) *ExchangeRateUpsertOne {
 	return u.Update(func(s *ExchangeRateUpsert) {
@@ -968,12 +1007,7 @@ func (u *ExchangeRateUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: ExchangeRateUpsertOne.ID is not supported by MySQL driver. Use ExchangeRateUpsertOne.Exec instead")
-	}
+func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -982,7 +1016,7 @@ func (u *ExchangeRateUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *ExchangeRateUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *ExchangeRateUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1033,6 +1067,10 @@ func (ercb *ExchangeRateCreateBulk) Save(ctx context.Context) ([]*ExchangeRate, 
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = uint32(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1228,6 +1266,20 @@ func (u *ExchangeRateUpsertBulk) AddDeletedAt(v uint32) *ExchangeRateUpsertBulk 
 func (u *ExchangeRateUpsertBulk) UpdateDeletedAt() *ExchangeRateUpsertBulk {
 	return u.Update(func(s *ExchangeRateUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *ExchangeRateUpsertBulk) SetEntID(v uuid.UUID) *ExchangeRateUpsertBulk {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *ExchangeRateUpsertBulk) UpdateEntID() *ExchangeRateUpsertBulk {
+	return u.Update(func(s *ExchangeRateUpsert) {
+		s.UpdateEntID()
 	})
 }
 

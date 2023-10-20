@@ -67,7 +67,7 @@ func CreateTxs(ctx context.Context, in []*npool.TxReq) ([]*npool.Tx, error) {
 func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 	info, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
 		resp, err := cli.GetTx(ctx, &npool.GetTxRequest{
-			ID: id,
+			EntID: id,
 		})
 		if err != nil {
 			return nil, err

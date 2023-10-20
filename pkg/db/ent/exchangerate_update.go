@@ -85,6 +85,20 @@ func (eru *ExchangeRateUpdate) AddDeletedAt(u int32) *ExchangeRateUpdate {
 	return eru
 }
 
+// SetEntID sets the "ent_id" field.
+func (eru *ExchangeRateUpdate) SetEntID(u uuid.UUID) *ExchangeRateUpdate {
+	eru.mutation.SetEntID(u)
+	return eru
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (eru *ExchangeRateUpdate) SetNillableEntID(u *uuid.UUID) *ExchangeRateUpdate {
+	if u != nil {
+		eru.SetEntID(*u)
+	}
+	return eru
+}
+
 // SetAppID sets the "app_id" field.
 func (eru *ExchangeRateUpdate) SetAppID(u uuid.UUID) *ExchangeRateUpdate {
 	eru.mutation.SetAppID(u)
@@ -310,7 +324,7 @@ func (eru *ExchangeRateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   exchangerate.Table,
 			Columns: exchangerate.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		},
@@ -362,6 +376,13 @@ func (eru *ExchangeRateUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: exchangerate.FieldDeletedAt,
+		})
+	}
+	if value, ok := eru.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: exchangerate.FieldEntID,
 		})
 	}
 	if value, ok := eru.mutation.AppID(); ok {
@@ -535,6 +556,20 @@ func (eruo *ExchangeRateUpdateOne) SetNillableDeletedAt(u *uint32) *ExchangeRate
 // AddDeletedAt adds u to the "deleted_at" field.
 func (eruo *ExchangeRateUpdateOne) AddDeletedAt(u int32) *ExchangeRateUpdateOne {
 	eruo.mutation.AddDeletedAt(u)
+	return eruo
+}
+
+// SetEntID sets the "ent_id" field.
+func (eruo *ExchangeRateUpdateOne) SetEntID(u uuid.UUID) *ExchangeRateUpdateOne {
+	eruo.mutation.SetEntID(u)
+	return eruo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (eruo *ExchangeRateUpdateOne) SetNillableEntID(u *uuid.UUID) *ExchangeRateUpdateOne {
+	if u != nil {
+		eruo.SetEntID(*u)
+	}
 	return eruo
 }
 
@@ -776,7 +811,7 @@ func (eruo *ExchangeRateUpdateOne) sqlSave(ctx context.Context) (_node *Exchange
 			Table:   exchangerate.Table,
 			Columns: exchangerate.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		},
@@ -845,6 +880,13 @@ func (eruo *ExchangeRateUpdateOne) sqlSave(ctx context.Context) (_node *Exchange
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: exchangerate.FieldDeletedAt,
+		})
+	}
+	if value, ok := eruo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: exchangerate.FieldEntID,
 		})
 	}
 	if value, ok := eruo.mutation.AppID(); ok {

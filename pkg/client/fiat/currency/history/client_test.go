@@ -38,7 +38,7 @@ func init() {
 }
 
 var ret = &currencymwpb.Currency{
-	ID:              uuid.NewString(),
+	EntID:           uuid.NewString(),
 	FiatName:        uuid.NewString(),
 	FiatUnit:        uuid.NewString(),
 	FeedType:        basetypes.CurrencyFeedType_CoinBase,
@@ -60,10 +60,10 @@ func setupCurrencyHistory(t *testing.T) func(*testing.T) {
 
 	h1, err := fiat1.NewHandler(
 		context.Background(),
-		fiat1.WithID(&ret.FiatID),
-		fiat1.WithName(&ret.FiatName),
-		fiat1.WithUnit(&ret.FiatUnit),
-		fiat1.WithLogo(&ret.FiatLogo),
+		fiat1.WithEntID(&ret.FiatID, true),
+		fiat1.WithName(&ret.FiatName, true),
+		fiat1.WithUnit(&ret.FiatUnit, true),
+		fiat1.WithLogo(&ret.FiatLogo, true),
 	)
 	assert.Nil(t, err)
 
@@ -72,10 +72,10 @@ func setupCurrencyHistory(t *testing.T) func(*testing.T) {
 
 	h2, err := currency1.NewHandler(
 		context.Background(),
-		currency1.WithFiatID(req.FiatID),
-		currency1.WithMarketValueHigh(req.MarketValueHigh),
-		currency1.WithMarketValueLow(req.MarketValueLow),
-		currency1.WithFeedType(req.FeedType),
+		currency1.WithFiatID(req.FiatID, true),
+		currency1.WithMarketValueHigh(req.MarketValueHigh, true),
+		currency1.WithMarketValueLow(req.MarketValueLow, true),
+		currency1.WithFeedType(req.FeedType, true),
 	)
 	assert.Nil(t, err)
 

@@ -85,6 +85,20 @@ func (fcu *FiatCurrencyUpdate) AddDeletedAt(u int32) *FiatCurrencyUpdate {
 	return fcu
 }
 
+// SetEntID sets the "ent_id" field.
+func (fcu *FiatCurrencyUpdate) SetEntID(u uuid.UUID) *FiatCurrencyUpdate {
+	fcu.mutation.SetEntID(u)
+	return fcu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fcu *FiatCurrencyUpdate) SetNillableEntID(u *uuid.UUID) *FiatCurrencyUpdate {
+	if u != nil {
+		fcu.SetEntID(*u)
+	}
+	return fcu
+}
+
 // SetFiatID sets the "fiat_id" field.
 func (fcu *FiatCurrencyUpdate) SetFiatID(u uuid.UUID) *FiatCurrencyUpdate {
 	fcu.mutation.SetFiatID(u)
@@ -251,7 +265,7 @@ func (fcu *FiatCurrencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   fiatcurrency.Table,
 			Columns: fiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: fiatcurrency.FieldID,
 			},
 		},
@@ -303,6 +317,13 @@ func (fcu *FiatCurrencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: fiatcurrency.FieldDeletedAt,
+		})
+	}
+	if value, ok := fcu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiatcurrency.FieldEntID,
 		})
 	}
 	if value, ok := fcu.mutation.FiatID(); ok {
@@ -430,6 +451,20 @@ func (fcuo *FiatCurrencyUpdateOne) SetNillableDeletedAt(u *uint32) *FiatCurrency
 // AddDeletedAt adds u to the "deleted_at" field.
 func (fcuo *FiatCurrencyUpdateOne) AddDeletedAt(u int32) *FiatCurrencyUpdateOne {
 	fcuo.mutation.AddDeletedAt(u)
+	return fcuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (fcuo *FiatCurrencyUpdateOne) SetEntID(u uuid.UUID) *FiatCurrencyUpdateOne {
+	fcuo.mutation.SetEntID(u)
+	return fcuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (fcuo *FiatCurrencyUpdateOne) SetNillableEntID(u *uuid.UUID) *FiatCurrencyUpdateOne {
+	if u != nil {
+		fcuo.SetEntID(*u)
+	}
 	return fcuo
 }
 
@@ -612,7 +647,7 @@ func (fcuo *FiatCurrencyUpdateOne) sqlSave(ctx context.Context) (_node *FiatCurr
 			Table:   fiatcurrency.Table,
 			Columns: fiatcurrency.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: fiatcurrency.FieldID,
 			},
 		},
@@ -681,6 +716,13 @@ func (fcuo *FiatCurrencyUpdateOne) sqlSave(ctx context.Context) (_node *FiatCurr
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: fiatcurrency.FieldDeletedAt,
+		})
+	}
+	if value, ok := fcuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: fiatcurrency.FieldEntID,
 		})
 	}
 	if value, ok := fcuo.mutation.FiatID(); ok {

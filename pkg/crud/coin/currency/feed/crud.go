@@ -12,7 +12,7 @@ import (
 )
 
 type Req struct {
-	ID           *uuid.UUID
+	EntID        *uuid.UUID
 	CoinTypeID   *uuid.UUID
 	FeedType     *basetypes.CurrencyFeedType
 	FeedCoinName *string
@@ -20,8 +20,8 @@ type Req struct {
 }
 
 func CreateSet(c *ent.CurrencyFeedCreate, req *Req) *ent.CurrencyFeedCreate {
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.CoinTypeID != nil {
 		c.SetCoinTypeID(*req.CoinTypeID)
@@ -49,7 +49,7 @@ func UpdateSet(u *ent.CurrencyFeedUpdateOne, req *Req) *ent.CurrencyFeedUpdateOn
 }
 
 type Conds struct {
-	ID          *cruder.Cond
+	EntID       *cruder.Cond
 	CoinTypeID  *cruder.Cond
 	CoinTypeIDs *cruder.Cond
 	Disabled    *cruder.Cond
@@ -58,14 +58,14 @@ type Conds struct {
 
 //nolint:gocyclo
 func SetQueryConds(q *ent.CurrencyFeedQuery, conds *Conds) (*ent.CurrencyFeedQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entcurrencyfeed.ID(id))
+			q.Where(entcurrencyfeed.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid currencyfeed field")
 		}

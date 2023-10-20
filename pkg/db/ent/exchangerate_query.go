@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/exchangerate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // ExchangeRateQuery is the builder for querying ExchangeRate entities.
@@ -87,8 +86,8 @@ func (erq *ExchangeRateQuery) FirstX(ctx context.Context) *ExchangeRate {
 
 // FirstID returns the first ExchangeRate ID from the query.
 // Returns a *NotFoundError when no ExchangeRate ID was found.
-func (erq *ExchangeRateQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (erq *ExchangeRateQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = erq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -100,7 +99,7 @@ func (erq *ExchangeRateQuery) FirstID(ctx context.Context) (id uuid.UUID, err er
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (erq *ExchangeRateQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (erq *ExchangeRateQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := erq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -138,8 +137,8 @@ func (erq *ExchangeRateQuery) OnlyX(ctx context.Context) *ExchangeRate {
 // OnlyID is like Only, but returns the only ExchangeRate ID in the query.
 // Returns a *NotSingularError when more than one ExchangeRate ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (erq *ExchangeRateQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (erq *ExchangeRateQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = erq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -155,7 +154,7 @@ func (erq *ExchangeRateQuery) OnlyID(ctx context.Context) (id uuid.UUID, err err
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (erq *ExchangeRateQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (erq *ExchangeRateQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := erq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -181,8 +180,8 @@ func (erq *ExchangeRateQuery) AllX(ctx context.Context) []*ExchangeRate {
 }
 
 // IDs executes the query and returns a list of ExchangeRate IDs.
-func (erq *ExchangeRateQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (erq *ExchangeRateQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := erq.Select(exchangerate.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -190,7 +189,7 @@ func (erq *ExchangeRateQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (erq *ExchangeRateQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (erq *ExchangeRateQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := erq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,7 +376,7 @@ func (erq *ExchangeRateQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   exchangerate.Table,
 			Columns: exchangerate.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: exchangerate.FieldID,
 			},
 		},

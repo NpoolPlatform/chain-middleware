@@ -15,11 +15,12 @@ func (s *Server) CreateFeed(ctx context.Context, in *npool.CreateFeedRequest) (*
 	req := in.GetInfo()
 	handler, err := currencyfeed1.NewHandler(
 		ctx,
-		currencyfeed1.WithID(req.ID),
-		currencyfeed1.WithFiatID(req.FiatID),
-		currencyfeed1.WithFeedType(req.FeedType),
-		currencyfeed1.WithFeedFiatName(req.FeedFiatName),
-		currencyfeed1.WithDisabled(req.Disabled),
+		currencyfeed1.WithID(req.ID, false),
+		currencyfeed1.WithEntID(req.EntID, false),
+		currencyfeed1.WithFiatID(req.FiatID, true),
+		currencyfeed1.WithFeedType(req.FeedType, true),
+		currencyfeed1.WithFeedFiatName(req.FeedFiatName, true),
+		currencyfeed1.WithDisabled(req.Disabled, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

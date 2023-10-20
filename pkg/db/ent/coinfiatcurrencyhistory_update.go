@@ -85,6 +85,20 @@ func (cfchu *CoinFiatCurrencyHistoryUpdate) AddDeletedAt(u int32) *CoinFiatCurre
 	return cfchu
 }
 
+// SetEntID sets the "ent_id" field.
+func (cfchu *CoinFiatCurrencyHistoryUpdate) SetEntID(u uuid.UUID) *CoinFiatCurrencyHistoryUpdate {
+	cfchu.mutation.SetEntID(u)
+	return cfchu
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfchu *CoinFiatCurrencyHistoryUpdate) SetNillableEntID(u *uuid.UUID) *CoinFiatCurrencyHistoryUpdate {
+	if u != nil {
+		cfchu.SetEntID(*u)
+	}
+	return cfchu
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (cfchu *CoinFiatCurrencyHistoryUpdate) SetCoinTypeID(u uuid.UUID) *CoinFiatCurrencyHistoryUpdate {
 	cfchu.mutation.SetCoinTypeID(u)
@@ -325,6 +339,13 @@ func (cfchu *CoinFiatCurrencyHistoryUpdate) sqlSave(ctx context.Context) (n int,
 			Column: coinfiatcurrencyhistory.FieldDeletedAt,
 		})
 	}
+	if value, ok := cfchu.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiatcurrencyhistory.FieldEntID,
+		})
+	}
 	if value, ok := cfchu.mutation.CoinTypeID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeUUID,
@@ -463,6 +484,20 @@ func (cfchuo *CoinFiatCurrencyHistoryUpdateOne) SetNillableDeletedAt(u *uint32) 
 // AddDeletedAt adds u to the "deleted_at" field.
 func (cfchuo *CoinFiatCurrencyHistoryUpdateOne) AddDeletedAt(u int32) *CoinFiatCurrencyHistoryUpdateOne {
 	cfchuo.mutation.AddDeletedAt(u)
+	return cfchuo
+}
+
+// SetEntID sets the "ent_id" field.
+func (cfchuo *CoinFiatCurrencyHistoryUpdateOne) SetEntID(u uuid.UUID) *CoinFiatCurrencyHistoryUpdateOne {
+	cfchuo.mutation.SetEntID(u)
+	return cfchuo
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfchuo *CoinFiatCurrencyHistoryUpdateOne) SetNillableEntID(u *uuid.UUID) *CoinFiatCurrencyHistoryUpdateOne {
+	if u != nil {
+		cfchuo.SetEntID(*u)
+	}
 	return cfchuo
 }
 
@@ -734,6 +769,13 @@ func (cfchuo *CoinFiatCurrencyHistoryUpdateOne) sqlSave(ctx context.Context) (_n
 			Type:   field.TypeUint32,
 			Value:  value,
 			Column: coinfiatcurrencyhistory.FieldDeletedAt,
+		})
+	}
+	if value, ok := cfchuo.mutation.EntID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiatcurrencyhistory.FieldEntID,
 		})
 	}
 	if value, ok := cfchuo.mutation.CoinTypeID(); ok {

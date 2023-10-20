@@ -17,13 +17,15 @@ import (
 type ExchangeRate struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID uint32 `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt uint32 `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
+	// EntID holds the value of the "ent_id" field.
+	EntID uuid.UUID `json:"ent_id,omitempty"`
 	// AppID holds the value of the "app_id" field.
 	AppID uuid.UUID `json:"app_id,omitempty"`
 	// CoinTypeID holds the value of the "coin_type_id" field.
@@ -49,9 +51,9 @@ func (*ExchangeRate) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new([]byte)
 		case exchangerate.FieldMarketValue, exchangerate.FieldSettleValue:
 			values[i] = new(decimal.Decimal)
-		case exchangerate.FieldCreatedAt, exchangerate.FieldUpdatedAt, exchangerate.FieldDeletedAt, exchangerate.FieldSettlePercent:
+		case exchangerate.FieldID, exchangerate.FieldCreatedAt, exchangerate.FieldUpdatedAt, exchangerate.FieldDeletedAt, exchangerate.FieldSettlePercent:
 			values[i] = new(sql.NullInt64)
-		case exchangerate.FieldID, exchangerate.FieldAppID, exchangerate.FieldCoinTypeID, exchangerate.FieldSetter:
+		case exchangerate.FieldEntID, exchangerate.FieldAppID, exchangerate.FieldCoinTypeID, exchangerate.FieldSetter:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type ExchangeRate", columns[i])
@@ -69,11 +71,11 @@ func (er *ExchangeRate) assignValues(columns []string, values []interface{}) err
 	for i := range columns {
 		switch columns[i] {
 		case exchangerate.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				er.ID = *value
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			er.ID = uint32(value.Int64)
 		case exchangerate.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -91,6 +93,12 @@ func (er *ExchangeRate) assignValues(columns []string, values []interface{}) err
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				er.DeletedAt = uint32(value.Int64)
+			}
+		case exchangerate.FieldEntID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field ent_id", values[i])
+			} else if value != nil {
+				er.EntID = *value
 			}
 		case exchangerate.FieldAppID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -172,6 +180,9 @@ func (er *ExchangeRate) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", er.DeletedAt))
+	builder.WriteString(", ")
+	builder.WriteString("ent_id=")
+	builder.WriteString(fmt.Sprintf("%v", er.EntID))
 	builder.WriteString(", ")
 	builder.WriteString("app_id=")
 	builder.WriteString(fmt.Sprintf("%v", er.AppID))

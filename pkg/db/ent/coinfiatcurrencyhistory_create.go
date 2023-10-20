@@ -65,6 +65,20 @@ func (cfchc *CoinFiatCurrencyHistoryCreate) SetNillableDeletedAt(u *uint32) *Coi
 	return cfchc
 }
 
+// SetEntID sets the "ent_id" field.
+func (cfchc *CoinFiatCurrencyHistoryCreate) SetEntID(u uuid.UUID) *CoinFiatCurrencyHistoryCreate {
+	cfchc.mutation.SetEntID(u)
+	return cfchc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (cfchc *CoinFiatCurrencyHistoryCreate) SetNillableEntID(u *uuid.UUID) *CoinFiatCurrencyHistoryCreate {
+	if u != nil {
+		cfchc.SetEntID(*u)
+	}
+	return cfchc
+}
+
 // SetCoinTypeID sets the "coin_type_id" field.
 func (cfchc *CoinFiatCurrencyHistoryCreate) SetCoinTypeID(u uuid.UUID) *CoinFiatCurrencyHistoryCreate {
 	cfchc.mutation.SetCoinTypeID(u)
@@ -241,6 +255,13 @@ func (cfchc *CoinFiatCurrencyHistoryCreate) defaults() error {
 		v := coinfiatcurrencyhistory.DefaultDeletedAt()
 		cfchc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := cfchc.mutation.EntID(); !ok {
+		if coinfiatcurrencyhistory.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized coinfiatcurrencyhistory.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := coinfiatcurrencyhistory.DefaultEntID()
+		cfchc.mutation.SetEntID(v)
+	}
 	if _, ok := cfchc.mutation.CoinTypeID(); !ok {
 		if coinfiatcurrencyhistory.DefaultCoinTypeID == nil {
 			return fmt.Errorf("ent: uninitialized coinfiatcurrencyhistory.DefaultCoinTypeID (forgotten import ent/runtime?)")
@@ -280,6 +301,9 @@ func (cfchc *CoinFiatCurrencyHistoryCreate) check() error {
 	}
 	if _, ok := cfchc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "CoinFiatCurrencyHistory.deleted_at"`)}
+	}
+	if _, ok := cfchc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "CoinFiatCurrencyHistory.ent_id"`)}
 	}
 	return nil
 }
@@ -338,6 +362,14 @@ func (cfchc *CoinFiatCurrencyHistoryCreate) createSpec() (*CoinFiatCurrencyHisto
 			Column: coinfiatcurrencyhistory.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := cfchc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: coinfiatcurrencyhistory.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := cfchc.mutation.CoinTypeID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -484,6 +516,18 @@ func (u *CoinFiatCurrencyHistoryUpsert) UpdateDeletedAt() *CoinFiatCurrencyHisto
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *CoinFiatCurrencyHistoryUpsert) AddDeletedAt(v uint32) *CoinFiatCurrencyHistoryUpsert {
 	u.Add(coinfiatcurrencyhistory.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinFiatCurrencyHistoryUpsert) SetEntID(v uuid.UUID) *CoinFiatCurrencyHistoryUpsert {
+	u.Set(coinfiatcurrencyhistory.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinFiatCurrencyHistoryUpsert) UpdateEntID() *CoinFiatCurrencyHistoryUpsert {
+	u.SetExcluded(coinfiatcurrencyhistory.FieldEntID)
 	return u
 }
 
@@ -687,6 +731,20 @@ func (u *CoinFiatCurrencyHistoryUpsertOne) AddDeletedAt(v uint32) *CoinFiatCurre
 func (u *CoinFiatCurrencyHistoryUpsertOne) UpdateDeletedAt() *CoinFiatCurrencyHistoryUpsertOne {
 	return u.Update(func(s *CoinFiatCurrencyHistoryUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinFiatCurrencyHistoryUpsertOne) SetEntID(v uuid.UUID) *CoinFiatCurrencyHistoryUpsertOne {
+	return u.Update(func(s *CoinFiatCurrencyHistoryUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinFiatCurrencyHistoryUpsertOne) UpdateEntID() *CoinFiatCurrencyHistoryUpsertOne {
+	return u.Update(func(s *CoinFiatCurrencyHistoryUpsert) {
+		s.UpdateEntID()
 	})
 }
 
@@ -1070,6 +1128,20 @@ func (u *CoinFiatCurrencyHistoryUpsertBulk) AddDeletedAt(v uint32) *CoinFiatCurr
 func (u *CoinFiatCurrencyHistoryUpsertBulk) UpdateDeletedAt() *CoinFiatCurrencyHistoryUpsertBulk {
 	return u.Update(func(s *CoinFiatCurrencyHistoryUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *CoinFiatCurrencyHistoryUpsertBulk) SetEntID(v uuid.UUID) *CoinFiatCurrencyHistoryUpsertBulk {
+	return u.Update(func(s *CoinFiatCurrencyHistoryUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *CoinFiatCurrencyHistoryUpsertBulk) UpdateEntID() *CoinFiatCurrencyHistoryUpsertBulk {
+	return u.Update(func(s *CoinFiatCurrencyHistoryUpsert) {
+		s.UpdateEntID()
 	})
 }
 

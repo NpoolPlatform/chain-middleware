@@ -13,7 +13,7 @@ import (
 )
 
 type Req struct {
-	ID              *uuid.UUID
+	EntID           *uuid.UUID
 	FiatID          *uuid.UUID
 	FeedType        *basetypes.CurrencyFeedType
 	MarketValueHigh *decimal.Decimal
@@ -21,8 +21,8 @@ type Req struct {
 }
 
 func CreateSet(c *ent.FiatCurrencyCreate, req *Req) *ent.FiatCurrencyCreate {
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.FiatID != nil {
 		c.SetFiatID(*req.FiatID)
@@ -51,21 +51,21 @@ func UpdateSet(u *ent.FiatCurrencyUpdateOne, req *Req) *ent.FiatCurrencyUpdateOn
 }
 
 type Conds struct {
-	ID       *cruder.Cond
+	EntID    *cruder.Cond
 	FiatID   *cruder.Cond
 	FiatIDs  *cruder.Cond
 	FiatName *cruder.Cond
 }
 
 func SetQueryConds(q *ent.FiatCurrencyQuery, conds *Conds) (*ent.FiatCurrencyQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entfiatcurrency.ID(id))
+			q.Where(entfiatcurrency.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid fiatcurrency field")
 		}

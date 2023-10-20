@@ -15,15 +15,15 @@ import (
 
 func (h *Handler) CreateTx(ctx context.Context) (*npool.Tx, error) {
 	id := uuid.New()
-	if h.ID == nil {
-		h.ID = &id
+	if h.EntID == nil {
+		h.EntID = &id
 	}
 
 	err := db.WithClient(ctx, func(_ctx context.Context, cli *ent.Client) error {
 		if _, err := txcrud.CreateSet(
 			cli.Tran.Create(),
 			&txcrud.Req{
-				ID:            h.ID,
+				EntID:         h.EntID,
 				CoinTypeID:    h.CoinTypeID,
 				FromAccountID: h.FromAccountID,
 				ToAccountID:   h.ToAccountID,
@@ -55,7 +55,7 @@ func (h *Handler) CreateTxs(ctx context.Context) ([]*npool.Tx, error) {
 			if err != nil {
 				return err
 			}
-			ids = append(ids, info.ID)
+			ids = append(ids, info.EntID)
 		}
 		return nil
 	})
@@ -64,7 +64,7 @@ func (h *Handler) CreateTxs(ctx context.Context) ([]*npool.Tx, error) {
 	}
 
 	h.Conds = &txcrud.Conds{
-		IDs: &cruder.Cond{Op: cruder.IN, Val: ids},
+		EntIDs: &cruder.Cond{Op: cruder.IN, Val: ids},
 	}
 	h.Offset = 0
 	h.Limit = int32(len(ids))

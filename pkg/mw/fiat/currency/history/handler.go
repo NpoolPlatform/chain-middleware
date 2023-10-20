@@ -3,6 +3,7 @@ package currencyhistory
 import (
 	"context"
 
+	constant "github.com/NpoolPlatform/chain-middleware/pkg/const"
 	historycrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/fiat/currency/history"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/fiat/currency/history"
 
@@ -29,13 +30,16 @@ func NewHandler(ctx context.Context, options ...func(context.Context, *Handler) 
 func WithConds(conds *npool.Conds) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
 		h.Conds = &historycrud.Conds{}
-		if conds.ID != nil {
-			id, err := uuid.Parse(conds.GetID().GetValue())
+		if conds == nil {
+			return nil
+		}
+		if conds.EntID != nil {
+			id, err := uuid.Parse(conds.GetEntID().GetValue())
 			if err != nil {
 				return err
 			}
-			h.Conds.ID = &cruder.Cond{
-				Op:  conds.GetID().GetOp(),
+			h.Conds.EntID = &cruder.Cond{
+				Op:  conds.GetEntID().GetOp(),
 				Val: id,
 			}
 		}
@@ -88,6 +92,9 @@ func WithOffset(offset int32) func(context.Context, *Handler) error {
 
 func WithLimit(limit int32) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if limit == 0 {
+			limit = constant.DefaultRowLimit
+		}
 		h.Limit = limit
 		return nil
 	}

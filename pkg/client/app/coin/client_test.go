@@ -41,7 +41,7 @@ var unit = uuid.NewString()
 var logo = uuid.NewString()
 
 var ret = &npool.Coin{
-	ID:                          uuid.NewString(),
+	EntID:                       uuid.NewString(),
 	AppID:                       uuid.NewString(),
 	CoinName:                    name,
 	Name:                        name,
@@ -77,8 +77,16 @@ var ret = &npool.Coin{
 	LeastTransferAmount:         "0.000000000000000000",
 }
 
+var chainType = uuid.NewString()
+var chainNativeUnit = uuid.NewString()
+var chainAtomicUnit = uuid.NewString()
+var chainUnitExp = uint32(1)
+var gasType = basetypes.GasType_FixedGas
+var chainID = uuid.NewString()
+var chainNickname = uuid.NewString()
+var chainNativeCoinName = uuid.NewString()
+
 var req = &npool.CoinReq{
-	ID:                       &ret.ID,
 	AppID:                    &ret.AppID,
 	Name:                     &ret.Name,
 	DisplayNames:             ret.DisplayNames,
@@ -89,6 +97,7 @@ var req = &npool.CoinReq{
 	SettlePercent:            &ret.SettlePercent,
 	SettleTips:               ret.SettleTips,
 	Setter:                   &ret.Setter,
+	DailyRewardAmount:        &ret.DailyRewardAmount,
 	MaxAmountPerWithdraw:     &ret.MaxAmountPerWithdraw,
 }
 
@@ -99,11 +108,19 @@ func setupAppCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithUnit(&ret.Unit),
-		coin1.WithLogo(&ret.Logo),
-		coin1.WithENV(&ret.ENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithUnit(&ret.Unit, true),
+		coin1.WithLogo(&ret.Logo, true),
+		coin1.WithENV(&ret.ENV, true),
+		coin1.WithChainType(&chainType, true),
+		coin1.WithChainNativeUnit(&chainNativeUnit, true),
+		coin1.WithChainAtomicUnit(&chainAtomicUnit, true),
+		coin1.WithChainUnitExp(&chainUnitExp, true),
+		coin1.WithGasType(&gasType, true),
+		coin1.WithChainID(&chainID, true),
+		coin1.WithChainNickname(&chainNickname, true),
+		coin1.WithChainNativeCoinName(&chainNativeCoinName, true),
 	)
 	assert.Nil(t, err)
 
@@ -121,6 +138,7 @@ func createCoin(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		ret.FeeCoinTypeID = info.FeeCoinTypeID
 		ret.DisplayNamesStr = info.DisplayNamesStr
 		ret.SettleTipsStr = info.SettleTipsStr
@@ -151,7 +169,7 @@ func updateCoin(t *testing.T) {
 }
 
 func getCoin(t *testing.T) {
-	info, err := GetCoin(context.Background(), ret.ID)
+	info, err := GetCoin(context.Background(), ret.EntID)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, ret)
 	}
@@ -159,7 +177,7 @@ func getCoin(t *testing.T) {
 
 func getCoins(t *testing.T) {
 	infos, total, err := GetCoins(context.Background(), &npool.Conds{
-		ID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.EntID},
 	}, 0, 100)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)
@@ -176,7 +194,7 @@ func deleteCoin(t *testing.T) {
 		assert.Equal(t, info, ret)
 	}
 
-	info, err = GetCoin(context.Background(), ret.ID)
+	info, err = GetCoin(context.Background(), ret.EntID)
 	assert.Nil(t, err)
 	assert.Nil(t, info)
 }

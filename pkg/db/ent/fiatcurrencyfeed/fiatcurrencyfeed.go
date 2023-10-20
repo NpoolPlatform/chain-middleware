@@ -18,6 +18,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
+	// FieldEntID holds the string denoting the ent_id field in the database.
+	FieldEntID = "ent_id"
 	// FieldFiatID holds the string denoting the fiat_id field in the database.
 	FieldFiatID = "fiat_id"
 	// FieldFeedType holds the string denoting the feed_type field in the database.
@@ -36,6 +38,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
+	FieldEntID,
 	FieldFiatID,
 	FieldFeedType,
 	FieldFeedFiatName,
@@ -69,6 +72,8 @@ var (
 	UpdateDefaultUpdatedAt func() uint32
 	// DefaultDeletedAt holds the default value on creation for the "deleted_at" field.
 	DefaultDeletedAt func() uint32
+	// DefaultEntID holds the default value on creation for the "ent_id" field.
+	DefaultEntID func() uuid.UUID
 	// DefaultFiatID holds the default value on creation for the "fiat_id" field.
 	DefaultFiatID func() uuid.UUID
 	// DefaultFeedType holds the default value on creation for the "feed_type" field.
@@ -77,6 +82,4 @@ var (
 	DefaultFeedFiatName string
 	// DefaultDisabled holds the default value on creation for the "disabled" field.
 	DefaultDisabled bool
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
 )

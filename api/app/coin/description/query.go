@@ -14,7 +14,7 @@ import (
 func (s *Server) GetCoinDescription(ctx context.Context, in *npool.GetCoinDescriptionRequest) (*npool.GetCoinDescriptionResponse, error) {
 	handler, err := description1.NewHandler(
 		ctx,
-		description1.WithID(&in.ID),
+		description1.WithEntID(&in.EntID, true),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

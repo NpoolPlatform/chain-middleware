@@ -28,7 +28,7 @@ func init() {
 }
 
 var ret = &npool.CoinDescription{
-	ID:         uuid.NewString(),
+	EntID:      uuid.NewString(),
 	AppID:      uuid.NewString(),
 	CoinLogo:   uuid.NewString(),
 	CoinUnit:   "BTC",
@@ -53,26 +53,28 @@ func setupCoin(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
-	_, err = h1.CreateCoin(context.Background())
+	info1, err := h1.CreateCoin(context.Background())
 	assert.Nil(t, err)
+	h1.ID = &info1.ID
 
 	h2, err := appcoin1.NewHandler(
 		context.Background(),
-		appcoin1.WithAppID(&ret.AppID),
-		appcoin1.WithCoinTypeID(&ret.CoinTypeID),
+		appcoin1.WithAppID(&ret.AppID, true),
+		appcoin1.WithCoinTypeID(&ret.CoinTypeID, true),
 	)
 	assert.Nil(t, err)
 
-	_, err = h2.CreateCoin(context.Background())
+	info2, err := h2.CreateCoin(context.Background())
 	assert.Nil(t, err)
+	h2.ID = &info2.ID
 
 	return func(*testing.T) {
 		_, _ = h1.DeleteCoin(context.Background())
@@ -83,12 +85,12 @@ func setupCoin(t *testing.T) func(*testing.T) {
 func create(t *testing.T) {
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(req.ID),
-		WithAppID(req.AppID),
-		WithCoinTypeID(req.CoinTypeID),
-		WithTitle(req.Title),
-		WithMessage(req.Message),
-		WithUsedFor(req.UsedFor),
+		WithEntID(req.EntID, false),
+		WithAppID(req.AppID, true),
+		WithCoinTypeID(req.CoinTypeID, true),
+		WithTitle(req.Title, true),
+		WithMessage(req.Message, true),
+		WithUsedFor(req.UsedFor, true),
 	)
 	assert.Nil(t, err)
 
@@ -97,6 +99,7 @@ func create(t *testing.T) {
 		ret.UpdatedAt = info.UpdatedAt
 		ret.CreatedAt = info.CreatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, info, ret)
 	}
 }
@@ -110,9 +113,9 @@ func update(t *testing.T) {
 
 	handler, err := NewHandler(
 		context.Background(),
-		WithID(&ret.ID),
-		WithTitle(req.Title),
-		WithMessage(req.Message),
+		WithID(&ret.ID, true),
+		WithTitle(req.Title, true),
+		WithMessage(req.Message, true),
 	)
 	assert.Nil(t, err)
 

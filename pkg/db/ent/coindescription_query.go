@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coindescription"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // CoinDescriptionQuery is the builder for querying CoinDescription entities.
@@ -87,8 +86,8 @@ func (cdq *CoinDescriptionQuery) FirstX(ctx context.Context) *CoinDescription {
 
 // FirstID returns the first CoinDescription ID from the query.
 // Returns a *NotFoundError when no CoinDescription ID was found.
-func (cdq *CoinDescriptionQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (cdq *CoinDescriptionQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cdq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -100,7 +99,7 @@ func (cdq *CoinDescriptionQuery) FirstID(ctx context.Context) (id uuid.UUID, err
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cdq *CoinDescriptionQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (cdq *CoinDescriptionQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := cdq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -138,8 +137,8 @@ func (cdq *CoinDescriptionQuery) OnlyX(ctx context.Context) *CoinDescription {
 // OnlyID is like Only, but returns the only CoinDescription ID in the query.
 // Returns a *NotSingularError when more than one CoinDescription ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cdq *CoinDescriptionQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (cdq *CoinDescriptionQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cdq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -155,7 +154,7 @@ func (cdq *CoinDescriptionQuery) OnlyID(ctx context.Context) (id uuid.UUID, err 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cdq *CoinDescriptionQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (cdq *CoinDescriptionQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := cdq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -181,8 +180,8 @@ func (cdq *CoinDescriptionQuery) AllX(ctx context.Context) []*CoinDescription {
 }
 
 // IDs executes the query and returns a list of CoinDescription IDs.
-func (cdq *CoinDescriptionQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (cdq *CoinDescriptionQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := cdq.Select(coindescription.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -190,7 +189,7 @@ func (cdq *CoinDescriptionQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cdq *CoinDescriptionQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (cdq *CoinDescriptionQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := cdq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,7 +376,7 @@ func (cdq *CoinDescriptionQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   coindescription.Table,
 			Columns: coindescription.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: coindescription.FieldID,
 			},
 		},

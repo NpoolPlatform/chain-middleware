@@ -34,7 +34,7 @@ func init() {
 }
 
 var ret = &npool.Tx{
-	ID:            uuid.NewString(),
+	EntID:         uuid.NewString(),
 	CoinName:      uuid.NewString(),
 	CoinUnit:      "BTC",
 	CoinENV:       "test",
@@ -50,7 +50,7 @@ var ret = &npool.Tx{
 }
 
 var req = &npool.TxReq{
-	ID:            &ret.ID,
+	EntID:         &ret.EntID,
 	FromAccountID: &ret.FromAccountID,
 	ToAccountID:   &ret.ToAccountID,
 	Amount:        &ret.Amount,
@@ -66,11 +66,11 @@ func setupTx(t *testing.T) func(*testing.T) {
 
 	h1, err := coin1.NewHandler(
 		context.Background(),
-		coin1.WithID(&ret.CoinTypeID),
-		coin1.WithName(&ret.CoinName),
-		coin1.WithUnit(&ret.CoinUnit),
-		coin1.WithLogo(&ret.CoinLogo),
-		coin1.WithENV(&ret.CoinENV),
+		coin1.WithEntID(&ret.CoinTypeID, true),
+		coin1.WithName(&ret.CoinName, true),
+		coin1.WithUnit(&ret.CoinUnit, true),
+		coin1.WithLogo(&ret.CoinLogo, true),
+		coin1.WithENV(&ret.CoinENV, true),
 	)
 	assert.Nil(t, err)
 
@@ -88,6 +88,7 @@ func createTx(t *testing.T) {
 		ret.CreatedAt = info.CreatedAt
 		ret.UpdatedAt = info.UpdatedAt
 		ret.ID = info.ID
+		ret.EntID = info.EntID
 		assert.Equal(t, ret, info)
 	}
 }
@@ -117,7 +118,7 @@ func updateTx(t *testing.T) {
 }
 
 func getTx(t *testing.T) {
-	info, err := GetTx(context.Background(), ret.ID)
+	info, err := GetTx(context.Background(), ret.EntID)
 	if assert.Nil(t, err) {
 		assert.Equal(t, info, ret)
 	}
@@ -125,7 +126,7 @@ func getTx(t *testing.T) {
 
 func getTxs(t *testing.T) {
 	infos, total, err := GetTxs(context.Background(), &npool.Conds{
-		ID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.ID},
+		EntID: &basetypes.StringVal{Op: cruder.EQ, Value: ret.EntID},
 	}, 0, 1)
 	if assert.Nil(t, err) {
 		assert.Equal(t, len(infos), 1)

@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // CurrencyFeedQuery is the builder for querying CurrencyFeed entities.
@@ -87,8 +86,8 @@ func (cfq *CurrencyFeedQuery) FirstX(ctx context.Context) *CurrencyFeed {
 
 // FirstID returns the first CurrencyFeed ID from the query.
 // Returns a *NotFoundError when no CurrencyFeed ID was found.
-func (cfq *CurrencyFeedQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (cfq *CurrencyFeedQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cfq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -100,7 +99,7 @@ func (cfq *CurrencyFeedQuery) FirstID(ctx context.Context) (id uuid.UUID, err er
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cfq *CurrencyFeedQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (cfq *CurrencyFeedQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := cfq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -138,8 +137,8 @@ func (cfq *CurrencyFeedQuery) OnlyX(ctx context.Context) *CurrencyFeed {
 // OnlyID is like Only, but returns the only CurrencyFeed ID in the query.
 // Returns a *NotSingularError when more than one CurrencyFeed ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cfq *CurrencyFeedQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (cfq *CurrencyFeedQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = cfq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -155,7 +154,7 @@ func (cfq *CurrencyFeedQuery) OnlyID(ctx context.Context) (id uuid.UUID, err err
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cfq *CurrencyFeedQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (cfq *CurrencyFeedQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := cfq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -181,8 +180,8 @@ func (cfq *CurrencyFeedQuery) AllX(ctx context.Context) []*CurrencyFeed {
 }
 
 // IDs executes the query and returns a list of CurrencyFeed IDs.
-func (cfq *CurrencyFeedQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (cfq *CurrencyFeedQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := cfq.Select(currencyfeed.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -190,7 +189,7 @@ func (cfq *CurrencyFeedQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cfq *CurrencyFeedQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (cfq *CurrencyFeedQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := cfq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,7 +376,7 @@ func (cfq *CurrencyFeedQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   currencyfeed.Table,
 			Columns: currencyfeed.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: currencyfeed.FieldID,
 			},
 		},

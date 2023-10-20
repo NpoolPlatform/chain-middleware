@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
-	"github.com/google/uuid"
 )
 
 // CurrencyHistoryQuery is the builder for querying CurrencyHistory entities.
@@ -87,8 +86,8 @@ func (chq *CurrencyHistoryQuery) FirstX(ctx context.Context) *CurrencyHistory {
 
 // FirstID returns the first CurrencyHistory ID from the query.
 // Returns a *NotFoundError when no CurrencyHistory ID was found.
-func (chq *CurrencyHistoryQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (chq *CurrencyHistoryQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = chq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -100,7 +99,7 @@ func (chq *CurrencyHistoryQuery) FirstID(ctx context.Context) (id uuid.UUID, err
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (chq *CurrencyHistoryQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (chq *CurrencyHistoryQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := chq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -138,8 +137,8 @@ func (chq *CurrencyHistoryQuery) OnlyX(ctx context.Context) *CurrencyHistory {
 // OnlyID is like Only, but returns the only CurrencyHistory ID in the query.
 // Returns a *NotSingularError when more than one CurrencyHistory ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (chq *CurrencyHistoryQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (chq *CurrencyHistoryQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = chq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -155,7 +154,7 @@ func (chq *CurrencyHistoryQuery) OnlyID(ctx context.Context) (id uuid.UUID, err 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (chq *CurrencyHistoryQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (chq *CurrencyHistoryQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := chq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -181,8 +180,8 @@ func (chq *CurrencyHistoryQuery) AllX(ctx context.Context) []*CurrencyHistory {
 }
 
 // IDs executes the query and returns a list of CurrencyHistory IDs.
-func (chq *CurrencyHistoryQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (chq *CurrencyHistoryQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := chq.Select(currencyhistory.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -190,7 +189,7 @@ func (chq *CurrencyHistoryQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (chq *CurrencyHistoryQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (chq *CurrencyHistoryQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := chq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,7 +376,7 @@ func (chq *CurrencyHistoryQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   currencyhistory.Table,
 			Columns: currencyhistory.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: currencyhistory.FieldID,
 			},
 		},

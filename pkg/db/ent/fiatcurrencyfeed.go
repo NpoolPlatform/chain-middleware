@@ -15,13 +15,15 @@ import (
 type FiatCurrencyFeed struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID uint32 `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt uint32 `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt uint32 `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt uint32 `json:"deleted_at,omitempty"`
+	// EntID holds the value of the "ent_id" field.
+	EntID uuid.UUID `json:"ent_id,omitempty"`
 	// FiatID holds the value of the "fiat_id" field.
 	FiatID uuid.UUID `json:"fiat_id,omitempty"`
 	// FeedType holds the value of the "feed_type" field.
@@ -39,11 +41,11 @@ func (*FiatCurrencyFeed) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case fiatcurrencyfeed.FieldDisabled:
 			values[i] = new(sql.NullBool)
-		case fiatcurrencyfeed.FieldCreatedAt, fiatcurrencyfeed.FieldUpdatedAt, fiatcurrencyfeed.FieldDeletedAt:
+		case fiatcurrencyfeed.FieldID, fiatcurrencyfeed.FieldCreatedAt, fiatcurrencyfeed.FieldUpdatedAt, fiatcurrencyfeed.FieldDeletedAt:
 			values[i] = new(sql.NullInt64)
 		case fiatcurrencyfeed.FieldFeedType, fiatcurrencyfeed.FieldFeedFiatName:
 			values[i] = new(sql.NullString)
-		case fiatcurrencyfeed.FieldID, fiatcurrencyfeed.FieldFiatID:
+		case fiatcurrencyfeed.FieldEntID, fiatcurrencyfeed.FieldFiatID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type FiatCurrencyFeed", columns[i])
@@ -61,11 +63,11 @@ func (fcf *FiatCurrencyFeed) assignValues(columns []string, values []interface{}
 	for i := range columns {
 		switch columns[i] {
 		case fiatcurrencyfeed.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				fcf.ID = *value
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			fcf.ID = uint32(value.Int64)
 		case fiatcurrencyfeed.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -83,6 +85,12 @@ func (fcf *FiatCurrencyFeed) assignValues(columns []string, values []interface{}
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
 				fcf.DeletedAt = uint32(value.Int64)
+			}
+		case fiatcurrencyfeed.FieldEntID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field ent_id", values[i])
+			} else if value != nil {
+				fcf.EntID = *value
 			}
 		case fiatcurrencyfeed.FieldFiatID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
@@ -144,6 +152,9 @@ func (fcf *FiatCurrencyFeed) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("deleted_at=")
 	builder.WriteString(fmt.Sprintf("%v", fcf.DeletedAt))
+	builder.WriteString(", ")
+	builder.WriteString("ent_id=")
+	builder.WriteString(fmt.Sprintf("%v", fcf.EntID))
 	builder.WriteString(", ")
 	builder.WriteString("fiat_id=")
 	builder.WriteString(fmt.Sprintf("%v", fcf.FiatID))

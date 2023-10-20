@@ -13,7 +13,7 @@ import (
 )
 
 type Req struct {
-	ID              *uuid.UUID
+	EntID           *uuid.UUID
 	CoinTypeID      *uuid.UUID
 	FeedType        *basetypes.CurrencyFeedType
 	MarketValueHigh *decimal.Decimal
@@ -21,8 +21,8 @@ type Req struct {
 }
 
 func CreateSet(c *ent.CurrencyHistoryCreate, req *Req) *ent.CurrencyHistoryCreate {
-	if req.ID != nil {
-		c.SetID(*req.ID)
+	if req.EntID != nil {
+		c.SetEntID(*req.EntID)
 	}
 	if req.CoinTypeID != nil {
 		c.SetCoinTypeID(*req.CoinTypeID)
@@ -51,7 +51,7 @@ func UpdateSet(u *ent.CurrencyHistoryUpdateOne, req *Req) *ent.CurrencyHistoryUp
 }
 
 type Conds struct {
-	ID          *cruder.Cond
+	EntID       *cruder.Cond
 	CoinTypeID  *cruder.Cond
 	CoinTypeIDs *cruder.Cond
 	StartAt     *cruder.Cond
@@ -61,14 +61,14 @@ type Conds struct {
 
 // nolint:funlen,gocyclo
 func SetQueryConds(q *ent.CurrencyHistoryQuery, conds *Conds) (*ent.CurrencyHistoryQuery, error) {
-	if conds.ID != nil {
-		id, ok := conds.ID.Val.(uuid.UUID)
+	if conds.EntID != nil {
+		id, ok := conds.EntID.Val.(uuid.UUID)
 		if !ok {
-			return nil, fmt.Errorf("invalid id")
+			return nil, fmt.Errorf("invalid entid")
 		}
-		switch conds.ID.Op {
+		switch conds.EntID.Op {
 		case cruder.EQ:
-			q.Where(entcurrencyhis.ID(id))
+			q.Where(entcurrencyhis.EntID(id))
 		default:
 			return nil, fmt.Errorf("invalid currency field")
 		}
@@ -103,6 +103,8 @@ func SetQueryConds(q *ent.CurrencyHistoryQuery, conds *Conds) (*ent.CurrencyHist
 			return nil, fmt.Errorf("invalid startat")
 		}
 		switch conds.StartAt.Op {
+		case cruder.EQ:
+			q.Where(entcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:
 			q.Where(entcurrencyhis.CreatedAtLTE(at))
 		case cruder.GTE:
@@ -117,6 +119,8 @@ func SetQueryConds(q *ent.CurrencyHistoryQuery, conds *Conds) (*ent.CurrencyHist
 			return nil, fmt.Errorf("invalid endat")
 		}
 		switch conds.EndAt.Op {
+		case cruder.EQ:
+			q.Where(entcurrencyhis.CreatedAtLTE(at))
 		case cruder.GTE:
 			q.Where(entcurrencyhis.CreatedAtGTE(at))
 		case cruder.LTE:

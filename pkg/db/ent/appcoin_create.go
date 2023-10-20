@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -62,6 +61,20 @@ func (acc *AppCoinCreate) SetDeletedAt(u uint32) *AppCoinCreate {
 func (acc *AppCoinCreate) SetNillableDeletedAt(u *uint32) *AppCoinCreate {
 	if u != nil {
 		acc.SetDeletedAt(*u)
+	}
+	return acc
+}
+
+// SetEntID sets the "ent_id" field.
+func (acc *AppCoinCreate) SetEntID(u uuid.UUID) *AppCoinCreate {
+	acc.mutation.SetEntID(u)
+	return acc
+}
+
+// SetNillableEntID sets the "ent_id" field if the given value is not nil.
+func (acc *AppCoinCreate) SetNillableEntID(u *uuid.UUID) *AppCoinCreate {
+	if u != nil {
+		acc.SetEntID(*u)
 	}
 	return acc
 }
@@ -241,16 +254,8 @@ func (acc *AppCoinCreate) SetNillableMaxAmountPerWithdraw(d *decimal.Decimal) *A
 }
 
 // SetID sets the "id" field.
-func (acc *AppCoinCreate) SetID(u uuid.UUID) *AppCoinCreate {
+func (acc *AppCoinCreate) SetID(u uint32) *AppCoinCreate {
 	acc.mutation.SetID(u)
-	return acc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (acc *AppCoinCreate) SetNillableID(u *uuid.UUID) *AppCoinCreate {
-	if u != nil {
-		acc.SetID(*u)
-	}
 	return acc
 }
 
@@ -354,6 +359,13 @@ func (acc *AppCoinCreate) defaults() error {
 		v := appcoin.DefaultDeletedAt()
 		acc.mutation.SetDeletedAt(v)
 	}
+	if _, ok := acc.mutation.EntID(); !ok {
+		if appcoin.DefaultEntID == nil {
+			return fmt.Errorf("ent: uninitialized appcoin.DefaultEntID (forgotten import ent/runtime?)")
+		}
+		v := appcoin.DefaultEntID()
+		acc.mutation.SetEntID(v)
+	}
 	if _, ok := acc.mutation.AppID(); !ok {
 		if appcoin.DefaultAppID == nil {
 			return fmt.Errorf("ent: uninitialized appcoin.DefaultAppID (forgotten import ent/runtime?)")
@@ -412,13 +424,6 @@ func (acc *AppCoinCreate) defaults() error {
 		v := appcoin.DefaultMaxAmountPerWithdraw
 		acc.mutation.SetMaxAmountPerWithdraw(v)
 	}
-	if _, ok := acc.mutation.ID(); !ok {
-		if appcoin.DefaultID == nil {
-			return fmt.Errorf("ent: uninitialized appcoin.DefaultID (forgotten import ent/runtime?)")
-		}
-		v := appcoin.DefaultID()
-		acc.mutation.SetID(v)
-	}
 	return nil
 }
 
@@ -433,6 +438,9 @@ func (acc *AppCoinCreate) check() error {
 	if _, ok := acc.mutation.DeletedAt(); !ok {
 		return &ValidationError{Name: "deleted_at", err: errors.New(`ent: missing required field "AppCoin.deleted_at"`)}
 	}
+	if _, ok := acc.mutation.EntID(); !ok {
+		return &ValidationError{Name: "ent_id", err: errors.New(`ent: missing required field "AppCoin.ent_id"`)}
+	}
 	return nil
 }
 
@@ -444,12 +452,9 @@ func (acc *AppCoinCreate) sqlSave(ctx context.Context) (*AppCoin, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = uint32(id)
 	}
 	return _node, nil
 }
@@ -460,7 +465,7 @@ func (acc *AppCoinCreate) createSpec() (*AppCoin, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: appcoin.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: appcoin.FieldID,
 			},
 		}
@@ -468,7 +473,7 @@ func (acc *AppCoinCreate) createSpec() (*AppCoin, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = acc.conflict
 	if id, ok := acc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = &id
+		_spec.ID.Value = id
 	}
 	if value, ok := acc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -493,6 +498,14 @@ func (acc *AppCoinCreate) createSpec() (*AppCoin, *sqlgraph.CreateSpec) {
 			Column: appcoin.FieldDeletedAt,
 		})
 		_node.DeletedAt = value
+	}
+	if value, ok := acc.mutation.EntID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: appcoin.FieldEntID,
+		})
+		_node.EntID = value
 	}
 	if value, ok := acc.mutation.AppID(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -703,6 +716,18 @@ func (u *AppCoinUpsert) UpdateDeletedAt() *AppCoinUpsert {
 // AddDeletedAt adds v to the "deleted_at" field.
 func (u *AppCoinUpsert) AddDeletedAt(v uint32) *AppCoinUpsert {
 	u.Add(appcoin.FieldDeletedAt, v)
+	return u
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *AppCoinUpsert) SetEntID(v uuid.UUID) *AppCoinUpsert {
+	u.Set(appcoin.FieldEntID, v)
+	return u
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *AppCoinUpsert) UpdateEntID() *AppCoinUpsert {
+	u.SetExcluded(appcoin.FieldEntID)
 	return u
 }
 
@@ -1059,6 +1084,20 @@ func (u *AppCoinUpsertOne) UpdateDeletedAt() *AppCoinUpsertOne {
 	})
 }
 
+// SetEntID sets the "ent_id" field.
+func (u *AppCoinUpsertOne) SetEntID(v uuid.UUID) *AppCoinUpsertOne {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *AppCoinUpsertOne) UpdateEntID() *AppCoinUpsertOne {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.UpdateEntID()
+	})
+}
+
 // SetAppID sets the "app_id" field.
 func (u *AppCoinUpsertOne) SetAppID(v uuid.UUID) *AppCoinUpsertOne {
 	return u.Update(func(s *AppCoinUpsert) {
@@ -1355,12 +1394,7 @@ func (u *AppCoinUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *AppCoinUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: AppCoinUpsertOne.ID is not supported by MySQL driver. Use AppCoinUpsertOne.Exec instead")
-	}
+func (u *AppCoinUpsertOne) ID(ctx context.Context) (id uint32, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -1369,7 +1403,7 @@ func (u *AppCoinUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *AppCoinUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *AppCoinUpsertOne) IDX(ctx context.Context) uint32 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -1420,6 +1454,10 @@ func (accb *AppCoinCreateBulk) Save(ctx context.Context) ([]*AppCoin, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = uint32(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -1615,6 +1653,20 @@ func (u *AppCoinUpsertBulk) AddDeletedAt(v uint32) *AppCoinUpsertBulk {
 func (u *AppCoinUpsertBulk) UpdateDeletedAt() *AppCoinUpsertBulk {
 	return u.Update(func(s *AppCoinUpsert) {
 		s.UpdateDeletedAt()
+	})
+}
+
+// SetEntID sets the "ent_id" field.
+func (u *AppCoinUpsertBulk) SetEntID(v uuid.UUID) *AppCoinUpsertBulk {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.SetEntID(v)
+	})
+}
+
+// UpdateEntID sets the "ent_id" field to the value that was provided on create.
+func (u *AppCoinUpsertBulk) UpdateEntID() *AppCoinUpsertBulk {
+	return u.Update(func(s *AppCoinUpsert) {
+		s.UpdateEntID()
 	})
 }
 

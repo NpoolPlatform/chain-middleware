@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/predicate"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/tran"
-	"github.com/google/uuid"
 )
 
 // TranQuery is the builder for querying Tran entities.
@@ -87,8 +86,8 @@ func (tq *TranQuery) FirstX(ctx context.Context) *Tran {
 
 // FirstID returns the first Tran ID from the query.
 // Returns a *NotFoundError when no Tran ID was found.
-func (tq *TranQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (tq *TranQuery) FirstID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = tq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -100,7 +99,7 @@ func (tq *TranQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (tq *TranQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (tq *TranQuery) FirstIDX(ctx context.Context) uint32 {
 	id, err := tq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -138,8 +137,8 @@ func (tq *TranQuery) OnlyX(ctx context.Context) *Tran {
 // OnlyID is like Only, but returns the only Tran ID in the query.
 // Returns a *NotSingularError when more than one Tran ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (tq *TranQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (tq *TranQuery) OnlyID(ctx context.Context) (id uint32, err error) {
+	var ids []uint32
 	if ids, err = tq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -155,7 +154,7 @@ func (tq *TranQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (tq *TranQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (tq *TranQuery) OnlyIDX(ctx context.Context) uint32 {
 	id, err := tq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -181,8 +180,8 @@ func (tq *TranQuery) AllX(ctx context.Context) []*Tran {
 }
 
 // IDs executes the query and returns a list of Tran IDs.
-func (tq *TranQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (tq *TranQuery) IDs(ctx context.Context) ([]uint32, error) {
+	var ids []uint32
 	if err := tq.Select(tran.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -190,7 +189,7 @@ func (tq *TranQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (tq *TranQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (tq *TranQuery) IDsX(ctx context.Context) []uint32 {
 	ids, err := tq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,7 +376,7 @@ func (tq *TranQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   tran.Table,
 			Columns: tran.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint32,
 				Column: tran.FieldID,
 			},
 		},

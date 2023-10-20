@@ -15,9 +15,9 @@ func (s *Server) UpdateFeed(ctx context.Context, in *npool.UpdateFeedRequest) (*
 	req := in.GetInfo()
 	handler, err := currencyfeed1.NewHandler(
 		ctx,
-		currencyfeed1.WithID(req.ID),
-		currencyfeed1.WithFeedFiatName(req.FeedFiatName),
-		currencyfeed1.WithDisabled(req.Disabled),
+		currencyfeed1.WithID(req.ID, true),
+		currencyfeed1.WithFeedFiatName(req.FeedFiatName, false),
+		currencyfeed1.WithDisabled(req.Disabled, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(

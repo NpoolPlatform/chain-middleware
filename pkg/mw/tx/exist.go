@@ -2,7 +2,6 @@ package tx
 
 import (
 	"context"
-	"fmt"
 
 	txcrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/tx"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
@@ -11,10 +10,6 @@ import (
 )
 
 func (h *Handler) ExistTx(ctx context.Context) (bool, error) {
-	if h.ID == nil {
-		return false, fmt.Errorf("invalid id")
-	}
-
 	exist := false
 	var err error
 
@@ -23,7 +18,7 @@ func (h *Handler) ExistTx(ctx context.Context) (bool, error) {
 			Tran.
 			Query().
 			Where(
-				enttran.ID(*h.ID),
+				enttran.EntID(*h.EntID),
 				enttran.DeletedAt(0),
 			).
 			Exist(_ctx)
