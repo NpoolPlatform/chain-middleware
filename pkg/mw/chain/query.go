@@ -8,6 +8,7 @@ import (
 	chaincrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/chain"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent"
+	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/chain"
 
 	entchain "github.com/NpoolPlatform/chain-middleware/pkg/db/ent/chainbase"
@@ -79,6 +80,12 @@ func (h *queryHandler) scan(ctx context.Context) error {
 	return h.stm.Scan(ctx, &h.infos)
 }
 
+func (h *queryHandler) formalize() {
+	for _, info := range h.infos {
+		info.GasType = basetypes.GasType(basetypes.GasType_value[info.GasTypeStr])
+	}
+}
+
 func (h *Handler) GetChain(ctx context.Context) (*npool.Chain, error) {
 	handler := &queryHandler{
 		Handler: h,
@@ -103,6 +110,7 @@ func (h *Handler) GetChain(ctx context.Context) (*npool.Chain, error) {
 		return nil, fmt.Errorf("too many record")
 	}
 
+	handler.formalize()
 	return handler.infos[0], nil
 }
 
@@ -125,5 +133,6 @@ func (h *Handler) GetChains(ctx context.Context) ([]*npool.Chain, uint32, error)
 		return nil, 0, err
 	}
 
+	handler.formalize()
 	return handler.infos, handler.total, nil
 }
