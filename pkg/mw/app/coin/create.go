@@ -10,6 +10,8 @@ import (
 
 	appcoincrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/app/coin"
 	appexratecrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/app/coin/exrate"
+	coincrud "github.com/NpoolPlatform/chain-middleware/pkg/crud/coin"
+	coinmw "github.com/NpoolPlatform/chain-middleware/pkg/mw/coin"
 	redis2 "github.com/NpoolPlatform/go-service-framework/pkg/redis"
 	basetypes "github.com/NpoolPlatform/message/npool/basetypes/v1"
 	npool "github.com/NpoolPlatform/message/npool/chain/mw/v1/app/coin"
@@ -87,6 +89,26 @@ func (h *Handler) CreateCoin(ctx context.Context) (*npool.Coin, error) {
 	}
 	if exist {
 		return nil, fmt.Errorf("appcoin exist")
+	}
+
+	coinHandler, err := coinmw.NewHandler(
+		ctx,
+	)
+	if err != nil {
+		return nil, err
+	}
+	coinHandler.Conds = &coincrud.Conds{
+		EntID: &cruder.Cond{Op: cruder.EQ, Val: *h.CoinTypeID},
+	}
+	coin, err := coinHandler.GetCoinOnly(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if coin == nil {
+		return nil, fmt.Errorf("coin not exist")
+	}
+	if h.Name == nil {
+		h.Name = &coin.Name
 	}
 
 	id := uuid.New()
