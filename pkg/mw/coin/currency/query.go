@@ -128,38 +128,6 @@ func (h *queryHandler) queryJoinCurrency(s *sql.Selector) error {
 			return fmt.Errorf("invalid currency field op")
 		}
 	}
-	if h.Conds != nil && h.Conds.CoinTypeID != nil {
-		id, ok := h.Conds.CoinTypeID.Val.(uuid.UUID)
-		if !ok {
-			return fmt.Errorf("invalid cointypeid")
-		}
-		switch h.Conds.CoinTypeID.Op {
-		case cruder.EQ:
-			s.Where(
-				sql.EQ(t.C(entcurrency.FieldCoinTypeID), id),
-			)
-		default:
-			return fmt.Errorf("invalid currency field op")
-		}
-	}
-	if h.Conds != nil && h.Conds.CoinTypeIDs != nil {
-		ids, ok := h.Conds.CoinTypeIDs.Val.([]uuid.UUID)
-		if !ok {
-			return fmt.Errorf("invalid cointypeids")
-		}
-		var valueInterfaces []interface{}
-		for _, value := range ids {
-			valueInterfaces = append(valueInterfaces, value)
-		}
-		switch h.Conds.CoinTypeIDs.Op {
-		case cruder.IN:
-			s.Where(
-				sql.In(t.C(entcurrency.FieldCoinTypeID), valueInterfaces...),
-			)
-		default:
-			return fmt.Errorf("invalid currency field op")
-		}
-	}
 	if h.Conds != nil && h.Conds.FeedType != nil {
 		feedType, ok := h.Conds.FeedType.Val.(basetypes.CurrencyFeedType)
 		if !ok {
