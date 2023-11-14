@@ -93,7 +93,6 @@ func (h *queryHandler) queryJoinCoinExtra(s *sql.Selector) {
 		)
 }
 
-//nolint:gocyclo
 func (h *queryHandler) queryJoinCurrency(s *sql.Selector) error {
 	t := sql.Table(entcurrency.Table)
 	s.LeftJoin(t).
