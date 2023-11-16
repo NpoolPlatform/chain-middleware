@@ -259,6 +259,7 @@ func (h *createHandler) createNativeCoinSetting(ctx context.Context, tx *ent.Tx)
 	}
 	return nil
 }
+
 func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error {
 	stm, err := settingcrud.SetQueryConds(
 		tx.Setting.Query(),
@@ -284,7 +285,7 @@ func (h *createHandler) createCoinSetting(ctx context.Context, tx *ent.Tx) error
 		tx.Setting.Create(),
 		&settingcrud.Req{
 			CoinTypeID:                  h.EntID,
-			FeeCoinTypeID:               h.EntID,
+			FeeCoinTypeID:               h.FeeCoinTypeID,
 			WithdrawFeeByStableUSD:      h.WithdrawFeeByStableUSD,
 			WithdrawFeeAmount:           h.WithdrawFeeAmount,
 			CollectFeeAmount:            h.CollectFeeAmount,
