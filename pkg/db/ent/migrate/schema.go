@@ -228,6 +228,29 @@ var (
 			},
 		},
 	}
+	// CoinUsedForsColumns holds the columns for the "coin_used_fors" table.
+	CoinUsedForsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint32, Increment: true},
+		{Name: "created_at", Type: field.TypeUint32},
+		{Name: "updated_at", Type: field.TypeUint32},
+		{Name: "deleted_at", Type: field.TypeUint32},
+		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
+		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "used_for", Type: field.TypeString, Nullable: true, Default: "DefaultCoinUsedFor"},
+	}
+	// CoinUsedForsTable holds the schema information for the "coin_used_fors" table.
+	CoinUsedForsTable = &schema.Table{
+		Name:       "coin_used_fors",
+		Columns:    CoinUsedForsColumns,
+		PrimaryKey: []*schema.Column{CoinUsedForsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "coinusedfor_ent_id",
+				Unique:  true,
+				Columns: []*schema.Column{CoinUsedForsColumns[4]},
+			},
+		},
+	}
 	// CurrenciesColumns holds the columns for the "currencies" table.
 	CurrenciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint32, Increment: true},
@@ -545,6 +568,7 @@ var (
 		CoinFiatsTable,
 		CoinFiatCurrenciesTable,
 		CoinFiatCurrencyHistoriesTable,
+		CoinUsedForsTable,
 		CurrenciesTable,
 		CurrencyFeedsTable,
 		CurrencyHistoriesTable,
