@@ -91,6 +91,22 @@ func SetQueryConds(q *ent.CoinUsedForQuery, conds *Conds) (*ent.CoinUsedForQuery
 			return nil, fmt.Errorf("invalid usedfor field")
 		}
 	}
+	if conds.UsedFors != nil {
+		usedFors, ok := conds.UsedFors.Val.([]types.CoinUsedFor)
+		if !ok {
+			return nil, fmt.Errorf("invalid usedfors")
+		}
+		_usedFors := []string{}
+		for _, usedFor := range usedFors {
+			_usedFors = append(_usedFors, usedFor.String())
+		}
+		switch conds.UsedFors.Op {
+		case cruder.IN:
+			q.Where(entcoinusedfor.UsedForIn(_usedFors...))
+		default:
+			return nil, fmt.Errorf("invalid usedfor field")
+		}
+	}
 	q.Where(entcoinusedfor.DeletedAt(0))
 	return q, nil
 }
