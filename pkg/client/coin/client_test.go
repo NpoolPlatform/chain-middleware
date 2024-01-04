@@ -37,7 +37,6 @@ func init() {
 var name = uuid.NewString()
 var unit = uuid.NewString()
 var chainType = uuid.NewString()
-var chainNativeUnit = uuid.NewString()
 var chainAtomicUnit = uuid.NewString()
 var chainUnitExp = uint32(1)
 var gasType = basetypes.GasType_FixedGas

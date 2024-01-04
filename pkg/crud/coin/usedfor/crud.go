@@ -42,6 +42,7 @@ type Conds struct {
 	UsedFors    *cruder.Cond
 }
 
+//nolint:gocyclo
 func SetQueryConds(q *ent.CoinUsedForQuery, conds *Conds) (*ent.CoinUsedForQuery, error) {
 	if conds.EntID != nil {
 		id, ok := conds.EntID.Val.(uuid.UUID)

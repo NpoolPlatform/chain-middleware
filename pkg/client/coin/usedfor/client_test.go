@@ -119,7 +119,6 @@ func TestClient(t *testing.T) {
 	})
 
 	t.Run("createCoinUsedFor", createCoinUsedFor)
-	return
 	t.Run("getCoinUsedFors", getCoinUsedFors)
 	t.Run("deleteCoinUsedFor", deleteCoinUsedFor)
 }
