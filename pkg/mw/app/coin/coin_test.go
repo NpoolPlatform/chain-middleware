@@ -82,6 +82,7 @@ func setupCoin(t *testing.T) func(*testing.T) {
 		coin1.WithName(&ret.CoinName, true),
 		coin1.WithUnit(&coinUnit, true),
 		coin1.WithENV(&coinENV, true),
+		coin1.WithChainNativeUnit(&coinUnit, true),
 	)
 	assert.Nil(t, err)
 

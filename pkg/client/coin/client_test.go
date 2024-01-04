@@ -71,13 +71,13 @@ var req = &npool.CoinReq{
 	Unit:                &ret.Unit,
 	ENV:                 &ret.ENV,
 	ChainType:           &chainType,
-	ChainNativeUnit:     &chainNativeUnit,
 	ChainAtomicUnit:     &chainAtomicUnit,
 	ChainUnitExp:        &chainUnitExp,
 	GasType:             &gasType,
 	ChainID:             &chainID,
 	ChainNickname:       &chainNickname,
 	ChainNativeCoinName: &chainNativeCoinName,
+	ChainNativeUnit:     &ret.Unit,
 }
 
 func createCoin(t *testing.T) {
