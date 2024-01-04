@@ -24,6 +24,8 @@ const (
 	FieldCoinTypeID = "coin_type_id"
 	// FieldUsedFor holds the string denoting the used_for field in the database.
 	FieldUsedFor = "used_for"
+	// FieldPriority holds the string denoting the priority field in the database.
+	FieldPriority = "priority"
 	// Table holds the table name of the coinusedfor in the database.
 	Table = "coin_used_fors"
 )
@@ -37,6 +39,7 @@ var Columns = []string{
 	FieldEntID,
 	FieldCoinTypeID,
 	FieldUsedFor,
+	FieldPriority,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -72,4 +75,6 @@ var (
 	DefaultCoinTypeID func() uuid.UUID
 	// DefaultUsedFor holds the default value on creation for the "used_for" field.
 	DefaultUsedFor string
+	// DefaultPriority holds the default value on creation for the "priority" field.
+	DefaultPriority uint32
 )

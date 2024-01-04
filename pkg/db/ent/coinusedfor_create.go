@@ -106,6 +106,20 @@ func (cufc *CoinUsedForCreate) SetNillableUsedFor(s *string) *CoinUsedForCreate 
 	return cufc
 }
 
+// SetPriority sets the "priority" field.
+func (cufc *CoinUsedForCreate) SetPriority(u uint32) *CoinUsedForCreate {
+	cufc.mutation.SetPriority(u)
+	return cufc
+}
+
+// SetNillablePriority sets the "priority" field if the given value is not nil.
+func (cufc *CoinUsedForCreate) SetNillablePriority(u *uint32) *CoinUsedForCreate {
+	if u != nil {
+		cufc.SetPriority(*u)
+	}
+	return cufc
+}
+
 // SetID sets the "id" field.
 func (cufc *CoinUsedForCreate) SetID(u uint32) *CoinUsedForCreate {
 	cufc.mutation.SetID(u)
@@ -230,6 +244,10 @@ func (cufc *CoinUsedForCreate) defaults() error {
 		v := coinusedfor.DefaultUsedFor
 		cufc.mutation.SetUsedFor(v)
 	}
+	if _, ok := cufc.mutation.Priority(); !ok {
+		v := coinusedfor.DefaultPriority
+		cufc.mutation.SetPriority(v)
+	}
 	return nil
 }
 
@@ -328,6 +346,14 @@ func (cufc *CoinUsedForCreate) createSpec() (*CoinUsedFor, *sqlgraph.CreateSpec)
 			Column: coinusedfor.FieldUsedFor,
 		})
 		_node.UsedFor = value
+	}
+	if value, ok := cufc.mutation.Priority(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: coinusedfor.FieldPriority,
+		})
+		_node.Priority = value
 	}
 	return _node, _spec
 }
@@ -482,6 +508,30 @@ func (u *CoinUsedForUpsert) UpdateUsedFor() *CoinUsedForUpsert {
 // ClearUsedFor clears the value of the "used_for" field.
 func (u *CoinUsedForUpsert) ClearUsedFor() *CoinUsedForUpsert {
 	u.SetNull(coinusedfor.FieldUsedFor)
+	return u
+}
+
+// SetPriority sets the "priority" field.
+func (u *CoinUsedForUpsert) SetPriority(v uint32) *CoinUsedForUpsert {
+	u.Set(coinusedfor.FieldPriority, v)
+	return u
+}
+
+// UpdatePriority sets the "priority" field to the value that was provided on create.
+func (u *CoinUsedForUpsert) UpdatePriority() *CoinUsedForUpsert {
+	u.SetExcluded(coinusedfor.FieldPriority)
+	return u
+}
+
+// AddPriority adds v to the "priority" field.
+func (u *CoinUsedForUpsert) AddPriority(v uint32) *CoinUsedForUpsert {
+	u.Add(coinusedfor.FieldPriority, v)
+	return u
+}
+
+// ClearPriority clears the value of the "priority" field.
+func (u *CoinUsedForUpsert) ClearPriority() *CoinUsedForUpsert {
+	u.SetNull(coinusedfor.FieldPriority)
 	return u
 }
 
@@ -651,6 +701,34 @@ func (u *CoinUsedForUpsertOne) UpdateUsedFor() *CoinUsedForUpsertOne {
 func (u *CoinUsedForUpsertOne) ClearUsedFor() *CoinUsedForUpsertOne {
 	return u.Update(func(s *CoinUsedForUpsert) {
 		s.ClearUsedFor()
+	})
+}
+
+// SetPriority sets the "priority" field.
+func (u *CoinUsedForUpsertOne) SetPriority(v uint32) *CoinUsedForUpsertOne {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.SetPriority(v)
+	})
+}
+
+// AddPriority adds v to the "priority" field.
+func (u *CoinUsedForUpsertOne) AddPriority(v uint32) *CoinUsedForUpsertOne {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.AddPriority(v)
+	})
+}
+
+// UpdatePriority sets the "priority" field to the value that was provided on create.
+func (u *CoinUsedForUpsertOne) UpdatePriority() *CoinUsedForUpsertOne {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.UpdatePriority()
+	})
+}
+
+// ClearPriority clears the value of the "priority" field.
+func (u *CoinUsedForUpsertOne) ClearPriority() *CoinUsedForUpsertOne {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.ClearPriority()
 	})
 }
 
@@ -985,6 +1063,34 @@ func (u *CoinUsedForUpsertBulk) UpdateUsedFor() *CoinUsedForUpsertBulk {
 func (u *CoinUsedForUpsertBulk) ClearUsedFor() *CoinUsedForUpsertBulk {
 	return u.Update(func(s *CoinUsedForUpsert) {
 		s.ClearUsedFor()
+	})
+}
+
+// SetPriority sets the "priority" field.
+func (u *CoinUsedForUpsertBulk) SetPriority(v uint32) *CoinUsedForUpsertBulk {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.SetPriority(v)
+	})
+}
+
+// AddPriority adds v to the "priority" field.
+func (u *CoinUsedForUpsertBulk) AddPriority(v uint32) *CoinUsedForUpsertBulk {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.AddPriority(v)
+	})
+}
+
+// UpdatePriority sets the "priority" field to the value that was provided on create.
+func (u *CoinUsedForUpsertBulk) UpdatePriority() *CoinUsedForUpsertBulk {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.UpdatePriority()
+	})
+}
+
+// ClearPriority clears the value of the "priority" field.
+func (u *CoinUsedForUpsertBulk) ClearPriority() *CoinUsedForUpsertBulk {
+	return u.Update(func(s *CoinUsedForUpsert) {
+		s.ClearPriority()
 	})
 }
 

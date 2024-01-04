@@ -237,6 +237,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			coinusedfor.FieldEntID:      {Type: field.TypeUUID, Column: coinusedfor.FieldEntID},
 			coinusedfor.FieldCoinTypeID: {Type: field.TypeUUID, Column: coinusedfor.FieldCoinTypeID},
 			coinusedfor.FieldUsedFor:    {Type: field.TypeString, Column: coinusedfor.FieldUsedFor},
+			coinusedfor.FieldPriority:   {Type: field.TypeUint32, Column: coinusedfor.FieldPriority},
 		},
 	}
 	graph.Nodes[9] = &sqlgraph.Node{
@@ -1283,6 +1284,11 @@ func (f *CoinUsedForFilter) WhereCoinTypeID(p entql.ValueP) {
 // WhereUsedFor applies the entql string predicate on the used_for field.
 func (f *CoinUsedForFilter) WhereUsedFor(p entql.StringP) {
 	f.Where(p.Field(coinusedfor.FieldUsedFor))
+}
+
+// WherePriority applies the entql uint32 predicate on the priority field.
+func (f *CoinUsedForFilter) WherePriority(p entql.Uint32P) {
+	f.Where(p.Field(coinusedfor.FieldPriority))
 }
 
 // addPredicate implements the predicateAdder interface.

@@ -28,6 +28,8 @@ type CoinUsedFor struct {
 	CoinTypeID uuid.UUID `json:"coin_type_id,omitempty"`
 	// UsedFor holds the value of the "used_for" field.
 	UsedFor string `json:"used_for,omitempty"`
+	// Priority holds the value of the "priority" field.
+	Priority uint32 `json:"priority,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,7 +37,7 @@ func (*CoinUsedFor) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case coinusedfor.FieldID, coinusedfor.FieldCreatedAt, coinusedfor.FieldUpdatedAt, coinusedfor.FieldDeletedAt:
+		case coinusedfor.FieldID, coinusedfor.FieldCreatedAt, coinusedfor.FieldUpdatedAt, coinusedfor.FieldDeletedAt, coinusedfor.FieldPriority:
 			values[i] = new(sql.NullInt64)
 		case coinusedfor.FieldUsedFor:
 			values[i] = new(sql.NullString)
@@ -98,6 +100,12 @@ func (cuf *CoinUsedFor) assignValues(columns []string, values []interface{}) err
 			} else if value.Valid {
 				cuf.UsedFor = value.String
 			}
+		case coinusedfor.FieldPriority:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field priority", values[i])
+			} else if value.Valid {
+				cuf.Priority = uint32(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -143,6 +151,9 @@ func (cuf *CoinUsedFor) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("used_for=")
 	builder.WriteString(cuf.UsedFor)
+	builder.WriteString(", ")
+	builder.WriteString("priority=")
+	builder.WriteString(fmt.Sprintf("%v", cuf.Priority))
 	builder.WriteByte(')')
 	return builder.String()
 }

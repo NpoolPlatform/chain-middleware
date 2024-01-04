@@ -237,6 +237,7 @@ var (
 		{Name: "ent_id", Type: field.TypeUUID, Unique: true},
 		{Name: "coin_type_id", Type: field.TypeUUID, Nullable: true},
 		{Name: "used_for", Type: field.TypeString, Nullable: true, Default: "DefaultCoinUsedFor"},
+		{Name: "priority", Type: field.TypeUint32, Nullable: true, Default: 1},
 	}
 	// CoinUsedForsTable holds the schema information for the "coin_used_fors" table.
 	CoinUsedForsTable = &schema.Table{

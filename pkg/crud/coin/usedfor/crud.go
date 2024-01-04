@@ -14,6 +14,7 @@ import (
 type Req struct {
 	CoinTypeID *uuid.UUID
 	UsedFor    *types.CoinUsedFor
+	Priority   *uint32
 	DeletedAt  *uint32
 }
 
@@ -24,10 +25,16 @@ func CreateSet(c *ent.CoinUsedForCreate, req *Req) *ent.CoinUsedForCreate {
 	if req.UsedFor != nil {
 		c.SetUsedFor(req.UsedFor.String())
 	}
+	if req.Priority != nil {
+		c.SetPriority(*req.Priority)
+	}
 	return c
 }
 
 func UpdateSet(u *ent.CoinUsedForUpdateOne, req *Req) *ent.CoinUsedForUpdateOne {
+	if req.Priority != nil {
+		u.SetPriority(*req.Priority)
+	}
 	if req.DeletedAt != nil {
 		u.SetDeletedAt(*req.DeletedAt)
 	}

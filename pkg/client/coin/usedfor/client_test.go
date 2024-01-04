@@ -42,6 +42,7 @@ var ret = &npool.CoinUsedFor{
 	CoinENV:    "test",
 	UsedFor:    types.CoinUsedFor_CoinUsedForCouponCash,
 	UsedForStr: types.CoinUsedFor_CoinUsedForCouponCash.String(),
+	Priority:   1,
 }
 
 var req = &npool.CoinUsedForReq{

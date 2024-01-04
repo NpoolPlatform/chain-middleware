@@ -46,6 +46,7 @@ func (h *Handler) CreateCoinUsedFor(ctx context.Context) (*npool.CoinUsedFor, er
 			&coinusedforcrud.Req{
 				CoinTypeID: h.CoinTypeID,
 				UsedFor:    h.UsedFor,
+				Priority:   h.Priority,
 			},
 		).Save(_ctx)
 		if err != nil {

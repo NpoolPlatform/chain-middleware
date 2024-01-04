@@ -18,6 +18,7 @@ type Handler struct {
 	EntID      *uuid.UUID
 	CoinTypeID *uuid.UUID
 	UsedFor    *types.CoinUsedFor
+	Priority   *uint32
 	Conds      *coinusedforcrud.Conds
 	Offset     int32
 	Limit      int32
@@ -95,6 +96,13 @@ func WithUsedFor(usedFor *types.CoinUsedFor, must bool) func(context.Context, *H
 			return fmt.Errorf("invalid usedfor")
 		}
 		h.UsedFor = usedFor
+		return nil
+	}
+}
+
+func WithPriority(n *uint32, must bool) func(context.Context, *Handler) error {
+	return func(ctx context.Context, h *Handler) error {
+		h.Priority = n
 		return nil
 	}
 }

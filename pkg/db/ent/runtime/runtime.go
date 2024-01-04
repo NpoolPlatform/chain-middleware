@@ -558,6 +558,10 @@ func init() {
 	coinusedforDescUsedFor := coinusedforFields[1].Descriptor()
 	// coinusedfor.DefaultUsedFor holds the default value on creation for the used_for field.
 	coinusedfor.DefaultUsedFor = coinusedforDescUsedFor.Default.(string)
+	// coinusedforDescPriority is the schema descriptor for priority field.
+	coinusedforDescPriority := coinusedforFields[2].Descriptor()
+	// coinusedfor.DefaultPriority holds the default value on creation for the priority field.
+	coinusedfor.DefaultPriority = coinusedforDescPriority.Default.(uint32)
 	currencyMixin := schema.Currency{}.Mixin()
 	currency.Policy = privacy.NewPolicies(currencyMixin[0], schema.Currency{})
 	currency.Hooks[0] = func(next ent.Mutator) ent.Mutator {

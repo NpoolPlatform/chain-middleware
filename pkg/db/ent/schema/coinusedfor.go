@@ -32,6 +32,10 @@ func (CoinUsedFor) Fields() []ent.Field {
 			String("used_for").
 			Optional().
 			Default(types.CoinUsedFor_DefaultCoinUsedFor.String()),
+		field.
+			Uint32("priority").
+			Optional().
+			Default(1),
 	}
 }
 

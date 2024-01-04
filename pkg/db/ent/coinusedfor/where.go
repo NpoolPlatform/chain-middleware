@@ -121,6 +121,13 @@ func UsedFor(v string) predicate.CoinUsedFor {
 	})
 }
 
+// Priority applies equality check predicate on the "priority" field. It's identical to PriorityEQ.
+func Priority(v uint32) predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPriority), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v uint32) predicate.CoinUsedFor {
 	return predicate.CoinUsedFor(func(s *sql.Selector) {
@@ -565,6 +572,84 @@ func UsedForEqualFold(v string) predicate.CoinUsedFor {
 func UsedForContainsFold(v string) predicate.CoinUsedFor {
 	return predicate.CoinUsedFor(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldUsedFor), v))
+	})
+}
+
+// PriorityEQ applies the EQ predicate on the "priority" field.
+func PriorityEQ(v uint32) predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPriority), v))
+	})
+}
+
+// PriorityNEQ applies the NEQ predicate on the "priority" field.
+func PriorityNEQ(v uint32) predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPriority), v))
+	})
+}
+
+// PriorityIn applies the In predicate on the "priority" field.
+func PriorityIn(vs ...uint32) predicate.CoinUsedFor {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldPriority), v...))
+	})
+}
+
+// PriorityNotIn applies the NotIn predicate on the "priority" field.
+func PriorityNotIn(vs ...uint32) predicate.CoinUsedFor {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldPriority), v...))
+	})
+}
+
+// PriorityGT applies the GT predicate on the "priority" field.
+func PriorityGT(v uint32) predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPriority), v))
+	})
+}
+
+// PriorityGTE applies the GTE predicate on the "priority" field.
+func PriorityGTE(v uint32) predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPriority), v))
+	})
+}
+
+// PriorityLT applies the LT predicate on the "priority" field.
+func PriorityLT(v uint32) predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPriority), v))
+	})
+}
+
+// PriorityLTE applies the LTE predicate on the "priority" field.
+func PriorityLTE(v uint32) predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPriority), v))
+	})
+}
+
+// PriorityIsNil applies the IsNil predicate on the "priority" field.
+func PriorityIsNil() predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldPriority)))
+	})
+}
+
+// PriorityNotNil applies the NotNil predicate on the "priority" field.
+func PriorityNotNil() predicate.CoinUsedFor {
+	return predicate.CoinUsedFor(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldPriority)))
 	})
 }
 

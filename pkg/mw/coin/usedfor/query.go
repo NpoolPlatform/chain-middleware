@@ -30,6 +30,7 @@ func (h *queryHandler) selectCoinUsedFor(stm *ent.CoinUsedForQuery) {
 		entcoinusedfor.FieldEntID,
 		entcoinusedfor.FieldCoinTypeID,
 		entcoinusedfor.FieldUsedFor,
+		entcoinusedfor.FieldPriority,
 		entcoinusedfor.FieldCreatedAt,
 		entcoinusedfor.FieldUpdatedAt,
 	)
@@ -137,6 +138,7 @@ func (h *Handler) GetCoinUsedFors(ctx context.Context) ([]*npool.CoinUsedFor, ui
 		}
 		handler.queryJoin()
 		handler.stm.
+			Order(ent.Asc(entcoinusedfor.FieldPriority)).
 			Offset(int(h.Offset)).
 			Limit(int(h.Limit))
 		return handler.scan(_ctx)

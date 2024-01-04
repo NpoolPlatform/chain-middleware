@@ -8615,6 +8615,8 @@ type CoinUsedForMutation struct {
 	ent_id        *uuid.UUID
 	coin_type_id  *uuid.UUID
 	used_for      *string
+	priority      *uint32
+	addpriority   *int32
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*CoinUsedFor, error)
@@ -9027,6 +9029,76 @@ func (m *CoinUsedForMutation) ResetUsedFor() {
 	delete(m.clearedFields, coinusedfor.FieldUsedFor)
 }
 
+// SetPriority sets the "priority" field.
+func (m *CoinUsedForMutation) SetPriority(u uint32) {
+	m.priority = &u
+	m.addpriority = nil
+}
+
+// Priority returns the value of the "priority" field in the mutation.
+func (m *CoinUsedForMutation) Priority() (r uint32, exists bool) {
+	v := m.priority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPriority returns the old "priority" field's value of the CoinUsedFor entity.
+// If the CoinUsedFor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CoinUsedForMutation) OldPriority(ctx context.Context) (v uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPriority is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPriority requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPriority: %w", err)
+	}
+	return oldValue.Priority, nil
+}
+
+// AddPriority adds u to the "priority" field.
+func (m *CoinUsedForMutation) AddPriority(u int32) {
+	if m.addpriority != nil {
+		*m.addpriority += u
+	} else {
+		m.addpriority = &u
+	}
+}
+
+// AddedPriority returns the value that was added to the "priority" field in this mutation.
+func (m *CoinUsedForMutation) AddedPriority() (r int32, exists bool) {
+	v := m.addpriority
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearPriority clears the value of the "priority" field.
+func (m *CoinUsedForMutation) ClearPriority() {
+	m.priority = nil
+	m.addpriority = nil
+	m.clearedFields[coinusedfor.FieldPriority] = struct{}{}
+}
+
+// PriorityCleared returns if the "priority" field was cleared in this mutation.
+func (m *CoinUsedForMutation) PriorityCleared() bool {
+	_, ok := m.clearedFields[coinusedfor.FieldPriority]
+	return ok
+}
+
+// ResetPriority resets all changes to the "priority" field.
+func (m *CoinUsedForMutation) ResetPriority() {
+	m.priority = nil
+	m.addpriority = nil
+	delete(m.clearedFields, coinusedfor.FieldPriority)
+}
+
 // Where appends a list predicates to the CoinUsedForMutation builder.
 func (m *CoinUsedForMutation) Where(ps ...predicate.CoinUsedFor) {
 	m.predicates = append(m.predicates, ps...)
@@ -9046,7 +9118,7 @@ func (m *CoinUsedForMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CoinUsedForMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, coinusedfor.FieldCreatedAt)
 	}
@@ -9064,6 +9136,9 @@ func (m *CoinUsedForMutation) Fields() []string {
 	}
 	if m.used_for != nil {
 		fields = append(fields, coinusedfor.FieldUsedFor)
+	}
+	if m.priority != nil {
+		fields = append(fields, coinusedfor.FieldPriority)
 	}
 	return fields
 }
@@ -9085,6 +9160,8 @@ func (m *CoinUsedForMutation) Field(name string) (ent.Value, bool) {
 		return m.CoinTypeID()
 	case coinusedfor.FieldUsedFor:
 		return m.UsedFor()
+	case coinusedfor.FieldPriority:
+		return m.Priority()
 	}
 	return nil, false
 }
@@ -9106,6 +9183,8 @@ func (m *CoinUsedForMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldCoinTypeID(ctx)
 	case coinusedfor.FieldUsedFor:
 		return m.OldUsedFor(ctx)
+	case coinusedfor.FieldPriority:
+		return m.OldPriority(ctx)
 	}
 	return nil, fmt.Errorf("unknown CoinUsedFor field %s", name)
 }
@@ -9157,6 +9236,13 @@ func (m *CoinUsedForMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUsedFor(v)
 		return nil
+	case coinusedfor.FieldPriority:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPriority(v)
+		return nil
 	}
 	return fmt.Errorf("unknown CoinUsedFor field %s", name)
 }
@@ -9174,6 +9260,9 @@ func (m *CoinUsedForMutation) AddedFields() []string {
 	if m.adddeleted_at != nil {
 		fields = append(fields, coinusedfor.FieldDeletedAt)
 	}
+	if m.addpriority != nil {
+		fields = append(fields, coinusedfor.FieldPriority)
+	}
 	return fields
 }
 
@@ -9188,6 +9277,8 @@ func (m *CoinUsedForMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedUpdatedAt()
 	case coinusedfor.FieldDeletedAt:
 		return m.AddedDeletedAt()
+	case coinusedfor.FieldPriority:
+		return m.AddedPriority()
 	}
 	return nil, false
 }
@@ -9218,6 +9309,13 @@ func (m *CoinUsedForMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddDeletedAt(v)
 		return nil
+	case coinusedfor.FieldPriority:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddPriority(v)
+		return nil
 	}
 	return fmt.Errorf("unknown CoinUsedFor numeric field %s", name)
 }
@@ -9231,6 +9329,9 @@ func (m *CoinUsedForMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(coinusedfor.FieldUsedFor) {
 		fields = append(fields, coinusedfor.FieldUsedFor)
+	}
+	if m.FieldCleared(coinusedfor.FieldPriority) {
+		fields = append(fields, coinusedfor.FieldPriority)
 	}
 	return fields
 }
@@ -9251,6 +9352,9 @@ func (m *CoinUsedForMutation) ClearField(name string) error {
 		return nil
 	case coinusedfor.FieldUsedFor:
 		m.ClearUsedFor()
+		return nil
+	case coinusedfor.FieldPriority:
+		m.ClearPriority()
 		return nil
 	}
 	return fmt.Errorf("unknown CoinUsedFor nullable field %s", name)
@@ -9277,6 +9381,9 @@ func (m *CoinUsedForMutation) ResetField(name string) error {
 		return nil
 	case coinusedfor.FieldUsedFor:
 		m.ResetUsedFor()
+		return nil
+	case coinusedfor.FieldPriority:
+		m.ResetPriority()
 		return nil
 	}
 	return fmt.Errorf("unknown CoinUsedFor field %s", name)

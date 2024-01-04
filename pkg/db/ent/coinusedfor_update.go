@@ -138,6 +138,33 @@ func (cufu *CoinUsedForUpdate) ClearUsedFor() *CoinUsedForUpdate {
 	return cufu
 }
 
+// SetPriority sets the "priority" field.
+func (cufu *CoinUsedForUpdate) SetPriority(u uint32) *CoinUsedForUpdate {
+	cufu.mutation.ResetPriority()
+	cufu.mutation.SetPriority(u)
+	return cufu
+}
+
+// SetNillablePriority sets the "priority" field if the given value is not nil.
+func (cufu *CoinUsedForUpdate) SetNillablePriority(u *uint32) *CoinUsedForUpdate {
+	if u != nil {
+		cufu.SetPriority(*u)
+	}
+	return cufu
+}
+
+// AddPriority adds u to the "priority" field.
+func (cufu *CoinUsedForUpdate) AddPriority(u int32) *CoinUsedForUpdate {
+	cufu.mutation.AddPriority(u)
+	return cufu
+}
+
+// ClearPriority clears the value of the "priority" field.
+func (cufu *CoinUsedForUpdate) ClearPriority() *CoinUsedForUpdate {
+	cufu.mutation.ClearPriority()
+	return cufu
+}
+
 // Mutation returns the CoinUsedForMutation object of the builder.
 func (cufu *CoinUsedForUpdate) Mutation() *CoinUsedForMutation {
 	return cufu.mutation
@@ -311,6 +338,26 @@ func (cufu *CoinUsedForUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: coinusedfor.FieldUsedFor,
 		})
 	}
+	if value, ok := cufu.mutation.Priority(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: coinusedfor.FieldPriority,
+		})
+	}
+	if value, ok := cufu.mutation.AddedPriority(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: coinusedfor.FieldPriority,
+		})
+	}
+	if cufu.mutation.PriorityCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Column: coinusedfor.FieldPriority,
+		})
+	}
 	_spec.Modifiers = cufu.modifiers
 	if n, err = sqlgraph.UpdateNodes(ctx, cufu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -438,6 +485,33 @@ func (cufuo *CoinUsedForUpdateOne) SetNillableUsedFor(s *string) *CoinUsedForUpd
 // ClearUsedFor clears the value of the "used_for" field.
 func (cufuo *CoinUsedForUpdateOne) ClearUsedFor() *CoinUsedForUpdateOne {
 	cufuo.mutation.ClearUsedFor()
+	return cufuo
+}
+
+// SetPriority sets the "priority" field.
+func (cufuo *CoinUsedForUpdateOne) SetPriority(u uint32) *CoinUsedForUpdateOne {
+	cufuo.mutation.ResetPriority()
+	cufuo.mutation.SetPriority(u)
+	return cufuo
+}
+
+// SetNillablePriority sets the "priority" field if the given value is not nil.
+func (cufuo *CoinUsedForUpdateOne) SetNillablePriority(u *uint32) *CoinUsedForUpdateOne {
+	if u != nil {
+		cufuo.SetPriority(*u)
+	}
+	return cufuo
+}
+
+// AddPriority adds u to the "priority" field.
+func (cufuo *CoinUsedForUpdateOne) AddPriority(u int32) *CoinUsedForUpdateOne {
+	cufuo.mutation.AddPriority(u)
+	return cufuo
+}
+
+// ClearPriority clears the value of the "priority" field.
+func (cufuo *CoinUsedForUpdateOne) ClearPriority() *CoinUsedForUpdateOne {
+	cufuo.mutation.ClearPriority()
 	return cufuo
 }
 
@@ -642,6 +716,26 @@ func (cufuo *CoinUsedForUpdateOne) sqlSave(ctx context.Context) (_node *CoinUsed
 		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
 			Column: coinusedfor.FieldUsedFor,
+		})
+	}
+	if value, ok := cufuo.mutation.Priority(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: coinusedfor.FieldPriority,
+		})
+	}
+	if value, ok := cufuo.mutation.AddedPriority(); ok {
+		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Value:  value,
+			Column: coinusedfor.FieldPriority,
+		})
+	}
+	if cufuo.mutation.PriorityCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeUint32,
+			Column: coinusedfor.FieldPriority,
 		})
 	}
 	_spec.Modifiers = cufuo.modifiers
