@@ -78,7 +78,6 @@ var ret = &npool.Coin{
 }
 
 var chainType = uuid.NewString()
-var chainNativeUnit = uuid.NewString()
 var chainAtomicUnit = uuid.NewString()
 var chainUnitExp = uint32(1)
 var gasType = basetypes.GasType_FixedGas
@@ -114,7 +113,7 @@ func setupAppCoin(t *testing.T) func(*testing.T) {
 		coin1.WithLogo(&ret.Logo, true),
 		coin1.WithENV(&ret.ENV, true),
 		coin1.WithChainType(&chainType, true),
-		coin1.WithChainNativeUnit(&chainNativeUnit, true),
+		coin1.WithChainNativeUnit(&ret.Unit, true),
 		coin1.WithChainAtomicUnit(&chainAtomicUnit, true),
 		coin1.WithChainUnitExp(&chainUnitExp, true),
 		coin1.WithGasType(&gasType, true),
