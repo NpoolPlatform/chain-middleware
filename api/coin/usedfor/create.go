@@ -13,6 +13,13 @@ import (
 
 func (s *Server) CreateCoinUsedFor(ctx context.Context, in *npool.CreateCoinUsedForRequest) (*npool.CreateCoinUsedForResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"CreateCoinUsedFor",
+			"In", in,
+		)
+		return &npool.CreateCoinUsedForResponse{}, status.Error(codes.InvalidArgument, "invalid info")
+	}
 	handler, err := coinusedfor1.NewHandler(
 		ctx,
 		coinusedfor1.WithCoinTypeID(req.CoinTypeID, true),
