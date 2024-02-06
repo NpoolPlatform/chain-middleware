@@ -18,6 +18,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrencyhistory"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinusedfor"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
@@ -54,6 +55,8 @@ type Client struct {
 	CoinFiatCurrency *CoinFiatCurrencyClient
 	// CoinFiatCurrencyHistory is the client for interacting with the CoinFiatCurrencyHistory builders.
 	CoinFiatCurrencyHistory *CoinFiatCurrencyHistoryClient
+	// CoinUsedFor is the client for interacting with the CoinUsedFor builders.
+	CoinUsedFor *CoinUsedForClient
 	// Currency is the client for interacting with the Currency builders.
 	Currency *CurrencyClient
 	// CurrencyFeed is the client for interacting with the CurrencyFeed builders.
@@ -95,6 +98,7 @@ func (c *Client) init() {
 	c.CoinFiat = NewCoinFiatClient(c.config)
 	c.CoinFiatCurrency = NewCoinFiatCurrencyClient(c.config)
 	c.CoinFiatCurrencyHistory = NewCoinFiatCurrencyHistoryClient(c.config)
+	c.CoinUsedFor = NewCoinUsedForClient(c.config)
 	c.Currency = NewCurrencyClient(c.config)
 	c.CurrencyFeed = NewCurrencyFeedClient(c.config)
 	c.CurrencyHistory = NewCurrencyHistoryClient(c.config)
@@ -146,6 +150,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CoinFiat:                NewCoinFiatClient(cfg),
 		CoinFiatCurrency:        NewCoinFiatCurrencyClient(cfg),
 		CoinFiatCurrencyHistory: NewCoinFiatCurrencyHistoryClient(cfg),
+		CoinUsedFor:             NewCoinUsedForClient(cfg),
 		Currency:                NewCurrencyClient(cfg),
 		CurrencyFeed:            NewCurrencyFeedClient(cfg),
 		CurrencyHistory:         NewCurrencyHistoryClient(cfg),
@@ -183,6 +188,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CoinFiat:                NewCoinFiatClient(cfg),
 		CoinFiatCurrency:        NewCoinFiatCurrencyClient(cfg),
 		CoinFiatCurrencyHistory: NewCoinFiatCurrencyHistoryClient(cfg),
+		CoinUsedFor:             NewCoinUsedForClient(cfg),
 		Currency:                NewCurrencyClient(cfg),
 		CurrencyFeed:            NewCurrencyFeedClient(cfg),
 		CurrencyHistory:         NewCurrencyHistoryClient(cfg),
@@ -230,6 +236,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.CoinFiat.Use(hooks...)
 	c.CoinFiatCurrency.Use(hooks...)
 	c.CoinFiatCurrencyHistory.Use(hooks...)
+	c.CoinUsedFor.Use(hooks...)
 	c.Currency.Use(hooks...)
 	c.CurrencyFeed.Use(hooks...)
 	c.CurrencyHistory.Use(hooks...)
@@ -968,6 +975,97 @@ func (c *CoinFiatCurrencyHistoryClient) GetX(ctx context.Context, id uint32) *Co
 func (c *CoinFiatCurrencyHistoryClient) Hooks() []Hook {
 	hooks := c.hooks.CoinFiatCurrencyHistory
 	return append(hooks[:len(hooks):len(hooks)], coinfiatcurrencyhistory.Hooks[:]...)
+}
+
+// CoinUsedForClient is a client for the CoinUsedFor schema.
+type CoinUsedForClient struct {
+	config
+}
+
+// NewCoinUsedForClient returns a client for the CoinUsedFor from the given config.
+func NewCoinUsedForClient(c config) *CoinUsedForClient {
+	return &CoinUsedForClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `coinusedfor.Hooks(f(g(h())))`.
+func (c *CoinUsedForClient) Use(hooks ...Hook) {
+	c.hooks.CoinUsedFor = append(c.hooks.CoinUsedFor, hooks...)
+}
+
+// Create returns a builder for creating a CoinUsedFor entity.
+func (c *CoinUsedForClient) Create() *CoinUsedForCreate {
+	mutation := newCoinUsedForMutation(c.config, OpCreate)
+	return &CoinUsedForCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CoinUsedFor entities.
+func (c *CoinUsedForClient) CreateBulk(builders ...*CoinUsedForCreate) *CoinUsedForCreateBulk {
+	return &CoinUsedForCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CoinUsedFor.
+func (c *CoinUsedForClient) Update() *CoinUsedForUpdate {
+	mutation := newCoinUsedForMutation(c.config, OpUpdate)
+	return &CoinUsedForUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CoinUsedForClient) UpdateOne(cuf *CoinUsedFor) *CoinUsedForUpdateOne {
+	mutation := newCoinUsedForMutation(c.config, OpUpdateOne, withCoinUsedFor(cuf))
+	return &CoinUsedForUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CoinUsedForClient) UpdateOneID(id uint32) *CoinUsedForUpdateOne {
+	mutation := newCoinUsedForMutation(c.config, OpUpdateOne, withCoinUsedForID(id))
+	return &CoinUsedForUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CoinUsedFor.
+func (c *CoinUsedForClient) Delete() *CoinUsedForDelete {
+	mutation := newCoinUsedForMutation(c.config, OpDelete)
+	return &CoinUsedForDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CoinUsedForClient) DeleteOne(cuf *CoinUsedFor) *CoinUsedForDeleteOne {
+	return c.DeleteOneID(cuf.ID)
+}
+
+// DeleteOne returns a builder for deleting the given entity by its id.
+func (c *CoinUsedForClient) DeleteOneID(id uint32) *CoinUsedForDeleteOne {
+	builder := c.Delete().Where(coinusedfor.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CoinUsedForDeleteOne{builder}
+}
+
+// Query returns a query builder for CoinUsedFor.
+func (c *CoinUsedForClient) Query() *CoinUsedForQuery {
+	return &CoinUsedForQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a CoinUsedFor entity by its id.
+func (c *CoinUsedForClient) Get(ctx context.Context, id uint32) (*CoinUsedFor, error) {
+	return c.Query().Where(coinusedfor.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CoinUsedForClient) GetX(ctx context.Context, id uint32) *CoinUsedFor {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CoinUsedForClient) Hooks() []Hook {
+	hooks := c.hooks.CoinUsedFor
+	return append(hooks[:len(hooks):len(hooks)], coinusedfor.Hooks[:]...)
 }
 
 // CurrencyClient is a client for the Currency schema.

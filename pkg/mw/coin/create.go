@@ -73,6 +73,11 @@ func (h *createHandler) createChainBase(ctx context.Context, tx *ent.Tx) error {
 
 func (h *createHandler) createNativeCoinBase(ctx context.Context, tx *ent.Tx) error {
 	if h.ChainNativeCoinName == nil {
+		h.FeeCoinTypeID = h.EntID
+		return nil
+	}
+	if *h.ChainNativeUnit == *h.Unit {
+		h.FeeCoinTypeID = h.EntID
 		return nil
 	}
 

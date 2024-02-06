@@ -37,7 +37,6 @@ func init() {
 var name = uuid.NewString()
 var unit = uuid.NewString()
 var chainType = uuid.NewString()
-var chainNativeUnit = uuid.NewString()
 var chainAtomicUnit = uuid.NewString()
 var chainUnitExp = uint32(1)
 var gasType = basetypes.GasType_FixedGas
@@ -71,13 +70,13 @@ var req = &npool.CoinReq{
 	Unit:                &ret.Unit,
 	ENV:                 &ret.ENV,
 	ChainType:           &chainType,
-	ChainNativeUnit:     &chainNativeUnit,
 	ChainAtomicUnit:     &chainAtomicUnit,
 	ChainUnitExp:        &chainUnitExp,
 	GasType:             &gasType,
 	ChainID:             &chainID,
 	ChainNickname:       &chainNickname,
 	ChainNativeCoinName: &chainNativeCoinName,
+	ChainNativeUnit:     &ret.Unit,
 }
 
 func createCoin(t *testing.T) {

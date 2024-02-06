@@ -13,6 +13,7 @@ import (
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiat"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinfiatcurrencyhistory"
+	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/coinusedfor"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currency"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyfeed"
 	"github.com/NpoolPlatform/chain-middleware/pkg/db/ent/currencyhistory"
@@ -515,6 +516,52 @@ func init() {
 	coinfiatcurrencyhistoryDescMarketValueHigh := coinfiatcurrencyhistoryFields[4].Descriptor()
 	// coinfiatcurrencyhistory.DefaultMarketValueHigh holds the default value on creation for the market_value_high field.
 	coinfiatcurrencyhistory.DefaultMarketValueHigh = coinfiatcurrencyhistoryDescMarketValueHigh.Default.(decimal.Decimal)
+	coinusedforMixin := schema.CoinUsedFor{}.Mixin()
+	coinusedfor.Policy = privacy.NewPolicies(coinusedforMixin[0], schema.CoinUsedFor{})
+	coinusedfor.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := coinusedfor.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	coinusedforMixinFields0 := coinusedforMixin[0].Fields()
+	_ = coinusedforMixinFields0
+	coinusedforMixinFields1 := coinusedforMixin[1].Fields()
+	_ = coinusedforMixinFields1
+	coinusedforFields := schema.CoinUsedFor{}.Fields()
+	_ = coinusedforFields
+	// coinusedforDescCreatedAt is the schema descriptor for created_at field.
+	coinusedforDescCreatedAt := coinusedforMixinFields0[0].Descriptor()
+	// coinusedfor.DefaultCreatedAt holds the default value on creation for the created_at field.
+	coinusedfor.DefaultCreatedAt = coinusedforDescCreatedAt.Default.(func() uint32)
+	// coinusedforDescUpdatedAt is the schema descriptor for updated_at field.
+	coinusedforDescUpdatedAt := coinusedforMixinFields0[1].Descriptor()
+	// coinusedfor.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	coinusedfor.DefaultUpdatedAt = coinusedforDescUpdatedAt.Default.(func() uint32)
+	// coinusedfor.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	coinusedfor.UpdateDefaultUpdatedAt = coinusedforDescUpdatedAt.UpdateDefault.(func() uint32)
+	// coinusedforDescDeletedAt is the schema descriptor for deleted_at field.
+	coinusedforDescDeletedAt := coinusedforMixinFields0[2].Descriptor()
+	// coinusedfor.DefaultDeletedAt holds the default value on creation for the deleted_at field.
+	coinusedfor.DefaultDeletedAt = coinusedforDescDeletedAt.Default.(func() uint32)
+	// coinusedforDescEntID is the schema descriptor for ent_id field.
+	coinusedforDescEntID := coinusedforMixinFields1[1].Descriptor()
+	// coinusedfor.DefaultEntID holds the default value on creation for the ent_id field.
+	coinusedfor.DefaultEntID = coinusedforDescEntID.Default.(func() uuid.UUID)
+	// coinusedforDescCoinTypeID is the schema descriptor for coin_type_id field.
+	coinusedforDescCoinTypeID := coinusedforFields[0].Descriptor()
+	// coinusedfor.DefaultCoinTypeID holds the default value on creation for the coin_type_id field.
+	coinusedfor.DefaultCoinTypeID = coinusedforDescCoinTypeID.Default.(func() uuid.UUID)
+	// coinusedforDescUsedFor is the schema descriptor for used_for field.
+	coinusedforDescUsedFor := coinusedforFields[1].Descriptor()
+	// coinusedfor.DefaultUsedFor holds the default value on creation for the used_for field.
+	coinusedfor.DefaultUsedFor = coinusedforDescUsedFor.Default.(string)
+	// coinusedforDescPriority is the schema descriptor for priority field.
+	coinusedforDescPriority := coinusedforFields[2].Descriptor()
+	// coinusedfor.DefaultPriority holds the default value on creation for the priority field.
+	coinusedfor.DefaultPriority = coinusedforDescPriority.Default.(uint32)
 	currencyMixin := schema.Currency{}.Mixin()
 	currency.Policy = privacy.NewPolicies(currencyMixin[0], schema.Currency{})
 	currency.Hooks[0] = func(next ent.Mutator) ent.Mutator {

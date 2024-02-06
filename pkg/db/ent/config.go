@@ -36,6 +36,7 @@ type hooks struct {
 	CoinFiat                []ent.Hook
 	CoinFiatCurrency        []ent.Hook
 	CoinFiatCurrencyHistory []ent.Hook
+	CoinUsedFor             []ent.Hook
 	Currency                []ent.Hook
 	CurrencyFeed            []ent.Hook
 	CurrencyHistory         []ent.Hook

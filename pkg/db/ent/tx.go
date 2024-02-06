@@ -30,6 +30,8 @@ type Tx struct {
 	CoinFiatCurrency *CoinFiatCurrencyClient
 	// CoinFiatCurrencyHistory is the client for interacting with the CoinFiatCurrencyHistory builders.
 	CoinFiatCurrencyHistory *CoinFiatCurrencyHistoryClient
+	// CoinUsedFor is the client for interacting with the CoinUsedFor builders.
+	CoinUsedFor *CoinUsedForClient
 	// Currency is the client for interacting with the Currency builders.
 	Currency *CurrencyClient
 	// CurrencyFeed is the client for interacting with the CurrencyFeed builders.
@@ -193,6 +195,7 @@ func (tx *Tx) init() {
 	tx.CoinFiat = NewCoinFiatClient(tx.config)
 	tx.CoinFiatCurrency = NewCoinFiatCurrencyClient(tx.config)
 	tx.CoinFiatCurrencyHistory = NewCoinFiatCurrencyHistoryClient(tx.config)
+	tx.CoinUsedFor = NewCoinUsedForClient(tx.config)
 	tx.Currency = NewCurrencyClient(tx.config)
 	tx.CurrencyFeed = NewCurrencyFeedClient(tx.config)
 	tx.CurrencyHistory = NewCurrencyHistoryClient(tx.config)
