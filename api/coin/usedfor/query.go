@@ -11,6 +11,35 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func (s *Server) GetCoinUsedFor(ctx context.Context, in *npool.GetCoinUsedForRequest) (*npool.GetCoinUsedForResponse, error) {
+	handler, err := coinusedfor1.NewHandler(
+		ctx,
+		coinusedfor1.WithEntID(&in.EntID, true),
+	)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetCoinUsedFor",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetCoinUsedForResponse{}, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	info, err := handler.GetCoinUsedFor(ctx)
+	if err != nil {
+		logger.Sugar().Errorw(
+			"GetCoinUsedFor",
+			"In", in,
+			"Error", err,
+		)
+		return &npool.GetCoinUsedForResponse{}, status.Error(codes.Internal, err.Error())
+	}
+
+	return &npool.GetCoinUsedForResponse{
+		Info: info,
+	}, nil
+}
+
 func (s *Server) GetCoinUsedFors(ctx context.Context, in *npool.GetCoinUsedForsRequest) (*npool.GetCoinUsedForsResponse, error) {
 	handler, err := coinusedfor1.NewHandler(
 		ctx,

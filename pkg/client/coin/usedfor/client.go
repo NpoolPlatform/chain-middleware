@@ -48,6 +48,22 @@ func CreateCoinUsedFor(ctx context.Context, in *npool.CoinUsedForReq) (*npool.Co
 	return info.(*npool.CoinUsedFor), nil
 }
 
+func GetCoinUsedFor(ctx context.Context, id string) (*npool.CoinUsedFor, error) {
+	info, err := withCRUD(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.GetCoinUsedFor(ctx, &npool.GetCoinUsedForRequest{
+			EntID: id,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Info, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return info.(*npool.CoinUsedFor), nil
+}
+
 func GetCoinUsedFors(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.CoinUsedFor, uint32, error) {
 	var total uint32
 
