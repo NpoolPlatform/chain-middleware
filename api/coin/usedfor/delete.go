@@ -13,9 +13,17 @@ import (
 
 func (s *Server) DeleteCoinUsedFor(ctx context.Context, in *npool.DeleteCoinUsedForRequest) (*npool.DeleteCoinUsedForResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"DeleteCoinUsedFor",
+			"In", in,
+		)
+		return &npool.DeleteCoinUsedForResponse{}, status.Error(codes.InvalidArgument, "invalid info")
+	}
 	handler, err := coinusedfor1.NewHandler(
 		ctx,
-		coinusedfor1.WithID(req.ID, true),
+		coinusedfor1.WithID(req.ID, false),
+		coinusedfor1.WithEntID(req.EntID, false),
 	)
 	if err != nil {
 		logger.Sugar().Errorw(
