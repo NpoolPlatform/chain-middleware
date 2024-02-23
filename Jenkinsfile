@@ -252,13 +252,13 @@ pipeline {
             branch=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           fi
           set +e
-          docker images | grep appuser-middleware | grep $branch
+          docker images | grep chain-middleware | grep $branch
           rc=$?
           set -e
           if [ 0 -eq $rc ]; then
             DOCKER_REGISTRY=$DOCKER_REGISTRY make release-docker-images
           fi
-          images=`docker images | grep entropypool | grep appuser-middleware | grep none | awk '{ print $3 }'`
+          images=`docker images | grep entropypool | grep chain-middleware | grep none | awk '{ print $3 }'`
           for image in $images; do
             docker rmi $image -f
           done
@@ -327,7 +327,7 @@ pipeline {
           if [ "x$BRANCH_NAME" != "xmaster" ]; then
             branch=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           fi
-          sed -i "s/appuser-middleware:latest/appuser-middleware:$branch/g" cmd/chain-middleware/k8s/00-configmap.yaml
+          sed -i "s/chain-middleware:latest/chain-middleware:$branch/g" cmd/chain-middleware/k8s/00-configmap.yaml
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/chain-middleware/k8s/00-configmap.yaml
           sed -i "s#currency_proxy: \\\"\\\"#currency_proxy: \\\"$CURRENCY_REQUEST_PROXY\\\"#g" cmd/chain-middleware/k8s/00-configmap.yaml
           if [ "x$REPLICAS_COUNT" == "x" ];then
