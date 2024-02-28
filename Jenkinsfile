@@ -327,13 +327,13 @@ pipeline {
           if [ "x$BRANCH_NAME" != "xmaster" ]; then
             branch=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           fi
-          sed -i "s/chain-middleware:latest/chain-middleware:$branch/g" cmd/chain-middleware/k8s/00-configmap.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/chain-middleware/k8s/00-configmap.yaml
+          sed -i "s/chain-middleware:latest/chain-middleware:$branch/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
           sed -i "s#currency_proxy: \\\"\\\"#currency_proxy: \\\"$CURRENCY_REQUEST_PROXY\\\"#g" cmd/chain-middleware/k8s/00-configmap.yaml
           if [ "x$REPLICAS_COUNT" == "x" ];then
             REPLICAS_COUNT=2
           fi
-          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/chain-middleware/k8s/00-configmap.yaml
+          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
           make deploy-to-k8s-cluster
         '''.stripIndent())
       }
