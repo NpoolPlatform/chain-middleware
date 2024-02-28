@@ -363,7 +363,8 @@ pipeline {
           if [ "x$REPLICAS_COUNT" == "x" ];then
             REPLICAS_COUNT=2
           fi
-          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/chain-middleware/k8s/00-configmap.yaml
+          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
+          sed -i "s/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
           make deploy-to-k8s-cluster
         '''.stripIndent())
       }
@@ -391,7 +392,8 @@ pipeline {
           if [ "x$REPLICAS_COUNT" == "x" ];then
             REPLICAS_COUNT=2
           fi
-          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/chain-middleware/k8s/00-configmap.yaml
+          sed -i "s/replicas: 2/replicas: $REPLICAS_COUNT/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
+          sed -i "s/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g" cmd/chain-middleware/k8s/02-chain-middleware.yaml
           make deploy-to-k8s-cluster
         '''.stripIndent())
       }
