@@ -15,6 +15,7 @@ func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateChainRequest) (
 	req := in.GetInfo()
 	handler, err := chain1.NewHandler(
 		ctx,
+		chain1.WithEntID(req.EntID, false),
 		chain1.WithChainType(req.ChainType, true),
 		chain1.WithNativeUnit(req.NativeUnit, true),
 		chain1.WithAtomicUnit(req.AtomicUnit, true),
