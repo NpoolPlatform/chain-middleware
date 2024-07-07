@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateChainRequest) (*npool.CreateChainResponse, error) {
+func (s *Server) CreateChain(ctx context.Context, in *npool.CreateChainRequest) (*npool.CreateChainResponse, error) {
 	req := in.GetInfo()
 	handler, err := chain1.NewHandler(
 		ctx,
