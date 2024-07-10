@@ -2,6 +2,7 @@ package tx
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	grpc2 "github.com/NpoolPlatform/go-service-framework/pkg/grpc"
@@ -78,6 +79,30 @@ func GetTx(ctx context.Context, id string) (*npool.Tx, error) {
 		return nil, err
 	}
 	return info.(*npool.Tx), nil
+}
+
+func GetTxOnly(ctx context.Context, conds *npool.Conds) (*npool.Tx, error) {
+	infos, err := do(ctx, func(_ctx context.Context, cli npool.MiddlewareClient) (cruder.Any, error) {
+		resp, err := cli.GetTxs(ctx, &npool.GetTxsRequest{
+			Conds:  conds,
+			Offset: 0,
+			Limit:  2,
+		})
+		if err != nil {
+			return nil, err
+		}
+		return resp.Infos, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(infos.([]*npool.Tx)) == 0 {
+		return nil, nil
+	}
+	if len(infos.([]*npool.Tx)) > 1 {
+		return nil, fmt.Errorf("too many records")
+	}
+	return infos.([]*npool.Tx)[0], nil
 }
 
 func GetTxs(ctx context.Context, conds *npool.Conds, offset, limit int32) ([]*npool.Tx, uint32, error) {
