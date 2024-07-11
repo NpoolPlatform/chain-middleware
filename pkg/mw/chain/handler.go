@@ -144,6 +144,12 @@ func WithAtomicUnit(unit *string, must bool) func(context.Context, *Handler) err
 
 func WithUnitExp(exp *uint32, must bool) func(context.Context, *Handler) error {
 	return func(ctx context.Context, h *Handler) error {
+		if exp == nil {
+			if must {
+				return fmt.Errorf("invalid unitexp")
+			}
+			return nil
+		}
 		h.UnitExp = exp
 		return nil
 	}
