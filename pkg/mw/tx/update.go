@@ -56,9 +56,14 @@ func (h *updateHandler) validateState(info *ent.Tran) error {
 		default:
 			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
 		}
-	case basetypes.TxState_TxStateSuccessful.String():
-		fallthrough //nolint
 	case basetypes.TxState_TxStateFail.String():
+		switch *h.State {
+		case basetypes.TxState_TxStateTransferring:
+		default:
+			return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
+		}
+		fallthrough //nolint
+	case basetypes.TxState_TxStateSuccessful.String():
 		fallthrough //nolint
 	default:
 		return fmt.Errorf("state is invalid: %v -> %v", info.State, h.State)
