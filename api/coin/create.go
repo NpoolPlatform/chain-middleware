@@ -13,6 +13,13 @@ import (
 
 func (s *Server) CreateCoin(ctx context.Context, in *npool.CreateCoinRequest) (*npool.CreateCoinResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"CreateCoin",
+			"In", in,
+		)
+		return &npool.CreateCoinResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := coin1.NewHandler(
 		ctx,
 		coin1.WithName(req.Name, true),

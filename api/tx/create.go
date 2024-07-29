@@ -14,6 +14,13 @@ import (
 
 func (s *Server) CreateTx(ctx context.Context, in *npool.CreateTxRequest) (*npool.CreateTxResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"CreateTx",
+			"In", in,
+		)
+		return &npool.CreateTxResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := tx1.NewHandler(
 		ctx,
 		tx1.WithID(req.ID, false),

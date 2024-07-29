@@ -13,6 +13,13 @@ import (
 
 func (s *Server) CreateFeed(ctx context.Context, in *npool.CreateFeedRequest) (*npool.CreateFeedResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"CreateFeed",
+			"In", in,
+		)
+		return &npool.CreateFeedResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := currencyfeed1.NewHandler(
 		ctx,
 		currencyfeed1.WithID(req.ID, false),

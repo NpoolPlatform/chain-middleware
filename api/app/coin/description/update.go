@@ -13,6 +13,13 @@ import (
 
 func (s *Server) UpdateCoinDescription(ctx context.Context, in *npool.UpdateCoinDescriptionRequest) (*npool.UpdateCoinDescriptionResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"UpdateCoinDescription",
+			"In", in,
+		)
+		return &npool.UpdateCoinDescriptionResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := description1.NewHandler(
 		ctx,
 		description1.WithID(req.ID, true),

@@ -13,6 +13,13 @@ import (
 
 func (s *Server) CreateCoinFiat(ctx context.Context, in *npool.CreateCoinFiatRequest) (*npool.CreateCoinFiatResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"CreateCoinFiat",
+			"In", in,
+		)
+		return &npool.CreateCoinFiatResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := coinfiat1.NewHandler(
 		ctx,
 		coinfiat1.WithCoinTypeID(req.CoinTypeID, true),
