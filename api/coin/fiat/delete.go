@@ -13,6 +13,13 @@ import (
 
 func (s *Server) DeleteCoinFiat(ctx context.Context, in *npool.DeleteCoinFiatRequest) (*npool.DeleteCoinFiatResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"DeleteCoinFiat",
+			"In", in,
+		)
+		return &npool.DeleteCoinFiatResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := coinfiat1.NewHandler(
 		ctx,
 		coinfiat1.WithID(req.ID, true),

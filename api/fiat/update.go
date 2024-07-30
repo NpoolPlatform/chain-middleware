@@ -13,6 +13,13 @@ import (
 
 func (s *Server) UpdateFiat(ctx context.Context, in *npool.UpdateFiatRequest) (*npool.UpdateFiatResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"UpdateFiat",
+			"In", in,
+		)
+		return &npool.UpdateFiatResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := fiat1.NewHandler(
 		ctx,
 		fiat1.WithID(req.ID, true),

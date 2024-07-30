@@ -13,6 +13,13 @@ import (
 
 func (s *Server) UpdateChain(ctx context.Context, in *npool.UpdateChainRequest) (*npool.UpdateChainResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"UpdateChain",
+			"In", in,
+		)
+		return &npool.UpdateChainResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := chain1.NewHandler(
 		ctx,
 		chain1.WithID(req.ID, false),

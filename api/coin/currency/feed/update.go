@@ -13,6 +13,13 @@ import (
 
 func (s *Server) UpdateFeed(ctx context.Context, in *npool.UpdateFeedRequest) (*npool.UpdateFeedResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"UpdateFeed",
+			"In", in,
+		)
+		return &npool.UpdateFeedResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := currencyfeed1.NewHandler(
 		ctx,
 		currencyfeed1.WithID(req.ID, true),

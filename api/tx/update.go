@@ -14,6 +14,13 @@ import (
 
 func (s *Server) UpdateTx(ctx context.Context, in *npool.UpdateTxRequest) (*npool.UpdateTxResponse, error) {
 	req := in.GetInfo()
+	if req == nil {
+		logger.Sugar().Errorw(
+			"UpdateTx",
+			"In", in,
+		)
+		return &npool.UpdateTxResponse{}, status.Error(codes.Aborted, "invalid info")
+	}
 	handler, err := tx1.NewHandler(
 		ctx,
 		tx1.WithID(req.ID, true),
