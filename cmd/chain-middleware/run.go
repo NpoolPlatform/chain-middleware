@@ -8,7 +8,6 @@ import (
 
 	apicli "github.com/NpoolPlatform/basal-middleware/pkg/client/api"
 	"github.com/NpoolPlatform/chain-middleware/pkg/currency"
-	"github.com/NpoolPlatform/chain-middleware/pkg/migrator"
 	"github.com/NpoolPlatform/go-service-framework/pkg/action"
 	"github.com/NpoolPlatform/go-service-framework/pkg/logger"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -37,9 +36,6 @@ var runCmd = &cli.Command{
 }
 
 func run(ctx context.Context) error {
-	if err := migrator.Migrate(ctx); err != nil {
-		return err
-	}
 	if err := db.Init(); err != nil {
 		return err
 	}
